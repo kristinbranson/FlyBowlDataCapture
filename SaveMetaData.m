@@ -22,7 +22,7 @@ fprintf(fid,'datetime="%s" ',datestr(handles.StartRecording_Time_datenum,'yyyy-m
 fprintf(fid,'experimenter="%s">\n',handles.Assay_Experimenter);
 fprintf(fid,'\t<flies line="%s" ',handles.Fly_LineName);
 fprintf(fid,'effector="%s" ',handles.params.MetaData_Effector);
-% TODO: is DOB the same as cross-date?
+% TODO: need to input Cross Date
 fprintf(fid,'cross-date="%s" ',handles.PreAssayHandling_DOBEnd);
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'count="0">\n');
