@@ -1,0 +1,5 @@
+X Save configuration. 
+X Rename file on Done. 
+X Handle abort. 
+Cross date.
+Output metadata.

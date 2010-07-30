@@ -1,0 +1,56 @@
+# List of possible Experimenter values
+Assay_Experimenters,hirokawaj,robiea,bransonk
+# List of possible Activity Peak values
+Rearing_ActivityPeaks,10:00,16:00
+# List of possible Incubator ID values
+Rearing_IncubatorIDs,1,2
+# Range of DOB Starts to show -- minimum and maximum number of days 
+# before today
+PreAssayHandling_DOBStart_Range,1,7
+# Range of DOB Ends to show -- minimum and maximum number of days 
+# before today
+PreAssayHandling_DOBEnd_Range,1,7
+# Range of Sorting Dates to show -- minimum and maximum number of days 
+# before today
+PreAssayHandling_SortingDate_Range,0,3
+# List of possible Sorting Handler values
+PreAssayHandling_SortingHandlers,hirokawaj,robiea,bransonk
+# Range of Starvation Dates to show -- minimum and maximum number of days 
+# before today
+PreAssayHandling_StarvationDate_Range,0,2
+# List of possible Starvation Handler values
+PreAssayHandling_StarvationHandlers,hirokawaj,robiea,bransonk
+# List of possible Rig values
+Assay_Rigs,1,2
+# List of possible Plate values
+Assay_Plates,1,2
+# List of possible Bowl values
+Assay_Bowls,1,2,3,4
+# Camera adaptor
+Imaq_Adaptor,winvideo
+# Device name
+Imaq_DeviceName,Integrated Webcam
+# Video format
+Imaq_VideoFormat,RGB24_640x480
+# Video ROI Position
+Imaq_ROIPosition,0,0,640,480
+# TODO: Camera Properties like shutter speed, gain
+# Video file type
+FileType,fmf
+# Number of seconds to record
+RecordTime,20
+# Minimum time in between preview window updates
+PreviewUpdatePeriod,.1
+# Directory to store video to
+OutputDirectory,C:\Users\kristin\Documents\work\data\flybowl\FBDC_test
+# Directory to temporarily store video to
+TmpOutputDirectory,
+# MetaData: Assay name
+MetaData_AssayName,FlyBowl
+MetaData_RearingProtocols,RP0001,RP0002
+MetaData_HandlingProtocols,HP0001,HP0002
+MetaData_ExpProtocols,EP0001
+MetaData_Effector,TrpA
+MetaData_RoomTemperatureSetPoint,25
+MetaData_RoomHumiditySetPoint,60
+MaxFrameRatePlot,30
