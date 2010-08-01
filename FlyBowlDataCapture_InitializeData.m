@@ -44,6 +44,11 @@ handles.secondformat = 13;
 handles.minhour = rem(datenum('06:00'),1);
 handles.maxhour = rem(datenum('23:00'),1);
 
+%% delete existing imaqs and timers
+
+delete(timerfind('Name','FBDC_RecordTimer'));
+delete(imaqfind('Name','FBDC_VideoInput'));
+
 %% parse parameter file
 
 % open the parameter file
@@ -78,7 +83,8 @@ try
   fclose(fid);
   
   % some values are numbers
-  numeric_params = {'PreAssayHandling_DOBStart_Range','PreAssayHandling_DOBEnd_Range',...
+  numeric_params = {'PreAssayHandling_CrossDate_Range',...
+    'PreAssayHandling_DOBStart_Range','PreAssayHandling_DOBEnd_Range',...
     'PreAssayHandling_SortingDate_Range','PreAssayHandling_StarvationDate_Range',...
     'Imaq_ROIPosition','RecordTime','PreviewUpdatePeriod',...
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
@@ -198,6 +204,33 @@ handles.Rearing_IncubatorID = previous_values.Rearing_IncubatorID;
 % set possible values, current value, color to default
 set(handles.popupmenu_Rearing_IncubatorID,'String',handles.Rearing_IncubatorIDs,...
   'Value',find(strcmp(handles.Rearing_IncubatorID,handles.Rearing_IncubatorIDs),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
+
+%% Cross Date
+
+% whether this has been changed or not
+handles.isdefault.PreAssayHandling_CrossDate = true;
+
+% possible values for CrossDate
+minv = floor(handles.now) - handles.params.PreAssayHandling_CrossDate_Range(2);
+maxv = floor(handles.now) - handles.params.PreAssayHandling_CrossDate_Range(1);
+handles.PreAssayHandling_CrossDate_datenums = minv:maxv;
+handles.PreAssayHandling_CrossDates = cellstr(datestr(handles.PreAssayHandling_CrossDate_datenums,handles.dateformat));
+
+% if CrossDate not stored in rc file, choose first date
+if ~isfield(previous_values,'PreAssayHandling_CrossDateOff') || ...
+    previous_values.PreAssayHandling_CrossDateOff > handles.params.PreAssayHandling_CrossDate_Range(2) || ...
+    previous_values.PreAssayHandling_CrossDateOff < handles.params.PreAssayHandling_CrossDate_Range(1),
+  previous_values.PreAssayHandling_CrossDateOff = handles.params.PreAssayHandling_CrossDate_Range(2);
+end
+
+% by default, previous offset
+handles.PreAssayHandling_CrossDate_datenum = floor(handles.now) - previous_values.PreAssayHandling_CrossDateOff;
+handles.PreAssayHandling_CrossDate = datestr(handles.PreAssayHandling_CrossDate_datenum,handles.dateformat);
+
+% set possible values, current value, color to default
+set(handles.popupmenu_PreAssayHandling_CrossDate,'String',handles.PreAssayHandling_CrossDates,...
+  'Value',find(strcmp(handles.PreAssayHandling_CrossDate,handles.PreAssayHandling_CrossDates),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% DOB Start
@@ -459,6 +492,37 @@ handles.Assay_Bowl = previous_values.Assay_Bowl;
 set(handles.popupmenu_Assay_Bowl,'String',handles.Assay_Bowls,...
   'Value',find(strcmp(handles.Assay_Bowl,handles.Assay_Bowls),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
+
+%% Redo Flag
+
+% whether this has been changed or not
+handles.isdefault.RedoFlag = true;
+
+% possible values for RedoFlag
+handles.RedoFlags = handles.params.RedoFlags;
+
+handles.RedoFlag = 'None';
+
+% set possible values, current value, color to default
+set(handles.popupmenu_RedoFlag,'String',handles.RedoFlags,...
+  'Value',find(strcmp(handles.RedoFlag,handles.RedoFlags),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
+
+%% Review Flag
+
+% whether this has been changed or not
+handles.isdefault.ReviewFlag = true;
+
+% possible values for ReviewFlag
+handles.ReviewFlags = handles.params.ReviewFlags;
+
+handles.ReviewFlag = 'None';
+
+% set possible values, current value, color to default
+set(handles.popupmenu_ReviewFlag,'String',handles.ReviewFlags,...
+  'Value',find(strcmp(handles.ReviewFlag,handles.ReviewFlags),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
+
 
 %% Technical Notes
 

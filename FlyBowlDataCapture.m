@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 29-Jul-2010 04:34:21
+% Last Modified by GUIDE v2.5 31-Jul-2010 23:10:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -269,23 +269,39 @@ guidata(hObject,handles);
 
 function handles = CheckOrderingErrors(handles)
 
-handles.isOrderingError = false(1,4);
+handles.isOrderingError = false(1,5);
+
+% is CrossDate > DOBStart?
+if handles.PreAssayHandling_CrossDate_datenum > handles.PreAssayHandling_DOBStart_datenum,
+  handles.isOrderingError(1:2) = true;
+end
 
 % is DOBStart > DOBEnd?
 if handles.PreAssayHandling_DOBStart_datenum > handles.PreAssayHandling_DOBEnd_datenum,
-  handles.isOrderingError(1:2) = true;
+  handles.isOrderingError(2:3) = true;
 end
 % is DOBEnd > SortingTime?
 if handles.PreAssayHandling_DOBEnd_datenum > handles.PreAssayHandling_SortingTime_datenum,
-  handles.isOrderingError(2:3) = true;
+  handles.isOrderingError(3:4) = true;
 end
 % is SortingTime > StarvationTime?
 if handles.PreAssayHandling_SortingTime_datenum > handles.PreAssayHandling_StarvationTime_datenum,
-  handles.isOrderingError(3:4) = true;
+  handles.isOrderingError(4:5) = true;
 end
 
 % set background colors
 if handles.isOrderingError(1),
+  set(handles.popupmenu_PreAssayHandling_CrossDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
+else  
+  % no ordering error, set color to either isdefault or changed color
+  if handles.isdefault.PreAssayHandling_CrossDate,
+    set(handles.popupmenu_PreAssayHandling_CrossDate,'BackgroundColor',handles.isdefault_bkgdcolor);
+  else
+    set(handles.popupmenu_PreAssayHandling_CrossDate,'BackgroundColor',handles.changed_bkgdcolor);
+  end
+end
+
+if handles.isOrderingError(2),
   set(handles.popupmenu_PreAssayHandling_DOBStart,'BackgroundColor',handles.shouldchange_bkgdcolor);
 else  
   % no ordering error, set color to either isdefault or changed color
@@ -296,7 +312,7 @@ else
   end
 end
 
-if handles.isOrderingError(2),
+if handles.isOrderingError(3),
   set(handles.popupmenu_PreAssayHandling_DOBEnd,'BackgroundColor',handles.shouldchange_bkgdcolor);
 else
   if handles.isdefault.PreAssayHandling_DOBEnd,
@@ -306,7 +322,7 @@ else
   end
 end
 
-if handles.isOrderingError(3),
+if handles.isOrderingError(4),
   set(handles.popupmenu_PreAssayHandling_SortingDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
   set(handles.edit_PreAssayHandling_SortingHour,'BackgroundColor',handles.shouldchange_bkgdcolor);
 else
@@ -322,7 +338,7 @@ else
   end
 end
 
-if handles.isOrderingError(4),
+if handles.isOrderingError(5),
   set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
   set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.shouldchange_bkgdcolor);
 else
@@ -809,7 +825,9 @@ if strcmp(v,'Cancel'),
   return;
 end
 
-stop(handles.vid);
+if isfield(handles,'vid') && isvalid(handles.vid),
+  stop(handles.vid);
+end
 handles = guidata(hObject);
 if exist(handles.FileName,'file'),
 
@@ -1014,3 +1032,103 @@ function menu_DetectCameras_Callback(hObject, eventdata, handles)
 % hObject    handle to menu_DetectCameras (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on selection change in popupmenu_PreAssayHandling_CrossDate.
+function popupmenu_PreAssayHandling_CrossDate_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_CrossDate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_CrossDate contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_CrossDate
+
+% grab value
+v = get(handles.popupmenu_PreAssayHandling_CrossDate,'Value');
+handles.PreAssayHandling_CrossDate = handles.PreAssayHandling_CrossDates{v};
+% store datenum
+handles.PreAssayHandling_CrossDate_datenum = datenum(handles.PreAssayHandling_CrossDate);
+
+% no longer default
+handles.isdefault.PreAssayHandling_CrossDate = false;
+
+% highlight ordering errors
+handles = CheckOrderingErrors(handles);
+
+guidata(hObject,handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_PreAssayHandling_CrossDate_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_CrossDate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in popupmenu_RedoFlag.
+function popupmenu_RedoFlag_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_RedoFlag (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_RedoFlag contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_RedoFlag
+handles.RedoFlag = handles.RedoFlags{get(hObject,'Value')};
+
+% no longer default
+handles.isdefault.RedoFlag = false;
+
+% set color
+set(handles.popupmenu_RedoFlag,'BackgroundColor',handles.changed_bkgdcolor);
+
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_RedoFlag_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_RedoFlag (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in popupmenu_ReviewFlag.
+function popupmenu_ReviewFlag_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_ReviewFlag (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_ReviewFlag contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_ReviewFlag
+
+handles.ReviewFlag = handles.ReviewFlags{get(hObject,'Value')};
+
+% no longer default
+handles.isdefault.ReviewFlag = false;
+
+% set color
+set(handles.popupmenu_ReviewFlag,'BackgroundColor',handles.changed_bkgdcolor);
+
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_ReviewFlag_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_ReviewFlag (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

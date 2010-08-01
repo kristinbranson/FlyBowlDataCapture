@@ -16,7 +16,7 @@ handles.vidRes = get(handles.vid, 'VideoResolution');
 handles.nBands = get(handles.vid, 'NumberOfBands'); 
 % maximum number of frames to record
 handles.FramesPerTrigger = str2double(get(handles.vid.source,'FrameRate')) * handles.params.RecordTime;
-set(handles.vid,'FramesPerTrigger',handles.FramesPerTrigger);
+set(handles.vid,'FramesPerTrigger',handles.FramesPerTrigger,'Name','FBDC_VideoInput');
 handles.hImage_Preview = image( zeros(handles.vidRes(2), handles.vidRes(1), handles.nBands) , 'Parent', handles.axes_PreviewVideo); 
 axis(handles.axes_PreviewVideo,'image');
 
