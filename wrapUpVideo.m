@@ -1,16 +1,41 @@
 function wrapUpVideo(obj,event,hObject) %#ok<INUSL>
 
-% clean up remaining frames
-f = obj.framesacquiredfcn;
-if ~isempty(f) && iscell(f),
-  while obj.framesavailable > 0,
-    feval(f{1},obj,'',hObject);
-  end
-end
+fprintf('Removing frames acquired function\n');
+% remove frames acquired function
 obj.framesacquiredfcn = '';
-handles = guidata(hObject);
+
+% set stop function to default
+fprintf('Removing stop function\n');
+obj.stopfcn = '';
+fprintf('Calling stop\n');
+stop(obj);
+
+% wait a few seconds
+pause(3);
+
+% wait until actually stopped
+fprintf('Waiting for Running == Off...\n');
+while true,
+  if ~isrunning(obj) && ~islogging(obj),
+    break;
+  end
+  pause(.5);
+end
+fprintf('Running = Off.\n');
+
+fprintf('Cleaning up remaining frames\n');
+% clean up remaining frames
+if obj.framesavailable > 0,
+  fprintf('Removing %d frames from buffer.\n',obj.framesavailable);
+  getdata(obj,obj.framesavailable);
+end
+
+% wait a few seconds
+pause(3);
 
 % close file
+fprintf('Closing file.\n');
+handles = guidata(hObject);
 switch handles.params.FileType,
   case 'avi'
     handles.logger.aviobj = close(handles.logger.aviobj);
@@ -21,9 +46,20 @@ switch handles.params.FileType,
 end
 
 % no longer recording
+fprintf('No longer recording.\n');
+handles = guidata(hObject);
 handles.IsRecording = false;
+handles.FinishedRecording = true;
 
+oldname = handles.FileName;
+fprintf('Renaming file.\n');
 handles = renameVideoFile(handles);
+guidata(hObject,handles);
+fprintf('Renamed to %s\n',handles.FileName);
+% add to status log
+handles = addToStatus(handles,{sprintf('%s: Finished recording. Video file moved from %s to %s.',...
+  datestr(now,handles.secondformat),oldname,handles.FileName)});
+guidata(hObject,handles);
 
 PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
 PreviewParams.IsRecording = false;
@@ -37,10 +73,6 @@ set(handles.text_Status_Recording,'String','Finished','BackgroundColor',handles.
 
 % frame rate status
 set(handles.text_Status_FrameRate,'String',sprintf('Ave: %.1f',handles.FrameCount / handles.writeFrame_time));
-
-% add to status log
-handles = addToStatus(handles,{sprintf('%s: Finished recording. Video file moved to %s.',...
-  datestr(now,handles.secondformat),handles.FileName)});
 
 % disable abort button
 set(handles.pushbutton_Abort,'Enable','off','BackgroundColor',handles.grayed_bkgdcolor);

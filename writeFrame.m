@@ -1,11 +1,16 @@
 function writeFrame(obj,event,hObject) %#ok<INUSL>
 
-handles = guidata(hObject);
-
 % copied from gVision/StartStop.m:writeFullROI
 
 % get a frame
 [frame,time,metadata] = getdata(obj,1); %#ok<NASGU>
+%fprintf('Writing frame %d at time %f\n',metadata.FrameNumber,time);
+
+handles = guidata(hObject);
+if isempty(fopen(handles.logger.fid)),
+  fprintf('File is closed, not writing\n');
+  return;
+end
 
 % write frame to file
 try
@@ -39,8 +44,14 @@ try
     'Ydata',handles.Status_FrameRate_History);
 
 catch
-  handles = addToStatus(handles,{'Warning: writeFrame called after writing finished. Disabling FramesAcquiredFcn.'});
+  if strcmp(handles.params.FileType,'fmf') && ...
+     isempty(fopen(handles.logger.fid)),
+    fprintf('File is closed, not writing\n');
+  else
+    handles = addToStatus(handles,{'Warning: writeFrame called after writing finished. Disabling FramesAcquiredFcn.'});
+  end
   handles.vid.framesacquiredfcn = '';
+  return;
 end
 
 guidata(hObject,handles);

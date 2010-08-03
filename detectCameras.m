@@ -40,3 +40,14 @@ if ~any(devidx),
 end  
 
 handles.DeviceIDs = cell2mat(adaptorinfo.DeviceIDs(devidx));
+
+% make names for each device
+handles.DeviceNames = cell(size(handles.DeviceIDs));
+for i = 1:length(handles.DeviceIDs),
+  handles.DeviceNames{i} = sprintf('Adaptor_%s___Name_%s___Format_%s___DeviceID_%d',...
+    handles.params.Imaq_Adaptor,...
+    handles.params.Imaq_DeviceName,...
+    handles.params.Imaq_VideoFormat,...
+    handles.DeviceIDs(i));
+  handles.DeviceNames{i} = strrep(handles.DeviceNames{i},' ','_');
+end

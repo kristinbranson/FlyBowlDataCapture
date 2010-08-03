@@ -2,6 +2,10 @@
 Assay_Experimenters,hirokawaj,robiea,bransonk
 # List of possible Activity Peak values
 Rearing_ActivityPeaks,10:00,16:00
+# These should correspond to activity peaks
+Rearing_LightsOns,08:00,14:00
+# These should correspond to activity peaks
+Rearing_LightsOffs,16:00,22:00
 # List of possible Incubator ID values
 Rearing_IncubatorIDs,1,2
 # Range of Cross Dates to show -- minimum and maximum number of days 
@@ -54,10 +58,11 @@ OutputDirectory,C:\Users\kristin\Documents\work\data\flybowl\FBDC_test
 TmpOutputDirectory,
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
-MetaData_RearingProtocols,RP0001,RP0002
-MetaData_HandlingProtocols,HP0001,HP0002
-MetaData_ExpProtocols,EP0001
+MetaData_RearingProtocols,RearingProtocol0001_Morning,RearingProtocol0002_Afternoon
+MetaData_SortingHandlingProtocols,SortingProtocol0001
+MetaData_StarvationHandlingProtocols,StarvationProtocol0001
+MetaData_ExpProtocols,ExperimentProtocol0001
 MetaData_Effector,TrpA
 MetaData_RoomTemperatureSetPoint,25
 MetaData_RoomHumiditySetPoint,60
-MaxFrameRatePlot,30
+MaxFrameRatePlot,35

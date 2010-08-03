@@ -46,8 +46,17 @@ handles.maxhour = rem(datenum('23:00'),1);
 
 %% delete existing imaqs and timers
 
-delete(timerfind('Name','FBDC_RecordTimer'));
-delete(imaqfind('Name','FBDC_VideoInput'));
+tmp = timerfind('Name','FBDC_RecordTimer');
+for i = 1:length(tmp),
+  if iscell(tmp),
+    delete(tmp{i});
+  else
+    delete(tmp(i));
+  end
+end
+for tmp = imaqfind('Name','FBDC_VideoInput'),
+  delete(tmp{1});
+end
 
 %% parse parameter file
 
@@ -578,6 +587,7 @@ set(handles.pushbutton_FliesLoaded,'BackgroundColor',handles.grayed_bkgdcolor,..
 %% Start Recording
 handles.StartRecording_Time_datenum = -1;
 handles.IsRecording = false;
+handles.FinishedRecording = false;
 handles.StartRecording_bkgdcolor = [.071,.212,.141];
 set(handles.pushbutton_StartRecording,'BackgroundColor',handles.grayed_bkgdcolor,...
   'String','Start Recording','Enable','off');

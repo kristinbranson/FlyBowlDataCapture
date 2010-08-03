@@ -75,7 +75,9 @@ function varargout = FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % save metadata
-handles = SaveMetaData(handles);
+if handles.FinishedRecording,
+  handles = SaveMetaData(handles);
+end
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
@@ -829,7 +831,7 @@ if isfield(handles,'vid') && isvalid(handles.vid),
   stop(handles.vid);
 end
 handles = guidata(hObject);
-if exist(handles.FileName,'file'),
+if isfield(handles,'FileName') && exist(handles.FileName,'file'),
 
   % move video to aborted temporary directory
   handles = guidata(hObject);
@@ -937,7 +939,11 @@ function pushbutton_Done_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % rename video
+oldname = handles.FileName;
 handles = renameVideoFile(handles);
+if ~strcmp(oldname,handles.FileName),
+  handles = addToStatus(handles,{sprintf('%s: Renamed %s -> %s.',datestr(now,handles.secondformat),oldname,handles.FileName)});
+end
 
 guidata(hObject,handles);
 
