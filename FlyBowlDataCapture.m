@@ -1081,6 +1081,12 @@ function menu_DetectCameras_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+if isfield(handles,'hImage_Preview') && ishandle(handles.hImage_Preview),
+  delete(handles.hImage_Preview);
+end
+set(handles.pushbutton_InitializeCamera,'Visible','on');
+handles = detectCamerasWrapper(handles);
+guidata(hObject,handles);
 
 % --- Executes on selection change in popupmenu_PreAssayHandling_CrossDate.
 function popupmenu_PreAssayHandling_CrossDate_Callback(hObject, eventdata, handles)

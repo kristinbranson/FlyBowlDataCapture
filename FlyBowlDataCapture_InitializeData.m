@@ -550,32 +550,14 @@ set(handles.edit_BehaviorNotes,'String',handles.BehaviorNotes);
 
 %% Detect Cameras
 
-handles.IsCameraInitialized = false;
-handles = detectCameras(handles);
-
-% if no devices found
-if isempty(handles.DeviceIDs),
-  handles.DeviceID = [];
-  set(handles.popupmenu_DeviceID,'Enable','off','String','No devices found','Value',1,...
-    'BackgroundColor',handles.shouldchange_bkgdcolor);
-
-else
-  
-  % if DeviceID not stored in rc file, choose first DeviceID
-  if ~isfield(previous_values,'DeviceID') || ...
-      ~ismember(previous_values.DeviceID,handles.DeviceIDs),
-    previous_values.DeviceID = handles.DeviceIDs(1);
-  end
-  
-  % by default, previous DeviceID
-  handles.DeviceID = previous_values.DeviceID;
-  
-  % set possible values, current value, color to default
-  set(handles.popupmenu_DeviceID,'String',cellstr(num2str(handles.DeviceIDs(:))),...
-    'Value',find(handles.DeviceID == handles.DeviceIDs,1),...
-    'BackgroundColor',handles.isdefault_bkgdcolor,...
-    'Enable','on');
+% if DeviceID not stored in rc file, choose first DeviceID
+if ~isfield(previous_values,'DeviceID'),
+  previous_values.DeviceID = [];
 end
+% by default, previous DeviceID
+handles.DeviceID = previous_values.DeviceID;
+
+handles = detectCamerasWrapper(handles);
 
 %% Shift Fly Temp
 handles.ShiftFlyTemp_Time_datenum = -1;
