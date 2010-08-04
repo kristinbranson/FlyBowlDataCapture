@@ -165,14 +165,14 @@ end
 handles.Fly_LineName = previous_values.Fly_LineName;
 
 % set possible values, current value, color to shouldchange
-%set(handles.popupmenu_Fly_LineName,'String',handles.Fly_LineNames,...
+%set(handles.edit_Fly_LineName,'String',handles.Fly_LineNames,...
 %  'Value',find(strcmp(handles.Fly_LineName,handles.Fly_LineNames),1),...
 %  'BackgroundColor',handles.shouldchange_bkgdcolor);
-set(handles.popupmenu_Fly_LineName,'String',handles.Fly_LineName,...
+set(handles.edit_Fly_LineName,'String',handles.Fly_LineName,...
   'BackgroundColor',handles.shouldchange_bkgdcolor);
 
 % we have not created the autofill version yet
-handles.isAutoComplete_popupmenu_Fly_LineName = false;
+handles.isAutoComplete_edit_Fly_LineName = false;
 
 % TODO: make this an edit box that autofills
 
@@ -678,4 +678,5 @@ set(handles.axes_Status_FrameRate,'Color',[0,0,0],...
   'YLim',[0,handles.params.MaxFrameRatePlot]);
 
 %% Preview axes
+
 set(handles.axes_PreviewVideo,'xtick',[],'ytick',[]);

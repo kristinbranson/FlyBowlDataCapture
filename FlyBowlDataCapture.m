@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 04-Aug-2010 03:36:33
+% Last Modified by GUIDE v2.5 04-Aug-2010 06:04:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -64,12 +64,12 @@ handles = FlyBowlDataCapture_InitializeData(handles);
 guidata(hObject,handles);
 
 set(handles.figure_main,'Visible','on');
-if ~handles.isAutoComplete_popupmenu_Fly_LineName,
+if ~handles.isAutoComplete_edit_Fly_LineName,
   handles.AutoCompleteEdit_Fly_LineName = ...
-    AutoCompleteEdit(handles.popupmenu_Fly_LineName,handles.Fly_LineNames,...
-    'Callback',get(handles.popupmenu_Fly_LineName,'Callback'));
-  set(handles.popupmenu_Fly_LineName,'Callback','');
-  handles.isAutoComplete_popupmenu_Fly_LineName = true;
+    AutoCompleteEdit(handles.edit_Fly_LineName,handles.Fly_LineNames,...
+    'Callback',get(handles.edit_Fly_LineName,'Callback'));
+  set(handles.edit_Fly_LineName,'Callback','');
+  handles.isAutoComplete_edit_Fly_LineName = true;
 end
 
 % UIWAIT makes FlyBowlDataCapture wait for user response (see UIRESUME)
@@ -141,23 +141,23 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in popupmenu_Fly_LineName.
-function popupmenu_Fly_LineName_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu_Fly_LineName (see GCBO)
+% --- Executes on selection change in edit_Fly_LineName.
+function edit_Fly_LineName_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_Fly_LineName (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Fly_LineName contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu_Fly_LineName
+% Hints: contents = cellstr(get(hObject,'String')) returns edit_Fly_LineName contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from edit_Fly_LineName
 
 % grab value
 drawnow;
-newname = get(handles.popupmenu_Fly_LineName,'String');
+newname = get(handles.edit_Fly_LineName,'String');
 i = find(strcmpi(newname,handles.Fly_LineNames));
 isvalid = ~isempty(i);
 if ~isvalid,
   % doesn't match a valid name? then revert
-  set(handles.popupmenu_Fly_LineName,'String',handles.Fly_LineName);
+  set(handles.edit_Fly_LineName,'String',handles.Fly_LineName);
 else
   % multiple matches, check for case sensitivity
   if length(i) > 1,
@@ -170,7 +170,7 @@ else
   % replace with correct capitalization if nec
   if ~strcmp(newname,handles.Fly_LineNames{i}),
     newname = handles.Fly_LineNames{i};
-    set(handles.popupmenu_Fly_LineName,'String',handles.Fly_LineNames{i});
+    set(handles.edit_Fly_LineName,'String',handles.Fly_LineNames{i});
   end
 end
 
@@ -182,22 +182,22 @@ if isvalid,
   handles.isdefault.Fly_LineName = false;
 
   % set color
-  set(handles.popupmenu_Fly_LineName,'BackgroundColor',handles.changed_bkgdcolor);
+  set(handles.edit_Fly_LineName,'BackgroundColor',handles.changed_bkgdcolor);
   
 else
   
   handles = addToStatus(handles,{sprintf('%s: Invalid line name %s switched back to %s.',...
     datestr(now,handles.secondformat))},...
     newname,handles.Fly_LineName);
-  set(handles.popupmenu_Fly_LineName,'BackgroundColor',handles.shouldchange_bkgdcolor);
+  set(handles.edit_Fly_LineName,'BackgroundColor',handles.shouldchange_bkgdcolor);
 
 end
 
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu_Fly_LineName_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu_Fly_LineName (see GCBO)
+function edit_Fly_LineName_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_Fly_LineName (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1186,3 +1186,16 @@ function figure_main_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to figure_main (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
+
+
+% --------------------------------------------------------------------
+function menu_Quit_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_Quit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+if handles.IsRecording,
+  pushbutton_Abort_Callback(handles.pushbutton_Abort, eventdata, handles);
+else
+  uiresume(handles.figure_main);
+end
