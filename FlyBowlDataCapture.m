@@ -1021,6 +1021,8 @@ function menu_File_SaveSettings_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+handles = RecordConfiguration(handles);
+guidata(hObject,handles);
 
 % --- Executes on button press in popupmenu_DeviceID.
 function popupmenu_DeviceID_Callback(hObject, eventdata, handles)
