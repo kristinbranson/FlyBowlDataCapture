@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 31-Jul-2010 23:10:38
+% Last Modified by GUIDE v2.5 04-Aug-2010 03:36:33
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -62,6 +62,15 @@ guidata(hObject, handles);
 handles = FlyBowlDataCapture_InitializeData(handles);
 
 guidata(hObject,handles);
+
+set(handles.figure_main,'Visible','on');
+if ~handles.isAutoComplete_popupmenu_Fly_LineName,
+  handles.AutoCompleteEdit_Fly_LineName = ...
+    AutoCompleteEdit(handles.popupmenu_Fly_LineName,handles.Fly_LineNames,...
+    'Callback',get(handles.popupmenu_Fly_LineName,'Callback'));
+  set(handles.popupmenu_Fly_LineName,'Callback','');
+  handles.isAutoComplete_popupmenu_Fly_LineName = true;
+end
 
 % UIWAIT makes FlyBowlDataCapture wait for user response (see UIRESUME)
 uiwait(handles.figure_main);
@@ -142,14 +151,47 @@ function popupmenu_Fly_LineName_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from popupmenu_Fly_LineName
 
 % grab value
-v = get(handles.popupmenu_Fly_LineName,'Value');
-handles.Fly_LineName = handles.Fly_LineNames{v};
+drawnow;
+newname = get(handles.popupmenu_Fly_LineName,'String');
+i = find(strcmpi(newname,handles.Fly_LineNames));
+isvalid = ~isempty(i);
+if ~isvalid,
+  % doesn't match a valid name? then revert
+  set(handles.popupmenu_Fly_LineName,'String',handles.Fly_LineName);
+else
+  % multiple matches, check for case sensitivity
+  if length(i) > 1,
+    % how many letters are exactly shared
+    nmatches = sum(char(handles.Fly_LineNames(i))==newname,2,'double');
+    % choose the maximum number of exact matches
+    [~,i1] = max(nmatches);
+    i = i(i1);
+  end
+  % replace with correct capitalization if nec
+  if ~strcmp(newname,handles.Fly_LineNames{i}),
+    newname = handles.Fly_LineNames{i};
+    set(handles.popupmenu_Fly_LineName,'String',handles.Fly_LineNames{i});
+  end
+end
 
-% no longer default
-handles.isdefault.Fly_LineName = false;
+if isvalid,
 
-% set color
-set(handles.popupmenu_Fly_LineName,'BackgroundColor',handles.changed_bkgdcolor);
+  handles.Fly_LineName = newname;
+  
+  % no longer default
+  handles.isdefault.Fly_LineName = false;
+
+  % set color
+  set(handles.popupmenu_Fly_LineName,'BackgroundColor',handles.changed_bkgdcolor);
+  
+else
+  
+  handles = addToStatus(handles,{sprintf('%s: Invalid line name %s switched back to %s.',...
+    datestr(now,handles.secondformat))},...
+    newname,handles.Fly_LineName);
+  set(handles.popupmenu_Fly_LineName,'BackgroundColor',handles.shouldchange_bkgdcolor);
+
+end
 
 guidata(hObject,handles);
 
@@ -1138,3 +1180,9 @@ function popupmenu_ReviewFlag_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+% --- Executes during object creation, after setting all properties.
+function figure_main_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to figure_main (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
