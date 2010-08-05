@@ -61,6 +61,10 @@ guidata(hObject, handles);
 % initialize data
 handles = FlyBowlDataCapture_InitializeData(handles);
 
+if isempty(which('findjobj')) && exist('findjobj','dir'),
+  addpath('findjobj');
+end
+
 set(handles.figure_main,'Visible','on');
 if ~handles.isAutoComplete_edit_Fly_LineName,
   handles.AutoCompleteEdit_Fly_LineName = ...
