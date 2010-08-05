@@ -1,3 +1,30 @@
+% hauto = AutoCompleteEdit(hObject,choices,...)
+% 
+% Modifies input edit box hObject to be an auto-complete edit box with
+% valid input choices. Only valid input choices are accepted for the edit
+% box string. Strings not in the choices list will be reset. The possible
+% autofills are chosen based on the part of the string in the edit box
+% before the cursor. 
+%
+% Inputs:
+% hObject: Handle to edit box.
+% choices: Cell of strings representing valid choices for the edit box. 
+%
+% Optional inputs:
+% 'maxheight': Maximum height of the popped up listbox, as a multiple of
+% the height of the edit box. 
+% 'Callback': Function that executes whenever the string for the edit box
+% is finally set. 
+% 
+% Output:
+% hauto: Struct with handles to various useful things.
+%
+% Other use:
+% warnings = AutoCompleteEdit(hauto,choices)
+% Resets the valid choices for an AutoCompleteEdit box to input choices.
+% hauto should be the output from the original AutoCompleteEdit call.
+% warnings is a string containing any warning messages generated. 
+%
 function hauto = AutoCompleteEdit(hObject,choices,varargin)
 
 if isstruct(hObject),
