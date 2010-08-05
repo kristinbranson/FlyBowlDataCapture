@@ -61,8 +61,6 @@ guidata(hObject, handles);
 % initialize data
 handles = FlyBowlDataCapture_InitializeData(handles);
 
-guidata(hObject,handles);
-
 set(handles.figure_main,'Visible','on');
 if ~handles.isAutoComplete_edit_Fly_LineName,
   handles.AutoCompleteEdit_Fly_LineName = ...
@@ -71,6 +69,8 @@ if ~handles.isAutoComplete_edit_Fly_LineName,
   set(handles.edit_Fly_LineName,'Callback','');
   handles.isAutoComplete_edit_Fly_LineName = true;
 end
+
+guidata(hObject,handles);
 
 % UIWAIT makes FlyBowlDataCapture wait for user response (see UIRESUME)
 uiwait(handles.figure_main);
@@ -187,8 +187,8 @@ if isvalid,
 else
   
   handles = addToStatus(handles,{sprintf('%s: Invalid line name %s switched back to %s.',...
-    datestr(now,handles.secondformat))},...
-    newname,handles.Fly_LineName);
+    datestr(now,handles.secondformat),...
+    newname,handles.Fly_LineName)});
   set(handles.edit_Fly_LineName,'BackgroundColor',handles.shouldchange_bkgdcolor);
 
 end
@@ -1014,6 +1014,18 @@ function menu_File_RefreshLineNames_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+handles.Fly_LineNames = readLineNames(handles.linename_file);
+
+% check to see if the current line name is valid
+if ~ismember(handles.Fly_LineName,handles.Fly_LineNames),
+  uiwait(errordlg(sprintf('Line name %s not in line name list, resetting line name to %s\n',handles.Fly_LineName,handles.Fly_LineNames{1})));
+  handles.Fly_LineName = handles.Fly_LineNames{1};
+end
+set(handles.edit_Fly_LineName,'String',handles.Fly_LineName);
+drawnow;
+AutoCompleteEdit(handles.AutoCompleteEdit_Fly_LineName,handles.Fly_LineNames);
+drawnow;
+guidata(hObject,handles);
 
 % --------------------------------------------------------------------
 function menu_File_SaveSettings_Callback(hObject, eventdata, handles)
