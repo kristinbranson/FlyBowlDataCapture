@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 04-Aug-2010 06:04:01
+% Last Modified by GUIDE v2.5 06-Aug-2010 08:23:16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -65,6 +65,7 @@ if isempty(which('findjobj')) && exist('findjobj','dir'),
   addpath('findjobj');
 end
 
+% make the line name edit box autocomplete -- must be visible
 set(handles.figure_main,'Visible','on');
 if ~handles.isAutoComplete_edit_Fly_LineName,
   handles.AutoCompleteEdit_Fly_LineName = ...
@@ -73,6 +74,10 @@ if ~handles.isAutoComplete_edit_Fly_LineName,
   set(handles.edit_Fly_LineName,'Callback','');
   handles.isAutoComplete_edit_Fly_LineName = true;
 end
+
+% get a reference to the underlying java component for the log
+handles.jhedit_Status = findjobj(handles.edit_Status);
+handles.jedit_Status = handles.jhedit_Status.getComponent(0).getComponent(0);
 
 guidata(hObject,handles);
 
@@ -1223,3 +1228,24 @@ if handles.IsRecording,
 else
   uiresume(handles.figure_main);
 end
+
+% --- Executes on button press in pushbutton_SaveMetaData.
+function pushbutton_SaveMetaData_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_SaveMetaData (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+handles = SaveMetaData(handles);
+
+guidata(hObject,handles);
+
+
+% --------------------------------------------------------------------
+function menu_File_SaveMetaData_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_File_SaveMetaData (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+handles = SaveMetaData(handles);
+
+guidata(hObject,handles);

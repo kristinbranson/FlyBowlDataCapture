@@ -4,11 +4,14 @@ handles = guidata(hObject);
 
 handles.StartRecording_Time_datenum = now;
 
+handles = SaveMetaData(handles);
+
 % create a temporary name for the video
 filestr = sprintf('FBDC_movie_%s_%d.%s',...
   datestr(handles.StartRecording_Time_datenum,30),...
   randi(9999,1),handles.params.FileType);
 handles.FileName = fullfile(handles.params.TmpOutputDirectory,filestr);
+handles.IsTmpFileName = true;
 
 % copied from gVision/StartStop.m
 

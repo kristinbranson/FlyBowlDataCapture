@@ -108,7 +108,7 @@ try
   % some values are not lists
   notlist_params = {'Imaq_Adaptor','Imaq_DeviceName','Imaq_VideoFormat',...
     'FileType','OutputDirectory','TmpOutputDirectory','MetaData_AssayName',...
-    'MetaData_Effector'};
+    'MetaData_Effector','MetaDataFileName','MovieFilePrefix'};
   for i = 1:length(notlist_params),
     handles.params.(notlist_params{i}) = handles.params.(notlist_params{i}){1};
   end

@@ -1,30 +1,34 @@
 function handles = renameVideoFile(handles)
 
 oldfilename = handles.FileName;
-fprintf('Oldfilename = %s\n',oldfilename);
 
-% generate a new name
-filestr = sprintf('%s_Rig%sPlate%sBowl%s_%s.%s',handles.Fly_LineName,...
-  handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Bowl,...
-  datestr(handles.StartRecording_Time_datenum,30),...
-  handles.params.FileType);
-newfilename = fullfile(handles.params.OutputDirectory,filestr);
-fprintf('Newfilename = %s\n',newfilename);
+% construct experiment name, directory
+handles = setExperimentName(handles);
 
-% if name is the same, nothing to do
-if strcmp(oldfilename,newfilename), return; end
+% already done everything by renaming directory
+if ~handles.IsTmpFileName,
+  return;
+end
 
-% try moving
+filestr = sprintf('movie.%s',handles.params.FileType);
+newfilename = fullfile(handles.ExperimentDirectory,filestr);
+
+% check if renaming already done
 if exist(newfilename,'file') && ~exist(oldfilename,'file'),
   fprintf('Hmm, %s already renamed to %s\n',oldfilename,newfilename);
+  handles.FileName = newfilename;
+  handles.IsTmpFileName = false;
+  return;
 end
+
 [success,msg] = movefile(oldfilename,newfilename,'f');
 if success,
+  handles.IsTmpFileName = false;
   handles.FileName = newfilename;
   fprintf('Renamed successfully\n');
 else
   s = {sprintf('Video temporarily stored to %s. ',oldfilename),...
-    sprintf('Could not rename %s. ',newfilename),...
+    sprintf('Could not rename %s. ',handles.FileName),...
     msg};
   uiwait(errordlg(s,'Error renaming file'));
   warning(cell2mat(s));

@@ -1,11 +1,12 @@
 function handles = SaveMetaData(handles)
 
-% construct name for main metadata file
-filestr = sprintf('ExperimentMetadata_%s_Rig%sPlate%sBowl%s_%s.xml',handles.Fly_LineName,...
-  handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Bowl,...
-  datestr(handles.StartRecording_Time_datenum,30));
-handles.MetaDataFileName = fullfile(handles.params.OutputDirectory,filestr);
+% construct experiment name, directory
+handles = setExperimentName(handles);
 
+% construct name for main metadata file
+handles.MetaDataFileName = fullfile(handles.ExperimentDirectory,handles.params.MetaDataFileName);
+
+% open meta data file
 fid = fopen(handles.MetaDataFileName,'w');
 if fid < 0,
   s = sprintf('Could not write to experiment metadata file %s',handles.MetaDataFileName);

@@ -54,8 +54,11 @@ RecordTime,20
 PreviewUpdatePeriod,.1
 # Directory to store video to
 OutputDirectory,C:\Users\kristin\Documents\work\data\flybowl\FBDC_test
+# Prefix of movie file
+MovieFilePrefix,movie
 # Directory to temporarily store video to
 TmpOutputDirectory,
+MetaDataFileName,Metadata.xml
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
 MetaData_RearingProtocols,RearingProtocol0001_Morning,RearingProtocol0002_Afternoon

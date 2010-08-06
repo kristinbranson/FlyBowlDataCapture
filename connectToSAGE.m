@@ -34,8 +34,11 @@ function db = connectToSAGE(varargin)
     %% Make sure the MySQL client JAR can be found.
     warning off MATLAB:javaclasspath:jarAlreadySpecified
     classpath = getenv('CLASSPATH');
+    javaclasspath0 = javaclasspath('-all');
     for path = regexp(classpath, pathsep, 'split')
+      if ~ismember(path,javaclasspath0),
         javaaddpath(path);
+      end
     end
 
     %% Connect to SAGE
