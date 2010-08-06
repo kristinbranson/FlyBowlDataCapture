@@ -20,7 +20,12 @@ handles.FrameCount = 0;
 
 % frame rate
 ss = getselectedsource(handles.vid);
-handles.FPS = str2double(get(ss,'FrameRate'));
+tmp = get(ss);
+if isfield(ss,'FrameRate'),
+  handles.FPS = tmp.FrameRate;
+else
+  handles.FPS = handles.params.Imaq_FrameRate;
+end
 
 % open video files for writing
 handles = openVideoFile(handles);

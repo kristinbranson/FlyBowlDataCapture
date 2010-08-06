@@ -5,6 +5,11 @@ handles.version = '0.1';
 
 % file containing parameters we may want to change some day
 handles.params_file = 'FlyBowlDataCaptureParams.txt';
+[filestr,pathstr] = uigetfile('*.txt','Choose Parameter File',handles.params_file);
+if ~ischar(filestr),
+  uiresume(handles.figure_main);
+end
+handles.params_file = fullfile(pathstr,filestr);
 
 % comment character in params file
 comment_char = '#';
@@ -100,9 +105,13 @@ try
     'PreAssayHandling_SortingDate_Range','PreAssayHandling_StarvationDate_Range',...
     'Imaq_ROIPosition','RecordTime','PreviewUpdatePeriod',...
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
-    'MaxFrameRatePlot','DoQuerySage'};
+    'MaxFrameRatePlot','DoQuerySage','Imaq_FrameRate','Imaq_Shutter','Imaq_Gain'};
   for i = 1:length(numeric_params),
-    handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
+    if isfield(handles.params,numeric_params{i}),
+      handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
+    else
+      fprintf('Parameter %s not set in parameter file.\n',handles.params.(numeric_params{i}));
+    end
   end
   
   % some values are not lists

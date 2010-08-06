@@ -14,10 +14,42 @@ end
 
 handles.vidRes = get(handles.vid, 'VideoResolution'); 
 handles.nBands = get(handles.vid, 'NumberOfBands'); 
+srcparams = get(handles.vid.source);
+srcparamnames = fieldnames(srcparams);
+
+% read frame rate from videoinput if possible
+if any(strcmpi(srcparamnames,'FrameRate')),
+  handles.params.Imaq_FrameRate = str2double(get(handles.vid.source,'FrameRate'));
+end
+
+% set shutter period if possible and necessary
+if isfield(handles.params,'Imaq_Shutter') && handles.params.Imaq_Shutter > 0 && ...
+    any(strcmpi(srcparamnames,'Shutter')),
+  set(handles.vid.source,'Shutter',handles.params.Imaq_Shutter);
+end
+
+% set gain if possible and necessary
+if isfield(handles.params,'Imaq_Gain') && handles.params.Imaq_Gain > 0 && ...
+    any(strcmpi(srcparamnames,'Gain')),
+  set(handles.vid.source,'Gain',handles.params.Imaq_Gain);
+end
+
+% get camera unique ID if available
+if any(strcmpi(srcparamnames,'UniqueID')),
+  handles.DeviceUniqueID = get(handles.vid.source,'UniqueID');
+else
+  handles.DeviceUniqueID = '';
+end
+
 % maximum number of frames to record
-handles.FramesPerTrigger = str2double(get(handles.vid.source,'FrameRate')) * handles.params.RecordTime;
+handles.FramesPerTrigger = handles.params.Imaq_FrameRate * handles.params.RecordTime;
 set(handles.vid,'FramesPerTrigger',handles.FramesPerTrigger,'Name','FBDC_VideoInput');
-handles.hImage_Preview = image( zeros(handles.vidRes(2), handles.vidRes(1), handles.nBands) , 'Parent', handles.axes_PreviewVideo); 
+tmp = zeros(handles.vidRes(2), handles.vidRes(1), handles.nBands);
+tmp(1,1,:) = 255;
+handles.hImage_Preview = image( tmp , 'Parent', handles.axes_PreviewVideo); 
+if handles.nBands == 1,
+  colormap(handles.axes_PreviewVideo,gray(256));
+end
 axis(handles.axes_PreviewVideo,'image');
 
 % Set up the update preview window function.
