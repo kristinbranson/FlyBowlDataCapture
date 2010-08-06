@@ -1018,7 +1018,7 @@ function menu_File_RefreshLineNames_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.Fly_LineNames = readLineNames(handles.linename_file);
+handles.Fly_LineNames = readLineNames(handles.linename_file,handles.db,true);
 
 % check to see if the current line name is valid
 if ~ismember(handles.Fly_LineName,handles.Fly_LineNames),

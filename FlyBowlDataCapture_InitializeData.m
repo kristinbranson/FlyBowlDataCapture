@@ -28,6 +28,9 @@ handles.grayed_bkgdcolor = 0.314 + zeros(1,3);
 % list of fly lines read frame Sage
 handles.linename_file = 'SageLineNames.txt';
 
+% name of Sage parameters file
+handles.SageParamsFile = 'SAGEReadParams.txt';
+
 % now
 handles.now = now;
 
@@ -152,8 +155,16 @@ set(handles.popupmenu_Assay_Experimenter,'String',handles.Assay_Experimenters,..
 % whether this has been changed or not
 handles.isdefault.Fly_LineName = true;
 
+% connect to Sage
+try
+  handles.db = connectToSAGE(handles.SageParamsFile);
+catch ME
+  warndlg(['Could not connect to Sage: ',getReport(ME)],'Could not connect to Sage');
+  handles.db = [];
+end
+
 % read the line names cached in handles.linename_file; sort by something?
-handles.Fly_LineNames = readLineNames(handles.linename_file);
+handles.Fly_LineNames = readLineNames(handles.linename_file,handles.db,false);
 
 % if line name not stored in rc file, choose first line name
 if ~isfield(previous_values,'Fly_LineName') || ...
