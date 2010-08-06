@@ -3,9 +3,6 @@ function handles = SaveMetaData(handles)
 % construct experiment name, directory
 handles = setExperimentName(handles);
 
-% construct name for main metadata file
-handles.MetaDataFileName = fullfile(handles.ExperimentDirectory,handles.params.MetaDataFileName);
-
 % open meta data file
 fid = fopen(handles.MetaDataFileName,'w');
 if fid < 0,
@@ -94,6 +91,14 @@ fprintf(fid,'  </apparatus>\n');
 fprintf(fid,'</experiment>\n');
 
 fclose(fid);
+
+% meta data does not need to be saved now
+handles.MetaDataNeedsSave = false;
+set(handles.pushbutton_SaveMetaData,'BackgroundColor',handles.grayed_bkgdcolor);
+
+% write to log file
+handles = addToStatus(handles,{sprintf('Saved MetaData to file %s.',...
+    handles.MetaDataFileName)});
 
 % % write the extra metadata file
 % filestr = sprintf('ExtraMetadata_%s_Rig%sPlate%sBowl%s_%s.xml',handles.Fly_LineName,...

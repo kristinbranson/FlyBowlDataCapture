@@ -49,8 +49,8 @@ guidata(hObject,handles);
 start(handles.vid);
 
 % add to status log
-handles = addToStatus(handles,{sprintf('%s: Started recording to file %s.',...
-  datestr(handles.StartRecording_Time_datenum,handles.secondformat),handles.FileName)});
+handles = addToStatus(handles,{sprintf('Started recording to file %s.',handles.FileName)},...
+  handles.StartRecording_Time_datenum);
 
 % set recording status
 set(handles.text_Status_Recording,'String','On','BackgroundColor',handles.Status_Recording_bkgdcolor);

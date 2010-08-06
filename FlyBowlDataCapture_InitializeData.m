@@ -100,7 +100,7 @@ try
     'PreAssayHandling_SortingDate_Range','PreAssayHandling_StarvationDate_Range',...
     'Imaq_ROIPosition','RecordTime','PreviewUpdatePeriod',...
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
-    'MaxFrameRatePlot'};
+    'MaxFrameRatePlot','DoQuerySage'};
   for i = 1:length(numeric_params),
     handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
   end
@@ -108,7 +108,7 @@ try
   % some values are not lists
   notlist_params = {'Imaq_Adaptor','Imaq_DeviceName','Imaq_VideoFormat',...
     'FileType','OutputDirectory','TmpOutputDirectory','MetaData_AssayName',...
-    'MetaData_Effector','MetaDataFileName','MovieFilePrefix'};
+    'MetaData_Effector','MetaDataFileName','MovieFilePrefix','LogFileName'};
   for i = 1:length(notlist_params),
     handles.params.(notlist_params{i}) = handles.params.(notlist_params{i}){1};
   end
@@ -127,6 +127,22 @@ if exist(handles.rcfile,'file'),
   catch
   end
 end
+
+%% temporary output directory
+if isempty(handles.params.TmpOutputDirectory),
+  handles.params.TmpOutputDirectory = tempdir;
+end
+
+%% Status window
+%handles.Status_MaxNLines = 50;
+handles.IsTmpLogFile = true;
+handles.LogFileName = fullfile(handles.params.TmpOutputDirectory,sprintf('TmpLog_%s.txt',datestr(now,30)));
+handles.Status = {};
+s = {
+  sprintf('FlyBowlDataCapture v. %s',handles.version)
+  '--------------------------------------'};
+handles = addToStatus(handles,s,-1);
+handles = addToStatus(handles,{'GUI initialization finished.'});
 
 %% Experimenter
 
@@ -156,15 +172,20 @@ set(handles.popupmenu_Assay_Experimenter,'String',handles.Assay_Experimenters,..
 handles.isdefault.Fly_LineName = true;
 
 % connect to Sage
-try
-  handles.db = connectToSAGE(handles.SageParamsFile);
-catch ME
-  warndlg(['Could not connect to Sage: ',getReport(ME)],'Could not connect to Sage');
-  handles.db = [];
+if handles.params.DoQuerySage,
+  try
+    handles.db = connectToSAGE(handles.SageParamsFile);
+    handles = addToStatus(handles,{'Connected to Sage.'});
+  catch ME
+    warndlg(['Could not connect to Sage: ',getReport(ME)],'Could not connect to Sage');
+    handles.db = [];
+    handles.params.DoQuerySage = false;
+    handles = addToStatus(handles,{'Could not connect to Sage. Turning off querying Sage.'});
+  end
 end
 
 % read the line names cached in handles.linename_file; sort by something?
-handles.Fly_LineNames = readLineNames(handles.linename_file,handles.db,false);
+handles = readLineNames(handles,false);
 
 % if line name not stored in rc file, choose first line name
 if ~isfield(previous_values,'Fly_LineName') || ...
@@ -613,10 +634,14 @@ handles.Done_bkgdcolor = [.404,.231,.012];
 set(handles.pushbutton_Done,'BackgroundColor',handles.grayed_bkgdcolor,...
   'String','Done','Enable','off');
 
-%% temporary output directory
-if isempty(handles.params.TmpOutputDirectory),
-  handles.params.TmpOutputDirectory = tempdir;
-end
+%% Save MetaData
+
+% meta data needs to be saved still
+handles.MetaDataNeedsSave = true;
+handles.SaveMetaData_bkgdcolor = [0,.35,.35];
+set(handles.pushbutton_SaveMetaData,'BackgroundColor',handles.SaveMetaData_bkgdcolor,...
+  'String','Save MetaData','Enable','on');
+
 
 %% Preview Status
 
@@ -638,19 +663,6 @@ set(handles.text_Status_FramesWritten,'String',num2str(0),...
 
 set(handles.text_Status_FrameRate,'String','N/A',...
   'BackgroundColor',handles.grayed_bkgdcolor);
-
-%% Status window
-handles.Status_MaxNLines = 50;
-handles.Status = {
-  sprintf('FlyBowlDataCapture v. %s',handles.version)
-  '--------------------------------------'
-  sprintf('%s: GUI initialization finished.',datestr(now,handles.secondformat))
-  };
-handles.Status = textwrap(handles.edit_Status,handles.Status);
-if length(handles.Status) > handles.Status_MaxNLines,
-  handles.Status = handles.Status(end-handles.Status_MaxNLines+1:end);
-end
-set(handles.edit_Status,'String',handles.Status);
 
 %% Temperature and humidity
 

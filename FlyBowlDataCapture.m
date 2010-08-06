@@ -53,10 +53,14 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to FlyBowlDataCapture (see VARARGIN)
 
 % Choose default command line output for FlyBowlDataCapture
-handles.output = hObject;
 
-% Update handles structure
-guidata(hObject, handles);
+handles.DEBUG = false;
+handles.IsProcessingError = false;
+guidata(hObject,handles);
+
+try
+  
+handles.output = hObject;
 
 % initialize data
 handles = FlyBowlDataCapture_InitializeData(handles);
@@ -84,6 +88,23 @@ guidata(hObject,handles);
 % UIWAIT makes FlyBowlDataCapture wait for user response (see UIRESUME)
 uiwait(handles.figure_main);
 
+catch ME,
+  
+  if handles.DEBUG,
+    getReport(ME)
+    rethrow ME;
+  else
+    s = {'Error during data capture:',getReport(ME)};
+    if exist('handles','var') && isstruct(handles) && ...
+        isfield(handles,'LogFileName') && ischar(handles.LogFileName),
+      s{end+1} = ['Log file location: ',handles.LogFileName];
+    end
+    s{end+1} = 'Please create a Jira ticket with this information.';
+    uiwait(msgbox(s,'Error During Data Capture'));
+    handles.IsProcessingError = true;
+    guidata(hObject,handles);
+  end
+end
 
 % --- Outputs from this function are returned to the command line.
 function varargout = FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles) 
@@ -92,13 +113,19 @@ function varargout = FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% save metadata
-if handles.FinishedRecording,
-  handles = SaveMetaData(handles);
-end
+try
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
+
+% save metadata
+if handles.MetaDataNeedsSave,
+  answer = questdlg('Save MetaData before quitting?','Save MetaData?','Yes','No','Yes');
+  if strcmpi(answer,'Yes'),
+    handles = SaveMetaData(handles);
+  end
+end
+
 if isfield(handles,'StopTimer') && isvalid(handles.StopTimer),
   stop(handles.StopTimer);
   delete(handles.StopTimer);
@@ -115,6 +142,15 @@ handles = RecordConfiguration(handles);
 guidata(hObject,handles);
 
 delete(handles.figure_main);
+
+catch ME
+  s = sprintf('Error during saving: %s\n',getReport(ME));
+  uiwait(errordlg(s,'Error while saving'));
+  if exist('handles','var') && isfield(handles,'figure_main') && ...
+      ishandle(handles.figure_main),
+    delete(handles.figure_main);
+  end
+end
 
 % --- Executes on selection change in popupmenu_Assay_Experimenter.
 function popupmenu_Assay_Experimenter_Callback(hObject, eventdata, handles)
@@ -134,6 +170,8 @@ handles.isdefault.Assay_Experimenter = false;
 
 % set color
 set(handles.popupmenu_Assay_Experimenter,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
@@ -193,10 +231,11 @@ if isvalid,
   % set color
   set(handles.edit_Fly_LineName,'BackgroundColor',handles.changed_bkgdcolor);
   
+  handles = ChangedMetaData(handles);
+  
 else
   
-  handles = addToStatus(handles,{sprintf('%s: Invalid line name %s switched back to %s.',...
-    datestr(now,handles.secondformat),...
+  handles = addToStatus(handles,{sprintf('Invalid line name %s switched back to %s.',...
     newname,handles.Fly_LineName)});
   set(handles.edit_Fly_LineName,'BackgroundColor',handles.shouldchange_bkgdcolor);
 
@@ -236,6 +275,8 @@ handles.isdefault.Rearing_ActivityPeak = false;
 % set color
 set(handles.popupmenu_Rearing_ActivityPeak,'BackgroundColor',handles.changed_bkgdcolor);
 
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -269,6 +310,8 @@ handles.isdefault.Rearing_IncubatorID = false;
 
 % set color
 set(handles.popupmenu_Rearing_IncubatorID,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
@@ -318,6 +361,8 @@ end
 % highlight ordering errors
 handles = CheckOrderingErrors(handles);
   
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 function handles = CheckOrderingErrors(handles)
@@ -453,6 +498,8 @@ end
 % highlight ordering errors
 handles = CheckOrderingErrors(handles);
 
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -492,6 +539,8 @@ handles.isdefault.PreAssayHandling_SortingDate = false;
 
 % highlight ordering errors
 handles = CheckOrderingErrors(handles);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
@@ -542,6 +591,8 @@ handles.isdefault.PreAssayHandling_SortingHour = false;
 % make sure date order is legal
 handles = CheckOrderingErrors(handles);
 
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -575,6 +626,8 @@ handles.isdefault.PreAssayHandling_SortingHandler = false;
 
 % set color
 set(handles.popupmenu_PreAssayHandling_SortingHandler,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
@@ -615,6 +668,8 @@ handles.isdefault.PreAssayHandling_StarvationDate = false;
 
 % highlight ordering errors
 handles = CheckOrderingErrors(handles);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
@@ -668,6 +723,8 @@ handles.isdefault.PreAssayHandling_StarvationHour = false;
 % highlight ordering errors
 handles = CheckOrderingErrors(handles);
 
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -701,6 +758,8 @@ handles.isdefault.Assay_Rig = false;
 
 % set color
 set(handles.popupmenu_Assay_Rig,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
@@ -737,6 +796,8 @@ handles.isdefault.Assay_Plate = false;
 % set color
 set(handles.popupmenu_Assay_Plate,'BackgroundColor',handles.changed_bkgdcolor);
 
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 
@@ -771,6 +832,8 @@ handles.isdefault.Assay_Bowl = false;
 
 % set color
 set(handles.popupmenu_Assay_Bowl,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
@@ -809,7 +872,9 @@ set(handles.pushbutton_FliesLoaded,'BackgroundColor',handles.FliesLoaded_bkgdcol
 set(handles.pushbutton_StartRecording,'Enable','off','BackgroundColor',handles.grayed_bkgdcolor);
 
 % add to status log
-handles = addToStatus(handles,{sprintf('%s: Shifted fly temperature.',datestr(handles.ShiftFlyTemp_Time_datenum,handles.secondformat))});
+handles = addToStatus(handles,{'Shifted fly temperature.'},handles.ShiftFlyTemp_Time_datenum);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
@@ -831,7 +896,9 @@ if handles.IsCameraInitialized,
 end
 
 % add to status log
-handles = addToStatus(handles,{sprintf('%s: Flies loaded.',datestr(handles.FliesLoaded_Time_datenum,handles.secondformat))});
+handles = addToStatus(handles,{'Flies loaded.'},handles.FliesLoaded_Time_datenum);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
@@ -873,10 +940,12 @@ function pushbutton_Abort_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-v = questdlg('Do you really want to quit? All data entered will be lost.','Really quit?','Quit','Cancel','Cancel');
+v = questdlg('Do you really want to quit?','Really quit?','Quit','Cancel','Cancel');
 if strcmp(v,'Cancel'),
   return;
 end
+
+handles = addToStatus(handles,{'Capture aborted.'});
 
 if isfield(handles,'vid') && isvalid(handles.vid),
   stop(handles.vid);
@@ -909,6 +978,9 @@ function edit_TechnicalNotes_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of edit_TechnicalNotes as a double
 
 handles.TechnicalNotes = get(hObject,'String');
+
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -934,6 +1006,9 @@ function edit_BehaviorNotes_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of edit_BehaviorNotes as a double
 
 handles.BehaviorNotes = get(hObject,'String');
+
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -968,6 +1043,8 @@ handles.isdefault.PreAssayHandling_StarvationHandler = false;
 % set color
 set(handles.popupmenu_PreAssayHandling_StarvationHandler,'BackgroundColor',handles.changed_bkgdcolor);
 
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -993,7 +1070,7 @@ function pushbutton_Done_Callback(hObject, eventdata, handles)
 oldname = handles.FileName;
 handles = renameVideoFile(handles);
 if ~strcmp(oldname,handles.FileName),
-  handles = addToStatus(handles,{sprintf('%s: Renamed %s -> %s.',datestr(now,handles.secondformat),oldname,handles.FileName)});
+  handles = addToStatus(handles,{sprintf('Renamed %s -> %s.',oldname,handles.FileName)});
 end
 
 guidata(hObject,handles);
@@ -1023,7 +1100,7 @@ function menu_File_RefreshLineNames_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.Fly_LineNames = readLineNames(handles.linename_file,handles.db,true);
+handles = readLineNames(handles,handles.params.DoQuerySage);
 
 % check to see if the current line name is valid
 if ~ismember(handles.Fly_LineName,handles.Fly_LineNames),
@@ -1034,6 +1111,9 @@ set(handles.edit_Fly_LineName,'String',handles.Fly_LineName);
 drawnow;
 AutoCompleteEdit(handles.AutoCompleteEdit_Fly_LineName,handles.Fly_LineNames);
 drawnow;
+
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 % --------------------------------------------------------------------
@@ -1065,6 +1145,8 @@ end
 % set color
 set(handles.popupmenu_DeviceID,'BackgroundColor',handles.changed_bkgdcolor);
   
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 
@@ -1109,6 +1191,9 @@ if isfield(handles,'hImage_Preview') && ishandle(handles.hImage_Preview),
 end
 set(handles.pushbutton_InitializeCamera,'Visible','on');
 handles = detectCamerasWrapper(handles);
+
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 % --- Executes on selection change in popupmenu_PreAssayHandling_CrossDate.
@@ -1131,6 +1216,8 @@ handles.isdefault.PreAssayHandling_CrossDate = false;
 
 % highlight ordering errors
 handles = CheckOrderingErrors(handles);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
@@ -1164,6 +1251,8 @@ handles.isdefault.RedoFlag = false;
 % set color
 set(handles.popupmenu_RedoFlag,'BackgroundColor',handles.changed_bkgdcolor);
 
+handles = ChangedMetaData(handles);
+
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -1195,6 +1284,8 @@ handles.isdefault.ReviewFlag = false;
 
 % set color
 set(handles.popupmenu_ReviewFlag,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 

@@ -30,7 +30,7 @@ PreAssayHandling_StarvationHandlers,hirokawaj,robiea,bransonk
 # List of possible Rig values
 Assay_Rigs,1,2
 # List of possible Plate values
-Assay_Plates,1,2
+Assay_Plates,01,02
 # List of possible Bowl values
 Assay_Bowls,1,2,3,4
 # List of possible Redo flags
@@ -58,7 +58,10 @@ OutputDirectory,C:\Users\kristin\Documents\work\data\flybowl\FBDC_test
 MovieFilePrefix,movie
 # Directory to temporarily store video to
 TmpOutputDirectory,
+# Name of file to store metadata to
 MetaDataFileName,Metadata.xml
+# Name of file to store log to
+LogFileName,Log.txt
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
 MetaData_RearingProtocols,RearingProtocol0001_Morning,RearingProtocol0002_Afternoon
@@ -69,3 +72,5 @@ MetaData_Effector,TrpA
 MetaData_RoomTemperatureSetPoint,25
 MetaData_RoomHumiditySetPoint,60
 MaxFrameRatePlot,35
+# Whether to try to connect over the network to Sage to query line names
+DoQuerySage,0

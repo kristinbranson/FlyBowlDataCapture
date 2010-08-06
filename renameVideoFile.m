@@ -15,21 +15,24 @@ newfilename = fullfile(handles.ExperimentDirectory,filestr);
 
 % check if renaming already done
 if exist(newfilename,'file') && ~exist(oldfilename,'file'),
-  fprintf('Hmm, %s already renamed to %s\n',oldfilename,newfilename);
+  handles = addToStatus(handles,{sprintf('Sanity check failed: %s already renamed to %s\n',oldfilename,newfilename)});
   handles.FileName = newfilename;
   handles.IsTmpFileName = false;
   return;
 end
 
+handles = addToStatus(handles,sprintf('Renaming movie file from %s to %s',oldfilename,newfilename));
 [success,msg] = movefile(oldfilename,newfilename,'f');
 if success,
+  %fprintf('Successfully renamed file from %s to %s\n',oldfilename,handles.FileName);
   handles.IsTmpFileName = false;
   handles.FileName = newfilename;
-  fprintf('Renamed successfully\n');
+  %fprintf('Renamed successfully\n');
 else
   s = {sprintf('Video temporarily stored to %s. ',oldfilename),...
     sprintf('Could not rename %s. ',handles.FileName),...
     msg};
   uiwait(errordlg(s,'Error renaming file'));
+  handles = addToStatus(handles,s);
   warning(cell2mat(s));
 end

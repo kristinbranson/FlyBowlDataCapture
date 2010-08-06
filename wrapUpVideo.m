@@ -57,8 +57,8 @@ handles = renameVideoFile(handles);
 guidata(hObject,handles);
 fprintf('Renamed to %s\n',handles.FileName);
 % add to status log
-handles = addToStatus(handles,{sprintf('%s: Finished recording. Video file moved from %s to %s.',...
-  datestr(now,handles.secondformat),oldname,handles.FileName)});
+handles = addToStatus(handles,{sprintf('Finished recording. Video file moved from %s to %s.',...
+  oldname,handles.FileName)});
 guidata(hObject,handles);
 
 PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');

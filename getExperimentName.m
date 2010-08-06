@@ -1,0 +1,13 @@
+function ExperimentName = getExperimentName(handles)
+
+if handles.StartRecording_Time_datenum <= 0,
+  timestampstr = 'notstarted';
+else
+  timestampstr = datestr(handles.StartRecording_Time_datenum,30);
+end
+
+ExperimentName = sprintf('%s_%s_Rig%sPlate%sBowl%s_%s',...
+  handles.Fly_LineName,...
+  handles.params.MetaData_Effector,...
+  handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Bowl,...
+  timestampstr);
