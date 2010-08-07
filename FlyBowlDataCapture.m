@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 06-Aug-2010 08:23:16
+% Last Modified by GUIDE v2.5 07-Aug-2010 04:01:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -61,6 +61,14 @@ guidata(hObject,handles);
 try
   
 handles.output = hObject;
+
+% file containing parameters we may want to change some day
+handles.params_file = 'FlyBowlDataCaptureParams.txt';
+[filestr,pathstr] = uigetfile('*.txt','Choose Parameter File',handles.params_file);
+if ~ischar(filestr),
+  uiresume(handles.figure_main);
+end
+handles.params_file = fullfile(pathstr,filestr);
 
 % initialize data
 handles = FlyBowlDataCapture_InitializeData(handles);
@@ -118,34 +126,13 @@ try
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-% save metadata
-if handles.MetaDataNeedsSave,
-  answer = questdlg('Save MetaData before quitting?','Save MetaData?','Yes','No','Yes');
-  if strcmpi(answer,'Yes'),
-    handles = SaveMetaData(handles);
-  end
-end
-
-if isfield(handles,'StopTimer') && isvalid(handles.StopTimer),
-  stop(handles.StopTimer);
-  delete(handles.StopTimer);
-end
-if isfield(handles,'vid') && isvalid(handles.vid),
-  delete(handles.vid);
-end
-if isfield(handles,'hImage_Preview') && ishandle(handles.hImage_Preview),
-  delete(handles.hImage_Preview);
-end
-
-% save figure
-handles = RecordConfiguration(handles);
 guidata(hObject,handles);
 
 delete(handles.figure_main);
 
 catch ME
-  s = sprintf('Error during saving: %s\n',getReport(ME));
-  uiwait(errordlg(s,'Error while saving'));
+  s = sprintf('Error while closing GUI: %s\n',getReport(ME));
+  uiwait(errordlg(s,'Error while closing GUI'));
   if exist('handles','var') && isfield(handles,'figure_main') && ...
       ishandle(handles.figure_main),
     delete(handles.figure_main);
@@ -920,7 +907,12 @@ set(handles.pushbutton_StartRecording,'Enable','off','BackgroundColor',handles.g
 
 % disable changing camera
 set(handles.popupmenu_DeviceID,'Enable','off');
-set(handles.menu_DetectCameras,'Enable','off');
+set(handles.menu_Edit_DetectCameras,'Enable','off');
+
+% disable File menus
+set(handles.menu_File_New,'Enable','off');
+set(handles.menu_File_Close,'Enable','off');
+set(handles.menu_Quit,'Enable','off');
 
 guidata(hObject,handles);
 
@@ -940,34 +932,12 @@ function pushbutton_Abort_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-v = questdlg('Do you really want to quit?','Really quit?','Quit','Cancel','Cancel');
-if strcmp(v,'Cancel'),
+[handles,didcancel] = CloseExperiment(handles);
+if didcancel,
   return;
 end
-
-handles = addToStatus(handles,{'Capture aborted.'});
-
-if isfield(handles,'vid') && isvalid(handles.vid),
-  stop(handles.vid);
-end
-handles = guidata(hObject);
-if isfield(handles,'FileName') && exist(handles.FileName,'file'),
-
-  % move video to aborted temporary directory
-  handles = guidata(hObject);
-  oldfilename = handles.FileName;
-  [~,filestr,ext] = fileparts(handles.FileName);
-  newfilename = fullfile(handles.params.TmpOutputDirectory,[filestr,ext]);
-  if ~strcmp(newfilename,oldfilename),
-    [success,msg] = movefile(oldfilename,newfilename);
-    if ~success,
-      s = sprintf('Could not move file %s to temporary storage %s: %s',oldfilename,newfilename,msg);
-      errordlg(s,'Error removing file.');
-    end
-  end
-end
-
-uiresume(handles.figure_main);
+handles = DisableGUI(handles);
+guidata(hObject,handles);
 
 function edit_TechnicalNotes_Callback(hObject, eventdata, handles)
 % hObject    handle to edit_TechnicalNotes (see GCBO)
@@ -1095,8 +1065,8 @@ function menu_File_Callback(hObject, eventdata, handles)
 
 
 % --------------------------------------------------------------------
-function menu_File_RefreshLineNames_Callback(hObject, eventdata, handles)
-% hObject    handle to menu_File_RefreshLineNames (see GCBO)
+function menu_Edit_RefreshLineNames_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_Edit_RefreshLineNames (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1117,8 +1087,8 @@ handles = ChangedMetaData(handles);
 guidata(hObject,handles);
 
 % --------------------------------------------------------------------
-function menu_File_SaveSettings_Callback(hObject, eventdata, handles)
-% hObject    handle to menu_File_SaveSettings (see GCBO)
+function menu_Edit_SaveConfig_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_Edit_SaveConfig (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1173,16 +1143,16 @@ function figure_main_CloseRequestFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: delete(hObject) closes the figure
-if handles.IsRecording,
-  pushbutton_Abort_Callback(handles.pushbutton_Abort, eventdata, handles);
-else
-  uiresume(handles.figure_main);
+[handles,didcancel] = CloseExperiment(handles);
+if didcancel,
+  return;
 end
-
+guidata(hObject,handles);
+uiresume(handles.figure_main);
 
 % --------------------------------------------------------------------
-function menu_DetectCameras_Callback(hObject, eventdata, handles)
-% hObject    handle to menu_DetectCameras (see GCBO)
+function menu_Edit_DetectCameras_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_Edit_DetectCameras (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1314,11 +1284,14 @@ function menu_Quit_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-if handles.IsRecording,
-  pushbutton_Abort_Callback(handles.pushbutton_Abort, eventdata, handles);
-else
-  uiresume(handles.figure_main);
+[handles,didcancel] = CloseExperiment(handles);
+if didcancel,
+  return;
 end
+
+guidata(hObject,handles);
+
+uiresume(handles.figure_main);
 
 % --- Executes on button press in pushbutton_SaveMetaData.
 function pushbutton_SaveMetaData_Callback(hObject, eventdata, handles)
@@ -1340,3 +1313,127 @@ function menu_File_SaveMetaData_Callback(hObject, eventdata, handles)
 handles = SaveMetaData(handles);
 
 guidata(hObject,handles);
+
+
+% --------------------------------------------------------------------
+function menu_Edit_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_Edit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function menu_File_New_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_File_New (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+if handles.GUIIsInitialized,
+  handles = CloseExperiment(handles);
+end
+
+guidata(hObject,handles);
+
+handles = EnableGUI(handles);
+
+% initialize data
+handles = FlyBowlDataCapture_InitializeData(handles);
+
+% reset line name choices
+AutoCompleteEdit(handles.AutoCompleteEdit_Fly_LineName,handles.Fly_LineNames);
+
+guidata(hObject,handles);
+
+
+% --------------------------------------------------------------------
+function menu_File_Close_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_File_Close (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+[handles,didcancel] = CloseExperiment(handles);
+if didcancel,
+  return;
+end
+handles = DisableGUI(handles);
+
+guidata(hObject,handles);
+
+function [handles,didcancel] = CloseExperiment(handles)
+
+hObject = handles.figure_main;
+didcancel = false;
+
+% if not done recording, then make sure user wants to stop prematurely
+if ~handles.FinishedRecording && handles.GUIIsInitialized,
+  v = questdlg('Do you really want to close the current experiment?','Really close?','Close','Cancel','Cancel');
+  if strcmp(v,'Cancel'),
+    didcancel = true;
+    return;
+  end
+  handles = addToStatus(handles,{'Capture aborted.'});
+end
+
+% recording stopped in the middle
+if handles.IsRecording,
+  handles = addToStatus(handles,sprintf('Video recording canceled after %f seconds',(now-handles.StartRecording_Time_datenum)*86400));
+end
+
+% stop logging
+if handles.IsRecording && isfield(handles,'vid') && isvalid(handles.vid),
+  guidata(hObject,handles);
+  stop(handles.vid);
+  handles = guidata(hObject);
+end
+
+% save metadata
+if handles.MetaDataNeedsSave,
+  answer = questdlg('Save MetaData before closing?','Save MetaData?','Yes','No','Yes');
+  if strcmpi(answer,'Yes'),
+    handles = SaveMetaData(handles);
+  end
+end
+handles.MetaDataNeedsSave = false;
+if isfield(handles,'StopTimer') && isvalid(handles.StopTimer),
+  stop(handles.StopTimer);
+  delete(handles.StopTimer);
+end
+if isfield(handles,'vid') && isvalid(handles.vid),
+  delete(handles.vid);
+end
+if isfield(handles,'hImage_Preview') && ishandle(handles.hImage_Preview),
+  delete(handles.hImage_Preview);
+end
+
+% save figure
+handles = RecordConfiguration(handles);
+
+function handles = EnableGUI(handles)
+
+chil = findobj(handles.figure_main,'type','uicontrol');
+handles.menus_disable = [handles.menu_Edit,handles.menu_File_SaveMetaData,handles.menu_File_Close];
+chil = [chil;handles.menus_disable'];
+for i = 1:length(chil),
+  if ishandle(chil(i)),
+    try
+      set(chil(i),'Enable','on');
+    catch
+    end
+  end
+end
+
+function handles = DisableGUI(handles)
+
+chil = findobj(handles.figure_main,'type','uicontrol');
+handles.menus_disable = [handles.menu_Edit,handles.menu_File_SaveMetaData,handles.menu_File_Close];
+chil = [chil;handles.menus_disable'];
+for i = 1:length(chil),
+  if ishandle(chil(i)),
+    try
+      set(chil(i),'Enable','off');
+    catch
+    end
+  end
+end
+
+handles.GUIIsInitialized = false;

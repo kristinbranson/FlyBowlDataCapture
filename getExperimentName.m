@@ -1,7 +1,7 @@
 function ExperimentName = getExperimentName(handles)
 
 if handles.StartRecording_Time_datenum <= 0,
-  timestampstr = 'notstarted';
+  timestampstr = sprintf('notstarted_%s',datestr(handles.GUIInitialization_Time_datenum,30));
 else
   timestampstr = datestr(handles.StartRecording_Time_datenum,30);
 end

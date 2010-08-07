@@ -1,5 +1,13 @@
 function handles = setCamera(handles)
 
+if ~isfield(handles,'DeviceID'), 
+  pause(2);
+end
+
+if ~isfield(handles,'DeviceID'),
+  error('DeviceID not yet set');
+end
+
 try
   handles.vid = videoinput(handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
 catch
@@ -44,7 +52,7 @@ end
 % maximum number of frames to record
 handles.FramesPerTrigger = handles.params.Imaq_FrameRate * handles.params.RecordTime;
 set(handles.vid,'FramesPerTrigger',handles.FramesPerTrigger,'Name','FBDC_VideoInput');
-tmp = zeros(handles.vidRes(2), handles.vidRes(1), handles.nBands);
+tmp = zeros(handles.vidRes(2), handles.vidRes(1), handles.nBands,'uint8');
 tmp(1,1,:) = 255;
 handles.hImage_Preview = image( tmp , 'Parent', handles.axes_PreviewVideo); 
 if handles.nBands == 1,

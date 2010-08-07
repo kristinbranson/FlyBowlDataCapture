@@ -3,14 +3,6 @@ function handles = FlyBowlDataCapture_InitializeData(handles)
 % version
 handles.version = '0.1';
 
-% file containing parameters we may want to change some day
-handles.params_file = 'FlyBowlDataCaptureParams.txt';
-[filestr,pathstr] = uigetfile('*.txt','Choose Parameter File',handles.params_file);
-if ~ischar(filestr),
-  uiresume(handles.figure_main);
-end
-handles.params_file = fullfile(pathstr,filestr);
-
 % comment character in params file
 comment_char = '#';
 
@@ -151,7 +143,6 @@ s = {
   sprintf('FlyBowlDataCapture v. %s',handles.version)
   '--------------------------------------'};
 handles = addToStatus(handles,s,-1);
-handles = addToStatus(handles,{'GUI initialization finished.'});
 
 %% Experimenter
 
@@ -694,3 +685,8 @@ set(handles.axes_Status_FrameRate,'Color',[0,0,0],...
 %% Preview axes
 
 set(handles.axes_PreviewVideo,'xtick',[],'ytick',[]);
+
+%% Initialization complete
+handles.GUIInitialization_Time_datenum = now;
+handles.GUIIsInitialized = true;
+handles = addToStatus(handles,{'GUI initialization finished.'},handles.GUIInitialization_Time_datenum);
