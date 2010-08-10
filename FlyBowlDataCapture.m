@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 07-Aug-2010 04:01:18
+% Last Modified by GUIDE v2.5 10-Aug-2010 13:41:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1437,3 +1437,50 @@ for i = 1:length(chil),
 end
 
 handles.GUIIsInitialized = false;
+
+
+% --- Executes on selection change in popupmenu_TempProbeID.
+function popupmenu_TempProbeID_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_TempProbeID (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_TempProbeID contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_TempProbeID
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_TempProbeID_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_TempProbeID (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in popupmenu_NDeadFlies.
+function popupmenu_NDeadFlies_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_NDeadFlies (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_NDeadFlies contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_NDeadFlies
+handles.NDeadFlies = get(hObject,'Value')-1;
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_NDeadFlies_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_NDeadFlies (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

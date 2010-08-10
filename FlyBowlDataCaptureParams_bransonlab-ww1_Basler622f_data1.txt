@@ -1,5 +1,7 @@
 # List of possible Experimenter values
 Assay_Experimenters,hirokawaj,robiea,bransonk
+# Expected number of flies
+NFlies,20
 # List of possible Activity Peak values
 Rearing_ActivityPeaks,10:00,16:00
 # These should correspond to activity peaks
