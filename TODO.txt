@@ -6,3 +6,4 @@ X Output metadata.
 X Allow opening new experiment without closing GUI. 
 Collect temperature.
 Two cameras controlled by one GUI. 
+Done button should not close GUI. 

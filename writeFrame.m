@@ -38,10 +38,11 @@ try
   set(handles.text_Status_Recording,'String',sprintf('%.1f s',handles.writeFrame_time));
   set(handles.text_Status_FramesWritten,'String',sprintf('%d',handles.FrameCount));
   set(handles.text_Status_FrameRate,'String',sprintf('%.2f Hz',handles.writeFrame_EmpiricalFPS));
-  handles.Status_FrameRate_History(1) = [];
-  handles.Status_FrameRate_History(end+1) = handles.writeFrame_EmpiricalFPS;
+  handles.Status_FrameRate_History(:,1) = [];
+  handles.Status_FrameRate_History(:,end+1) = [time,handles.writeFrame_EmpiricalFPS];
   set(handles.hLine_Status_FrameRate,...
-    'Ydata',handles.Status_FrameRate_History);
+    'Xdata',handles.Status_FrameRate_History(1,:)-handles.Status_FrameRate_History(1,end),...
+    'Ydata',handles.Status_FrameRate_History(2,:));
 
 catch
   if strcmp(handles.params.FileType,'fmf') && ...
