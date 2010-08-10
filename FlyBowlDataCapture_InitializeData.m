@@ -97,7 +97,7 @@ try
     'PreAssayHandling_SortingDate_Range','PreAssayHandling_StarvationDate_Range',...
     'Imaq_ROIPosition','NFlies','RecordTime','PreviewUpdatePeriod',...
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
-    'MaxFrameRatePlot','DoQuerySage','Imaq_FrameRate','Imaq_Shutter','Imaq_Gain'};
+    'FrameRatePlotYLim','TempPlotYLim','DoQuerySage','Imaq_FrameRate','Imaq_Shutter','Imaq_Gain'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -681,16 +681,34 @@ handles.MetaData_RoomHumidity = handles.params.MetaData_RoomHumiditySetPoint;
 %% Plot frame rate
 
 handles.Status_FrameRate_MaxSecondsPlot = 5;
+handles.Status_FrameRate_MaxNFramesPlot = ceil(handles.Status_FrameRate_MaxSecondsPlot * ...
+  handles.params.Imaq_FrameRate);
 handles.Status_FrameRate_History = nan(1,handles.Status_FrameRate_MaxNFramesPlot);
 handles.hLine_Status_FrameRate = plot(handles.axes_Status_FrameRate,...
   1:handles.Status_FrameRate_MaxNFramesPlot,handles.Status_FrameRate_History,'color',[0,1,0]);
-ylabel(handles.axes_Status_FrameRate,'fps');
+hylabel = ylabel(handles.axes_Status_FrameRate,'fps');
+set(hylabel,'Units','pixels');
+pos = get(hylabel,'Position');
+pos(1) = pos(1)+10;
+set(hylabel,'Position',pos);
 set(handles.axes_Status_FrameRate,'Color',[0,0,0],...
   'XColor','w','YColor','w',...
   'XLim',[1,handles.Status_FrameRate_MaxNFramesPlot],...
-  'YLim',[0,handles.params.MaxFrameRatePlot]);
+  'YLim',handles.params.FrameRatePlotYLim);
 
 %% Plot temperature
+
+handles.Status_Temp_History = zeros(2,0);
+handles.hLine_Status_Temp = plot(handles.axes_Status_Temp,nan,nan,'color',[0,1,0]);
+hylabel = ylabel(handles.axes_Status_Temp,'Temp (C)');
+set(hylabel,'Units','pixels');
+pos = get(hylabel,'Position');
+pos(1) = pos(1)+10;
+set(hylabel,'Position',pos);
+set(handles.axes_Status_Temp,'Color',[0,0,0],...
+  'XColor','w','YColor','w',...
+  'XLim',[-1,0],...
+  'YLim',handles.params.TempPlotYLim);
 
 %% Preview axes
 
