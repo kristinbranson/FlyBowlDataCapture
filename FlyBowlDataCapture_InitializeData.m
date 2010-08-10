@@ -3,14 +3,6 @@ function handles = FlyBowlDataCapture_InitializeData(handles)
 % version
 handles.version = '0.1';
 
-% file containing parameters we may want to change some day
-handles.params_file = 'FlyBowlDataCaptureParams.txt';
-[filestr,pathstr] = uigetfile('*.txt','Choose Parameter File',handles.params_file);
-if ~ischar(filestr),
-  uiresume(handles.figure_main);
-end
-handles.params_file = fullfile(pathstr,filestr);
-
 % comment character in params file
 comment_char = '#';
 
@@ -103,7 +95,7 @@ try
   numeric_params = {'PreAssayHandling_CrossDate_Range',...
     'PreAssayHandling_DOBStart_Range','PreAssayHandling_DOBEnd_Range',...
     'PreAssayHandling_SortingDate_Range','PreAssayHandling_StarvationDate_Range',...
-    'Imaq_ROIPosition','RecordTime','PreviewUpdatePeriod',...
+    'Imaq_ROIPosition','NFlies','RecordTime','PreviewUpdatePeriod',...
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
     'MaxFrameRatePlot','DoQuerySage','Imaq_FrameRate','Imaq_Shutter','Imaq_Gain'};
   for i = 1:length(numeric_params),
@@ -151,7 +143,6 @@ s = {
   sprintf('FlyBowlDataCapture v. %s',handles.version)
   '--------------------------------------'};
 handles = addToStatus(handles,s,-1);
-handles = addToStatus(handles,{'GUI initialization finished.'});
 
 %% Experimenter
 
@@ -548,6 +539,13 @@ set(handles.popupmenu_Assay_Bowl,'String',handles.Assay_Bowls,...
   'Value',find(strcmp(handles.Assay_Bowl,handles.Assay_Bowls),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
+%% Number of dead flies
+
+handles.NDeadFlies_str = cellstr(num2str((0:handles.params.NFlies)'));
+handles.NDeadFlies = 0;
+set(handles.popupmenu_NDeadFlies,'String',handles.NDeadFlies_str,...
+  'Value',handles.NDeadFlies+1);
+
 %% Redo Flag
 
 % whether this has been changed or not
@@ -682,15 +680,23 @@ handles.MetaData_RoomHumidity = handles.params.MetaData_RoomHumiditySetPoint;
 
 %% Plot frame rate
 
-handles.Status_FrameRate_MaxNFramesPlot = 100;
+handles.Status_FrameRate_MaxSecondsPlot = 5;
 handles.Status_FrameRate_History = nan(1,handles.Status_FrameRate_MaxNFramesPlot);
 handles.hLine_Status_FrameRate = plot(handles.axes_Status_FrameRate,...
   1:handles.Status_FrameRate_MaxNFramesPlot,handles.Status_FrameRate_History,'color',[0,1,0]);
+ylabel(handles.axes_Status_FrameRate,'fps');
 set(handles.axes_Status_FrameRate,'Color',[0,0,0],...
   'XColor','w','YColor','w',...
   'XLim',[1,handles.Status_FrameRate_MaxNFramesPlot],...
   'YLim',[0,handles.params.MaxFrameRatePlot]);
 
+%% Plot temperature
+
 %% Preview axes
 
 set(handles.axes_PreviewVideo,'xtick',[],'ytick',[]);
+
+%% Initialization complete
+handles.GUIInitialization_Time_datenum = now;
+handles.GUIIsInitialized = true;
+handles = addToStatus(handles,{'GUI initialization finished.'},handles.GUIInitialization_Time_datenum);

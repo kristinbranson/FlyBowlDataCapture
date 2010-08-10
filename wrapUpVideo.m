@@ -77,4 +77,13 @@ set(handles.text_Status_FrameRate,'String',sprintf('Ave: %.1f',handles.FrameCoun
 % disable abort button
 set(handles.pushbutton_Abort,'Enable','off','BackgroundColor',handles.grayed_bkgdcolor);
 
+% enable switching cameras
+set(handles.popupmenu_DeviceID,'Enable','on');
+set(handles.menu_Edit_DetectCameras,'Enable','on');
+
+% enable file menus
+set(handles.menu_File_New,'Enable','on');
+set(handles.menu_File_Close,'Enable','on');
+set(handles.menu_Quit,'Enable','on');
+
 guidata(hObject,handles);
