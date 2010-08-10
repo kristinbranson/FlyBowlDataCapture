@@ -1,5 +1,8 @@
 X Save configuration. 
 X Rename file on Done. 
 X Handle abort. 
-Cross date.
-Output metadata.
+X Cross date.
+X Output metadata.
+X Allow opening new experiment without closing GUI. 
+Collect temperature.
+Two cameras controlled by one GUI. 
