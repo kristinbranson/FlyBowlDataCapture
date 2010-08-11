@@ -60,11 +60,11 @@ RecordTime,20
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,.1
 # Directory to store video to
-OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1
+OutputDirectory,E:\Data\FlyBowl\Test
 # Prefix of movie file
 MovieFilePrefix,movie
 # Directory to temporarily store video to
-TmpOutputDirectory,C:\Users\labadmin\Documents\FlyBowl\tmpdata1
+TmpOutputDirectory,
 # Name of file to store metadata to
 MetaDataFileName,Metadata.xml
 # Name of file to store log to

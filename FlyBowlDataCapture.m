@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 10-Aug-2010 13:41:26
+% Last Modified by GUIDE v2.5 11-Aug-2010 10:38:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -878,7 +878,7 @@ set(hObject,'BackgroundColor',handles.grayed_bkgdcolor,...
   'String',sprintf('Load: %s',datestr(handles.FliesLoaded_Time_datenum,13)));
 
 % enable recording if camera is initialized
-if handles.IsCameraInitialized,
+if handles.IsCameraInitialized && handles.TempProbe_IsInitialized,
   set(handles.pushbutton_StartRecording,'Enable','on','BackgroundColor',handles.StartRecording_bkgdcolor);
 end
 
@@ -1036,6 +1036,8 @@ function pushbutton_Done_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+handles = DisableGUI(handles);
+
 % rename video
 oldname = handles.FileName;
 handles = renameVideoFile(handles);
@@ -1043,9 +1045,9 @@ if ~strcmp(oldname,handles.FileName),
   handles = addToStatus(handles,{sprintf('Renamed %s -> %s.',oldname,handles.FileName)});
 end
 
-guidata(hObject,handles);
+handles = resetTempProbe(handles);
 
-uiresume(handles.figure_main);
+guidata(hObject,handles);
 
 % --- Executes on key press with focus on popupmenu_Assay_Experimenter and none of its controls.
 function popupmenu_Assay_Experimenter_KeyPressFcn(hObject, eventdata, handles)
@@ -1129,7 +1131,7 @@ function pushbutton_InitializeCamera_Callback(hObject, eventdata, handles)
 handles = setCamera(handles);
 set(hObject,'Visible','off');
 
-if handles.FliesLoaded_Time_datenum > 0,
+if handles.FliesLoaded_Time_datenum > 0 && handles.TempProbe_IsInitialized,
   set(handles.pushbutton_StartRecording,'Enable','on','BackgroundColor',handles.StartRecording_bkgdcolor);
 end
 
@@ -1404,6 +1406,7 @@ end
 if isfield(handles,'hImage_Preview') && ishandle(handles.hImage_Preview),
   delete(handles.hImage_Preview);
 end
+handles = resetTempProbe(handles);
 
 % save figure
 handles = RecordConfiguration(handles);
@@ -1483,4 +1486,23 @@ function popupmenu_NDeadFlies_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton_InitializeTempProbe.
+function pushbutton_InitializeTempProbe_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_InitializeTempProbe (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+success = initializeTempProbe(hObject);
+if success,
+  set(hObject,'Visible','off');
+  set(handles.popupmenu_TempProbeID,'Enable','off');
+  if handles.FliesLoaded_Time_datenum > 0 && handles.IsCameraInitiailzed,
+    set(handles.pushbutton_StartRecording,'Enable','on','BackgroundColor',handles.StartRecording_bkgdcolor);
+  end
+else
+  uiwait(warndlg('Unable to initialize temperature probe. Perhaps it is open in another program?','Error Initializing Temp Probe'));
 end

@@ -29,7 +29,7 @@ if ~libisloaded('usbtc08'),
   loadlibrary('usbtc08.dll', 'usbtc08.h');
 end
 
-% op
+% open device
 tc08_handle=calllib('usbtc08','usb_tc08_open_unit');
 if tc08_handle<=0
   last_error=calllib('usbtc08','usb_tc08_get_last_error',0);

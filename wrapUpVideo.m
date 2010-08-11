@@ -45,6 +45,9 @@ switch handles.params.FileType,
     fclose(handles.logger.fid);
 end
 
+% close temperature file
+fclose(handles.TempFid);
+
 % no longer recording
 fprintf('No longer recording.\n');
 handles = guidata(hObject);

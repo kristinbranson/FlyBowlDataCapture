@@ -3,15 +3,34 @@ function startLogging(hObject)
 handles = guidata(hObject);
 
 handles.StartRecording_Time_datenum = now;
+handles.StartTempRecorded = false;
+handles = tryRecordStartTemp(handles);
 
 handles = SaveMetaData(handles);
 
 % create a temporary name for the video
+handles.RandomNumber = randi(9999,1);
 filestr = sprintf('FBDC_movie_%s_%d.%s',...
   datestr(handles.StartRecording_Time_datenum,30),...
-  randi(9999,1),handles.params.FileType);
+  handles.RandomNumber,handles.params.FileType);
 handles.FileName = fullfile(handles.params.TmpOutputDirectory,filestr);
 handles.IsTmpFileName = true;
+
+% create a temporary name for the temperature
+filestr = sprintf('FBDC_temperature_%s_%d.txt',...
+  datestr(handles.StartRecording_Time_datenum,30),...
+  handles.RandomNumber);
+handles.TempFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
+handles.TempFid = -1;
+try
+  handles.TempFid = fopen(handles.TempFileName,'w');
+catch
+end
+if handles.TempFid <= 0,
+  s = sprintf('Could not open temperature file %s',handles.TempFileName);
+  uiwait(errordlg(s,'Error opening temperature file'));
+  error(s);
+end
 
 % copied from gVision/StartStop.m
 

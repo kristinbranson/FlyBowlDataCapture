@@ -97,7 +97,9 @@ try
     'PreAssayHandling_SortingDate_Range','PreAssayHandling_StarvationDate_Range',...
     'Imaq_ROIPosition','NFlies','RecordTime','PreviewUpdatePeriod',...
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
-    'FrameRatePlotYLim','TempPlotYLim','DoQuerySage','Imaq_FrameRate','Imaq_Shutter','Imaq_Gain'};
+    'FrameRatePlotYLim','TempPlotYLim','DoQuerySage','Imaq_FrameRate',...
+    'Imaq_Shutter','Imaq_Gain','TempProbePeriod','TempProbeChannels',...
+    'TempProbeReject60Hz'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -598,6 +600,24 @@ handles.DeviceID = previous_values.DeviceID;
 
 handles = detectCamerasWrapper(handles);
 
+%% Temperature Probe
+
+handles.TempProbeIDs = handles.params.TempProbeChannels;
+
+% if TempProbeID not stored in rc file or invalid, choose first valid
+% channel
+if ~isfield(previous_values,'TempProbeID') || ...
+    ~ismember(previous_values.TempProbeID,handles.TempProbeIDs),
+  previous_values.TempProbeID = handles.TempProbeIDs(1);
+end
+% by default, previous TempProbeID
+handles.TempProbeID = previous_values.TempProbeID;
+
+set(handles.popupmenu_TempProbeID,'String',cellstr(num2str(handles.TempProbeIDs(:))),...
+  'value',find(handles.TempProbeID==handles.TempProbeIDs,1));
+
+handles.TempProbe_IsInitialized = false;
+
 %% Shift Fly Temp
 handles.ShiftFlyTemp_Time_datenum = -1;
 handles.ShiftFlyTemp_bkgdcolor = [.153,.227,.373];
@@ -680,9 +700,9 @@ handles.MetaData_RoomHumidity = handles.params.MetaData_RoomHumiditySetPoint;
 
 %% Plot frame rate
 
-handles.Status_FrameRate_MaxSecondsPlot = 5;
-handles.Status_FrameRate_MaxNFramesPlot = ceil(handles.Status_FrameRate_MaxSecondsPlot * ...
-  handles.params.Imaq_FrameRate);
+handles.Status_FrameRate_MaxNFramesPlot = 100;
+handles.Status_FrameRate_MaxSecondsPlot = handles.Status_FrameRate_MaxNFramesPlot / ...
+  handles.params.Imaq_FrameRate;
 handles.Status_FrameRate_History = nan(2,handles.Status_FrameRate_MaxNFramesPlot);
 handles.hLine_Status_FrameRate = plot(handles.axes_Status_FrameRate,...
   handles.Status_FrameRate_History(1,:)-handles.Status_FrameRate_History(1,end),...
@@ -692,7 +712,7 @@ set(hylabel,'Units','pixels');
 pos = get(hylabel,'Position');
 pos(1) = pos(1)+10;
 set(hylabel,'Position',pos);
-hxlabel = xlabel(handles.axes_Status_FrameRate,'Seconds ago');
+xlabel(handles.axes_Status_FrameRate,'Seconds ago');
 set(handles.axes_Status_FrameRate,'Color',[0,0,0],...
   'XColor','w','YColor','w',...
   'XLim',[-handles.Status_FrameRate_MaxSecondsPlot,0],...
@@ -700,17 +720,22 @@ set(handles.axes_Status_FrameRate,'Color',[0,0,0],...
 
 %% Plot temperature
 
-handles.Status_Temp_History = zeros(2,0);
-handles.hLine_Status_Temp = plot(handles.axes_Status_Temp,nan,nan,'color',[0,1,0]);
+handles.Status_Temp_MaxSamplesPlot = 100;
+handles.Status_Temp_MaxSecondsPlot = handles.Status_Temp_MaxSamplesPlot * ...
+  handles.params.TempProbePeriod;
+
+handles.Status_Temp_History = nan(2,handles.Status_Temp_MaxSamplesPlot);
+handles.hLine_Status_Temp = plot(handles.axes_Status_Temp,handles.Status_Temp_History(1,:),...
+  handles.Status_Temp_History(2,:),'color',[0,1,0]);
 hylabel = ylabel(handles.axes_Status_Temp,'Temp (C)');
 set(hylabel,'Units','pixels');
 pos = get(hylabel,'Position');
 pos(1) = pos(1)+10;
 set(hylabel,'Position',pos);
-hxlabel = xlabel(handles.axes_Status_Temp,'Seconds ago');
+xlabel(handles.axes_Status_Temp,'Seconds ago');
 set(handles.axes_Status_Temp,'Color',[0,0,0],...
   'XColor','w','YColor','w',...
-  'XLim',[-1,0],...
+  'XLim',[-handles.Status_Temp_MaxSecondsPlot,0],...
   'YLim',handles.params.TempPlotYLim);
 
 %% Preview axes
