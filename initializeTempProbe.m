@@ -158,7 +158,7 @@ success = true;
         handles = tryRecordStartTemp(handles);
       end
       for ii = 1:nreadings,
-        fprintf(handles.TempFid,'%f,%f\n',double(times_mscurr)/1000,double(tempcurr(ii)));
+        fprintf(handles.TempFid,'%f,%f\n',double(times_mscurr(ii))/1000,double(tempcurr(ii)));
       end
     end
     guidata(handles.figure_main,handles);
