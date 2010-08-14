@@ -1500,7 +1500,7 @@ success = initializeTempProbe(hObject);
 if success,
   set(hObject,'Visible','off');
   set(handles.popupmenu_TempProbeID,'Enable','off');
-  if handles.FliesLoaded_Time_datenum > 0 && handles.IsCameraInitiailzed,
+  if handles.FliesLoaded_Time_datenum > 0 && handles.IsCameraInitialized,
     set(handles.pushbutton_StartRecording,'Enable','on','BackgroundColor',handles.StartRecording_bkgdcolor);
   end
 else
