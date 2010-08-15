@@ -7,6 +7,16 @@ handles.PreAssayHandling_DOBEndOff = floor(handles.now) - handles.PreAssayHandli
 handles.PreAssayHandling_SortingDateOff = floor(handles.now) - handles.PreAssayHandling_SortingDate_datenum;
 handles.PreAssayHandling_StarvationDateOff = floor(handles.now) - handles.PreAssayHandling_StarvationDate_datenum;
 
+% get current figure position
+FigurePosition = get(handles.figure_main,'Position');
+if ~isfield(handles,'FigurePositionHistory'),
+  handles.FigurePositionHistory = {};
+end
+handles.FigurePositionHistory{end+1} = FigurePosition;
+if length(handles.FigurePositionHistory) > 2,
+  handles.FigurePositionHistory = handles.FigurePositionHistory(2:end);
+end
+
 fns = {
   'Assay_Experimenter'
   'Fly_LineName'
@@ -25,12 +35,14 @@ fns = {
   'Assay_Plate'
   'Assay_Bowl'
   'DeviceID'
+  'TempProbeID'
+  'FigurePositionHistory'
   };
 
 handlefns = fieldnames(handles);
 fnsmissing = setdiff(fns,handlefns);
 if ~isempty(fnsmissing),
-  warning('Missing previous value: %s.\n',fnsmissing{:});
+  warning('Missing previous value: %s.\n',fnsmissing{:}); %#ok<WNTAG>
 end
 fns = setdiff(fns,fnsmissing);
 save(handles.rcfile,'-struct','handles',fns{:});

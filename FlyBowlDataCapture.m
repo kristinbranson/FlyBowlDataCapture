@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 11-Aug-2010 10:38:26
+% Last Modified by GUIDE v2.5 15-Aug-2010 15:26:15
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;

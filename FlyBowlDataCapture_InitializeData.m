@@ -146,6 +146,15 @@ s = {
   '--------------------------------------'};
 handles = addToStatus(handles,s,-1);
 
+%% Figure position
+
+if isfield(previous_values,'FigurePositionHistory'),
+  handles.FigurePositionHistory = previous_values.FigurePositionHistory;
+  set(handles.figure_main,'Units','Pixels','Position',handles.FigurePositionHistory{1});
+else
+  handles.FigurePositionHistory = {};
+end
+
 %% Experimenter
 
 % whether this has been changed or not
