@@ -3,6 +3,7 @@ function handles = resetTempProbe(handles)
 if isfield(handles,'TempProbe_IsInitialized') && handles.TempProbe_IsInitialized,
   try
     stop(handles.TempProbe_timer);
+    delete(handles.TempProbe_timer);
     handles.TempProbe_IsInitialized = false;
     handles.Status_Temp_History(:) = nan;
     set(handles.hLine_Status_Temp,'XData',handles.Status_Temp_History(1,:),...

@@ -65,10 +65,14 @@ handles.output = hObject;
 % file containing parameters we may want to change some day
 handles.params_file = 'FlyBowlDataCaptureParams.txt';
 [filestr,pathstr] = uigetfile('*.txt','Choose Parameter File',handles.params_file);
-if ~ischar(filestr),
+if ~ischar(filestr) || isempty(filestr),
   uiresume(handles.figure_main);
+  return;
 end
 handles.params_file = fullfile(pathstr,filestr);
+if ~exist(handles.params_file),
+  error('File %s does not exist',handles.params_file);
+end
 
 % initialize data
 handles = FlyBowlDataCapture_InitializeData(handles);
@@ -122,9 +126,6 @@ function varargout = FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 try
-
-% Get default command line output from handles structure
-varargout{1} = handles.output;
 
 guidata(hObject,handles);
 
@@ -1396,16 +1397,24 @@ if handles.MetaDataNeedsSave,
   end
 end
 handles.MetaDataNeedsSave = false;
+
+% stop experiment timer
 if isfield(handles,'StopTimer') && isvalid(handles.StopTimer),
   stop(handles.StopTimer);
   delete(handles.StopTimer);
 end
+
+% delete vid object
 if isfield(handles,'vid') && isvalid(handles.vid),
   delete(handles.vid);
 end
+
+% delete preview image
 if isfield(handles,'hImage_Preview') && ishandle(handles.hImage_Preview),
   delete(handles.hImage_Preview);
 end
+
+% delete temp recorder timer
 handles = resetTempProbe(handles);
 
 % save figure
@@ -1450,7 +1459,8 @@ function popupmenu_TempProbeID_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_TempProbeID contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu_TempProbeID
-
+handles.TempProbeID = handles.TempProbeIDs(get(hObject,'Value'));
+guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
 function popupmenu_TempProbeID_CreateFcn(hObject, eventdata, handles)
