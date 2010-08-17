@@ -113,7 +113,16 @@ try
     'FileType','OutputDirectory','TmpOutputDirectory','MetaData_AssayName',...
     'MetaData_Effector','MetaDataFileName','MovieFilePrefix','LogFileName'};
   for i = 1:length(notlist_params),
-    handles.params.(notlist_params{i}) = handles.params.(notlist_params{i}){1};
+    fn = notlist_params{i};
+    if ischar(handles.params.(fn){1}),
+      tmp = handles.params.(fn){1};
+      for j = 2:length(handles.params.(fn)),
+        tmp = [tmp,',',handles.params.(fn){j}]; %#ok<AGROW>
+      end
+      handles.params.(fn) = tmp;
+    else
+      handles.params.(fn) = cat(2,handles.params.(fn){:});
+    end
   end
   
 catch ME

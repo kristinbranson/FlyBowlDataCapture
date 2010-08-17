@@ -46,14 +46,21 @@ else
   handles.FPS = handles.params.Imaq_FrameRate;
 end
 
+if strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
+  set(handles.vid.Source,'fmfFileName',handles.FileName);
+  set(handles.vid.Source,'LogFlag',1)
+end
+
+
 % open video files for writing
 handles = openVideoFile(handles);
 
 % video callbacks
 handles.vid.framesacquiredfcn = {@writeFrame,handles.figure_main};
-handles.vid.stopfcn = {@wrapUpVideo,handles.figure_main};
-
 handles.vid.framesacquiredfcncount = 1;
+
+% function called when video recording stops
+handles.vid.stopfcn = {@wrapUpVideo,handles.figure_main};
 
 % for computing fps
 handles.writeFrame_time = 0;
