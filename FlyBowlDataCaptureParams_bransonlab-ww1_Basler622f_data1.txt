@@ -48,7 +48,7 @@ Imaq_VideoFormat,F7_Y8_1280x1024
 # Video ROI Position
 Imaq_ROIPosition,0,0,1024,1024
 # Frame rate we expect
-Imaq_FrameRate,25
+Imaq_FrameRate,30
 # Shutter period
 Imaq_Shutter,100
 # Gain
@@ -93,6 +93,6 @@ TempProbeTypes,K,K
 # if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
 TempProbeReject60Hz,0
 # whether to read temperature or not
-DoRecordTemp,0
+DoRecordTemp,1
 # Line Names to add to the list in Sage
 ExtraLineNames,DL-wildtype
