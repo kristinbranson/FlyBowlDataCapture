@@ -11,19 +11,22 @@ fprintf('Removing stop function\n');
 obj.stopfcn = '';
 
 % stop
-fprintf('Calling stop\n');
-stop(obj);
 if strcmpi(info.AdaptorName,'gdcam')
+  fprintf('Settings log flag to 0\n');
   set(obj.Source,'LogFlag',0);
 end
+fprintf('Calling stop\n');
+stop(obj);
 
 % wait a few seconds
 pause(3);
 
 % wait until actually stopped
 fprintf('Waiting for Running == Off...\n');
+%if strcmpi(info.AdapdorName,'gdcam'),
 while true,
-  if ~isrunning(obj) && ~islogging(obj),
+  if ~isrunning(obj) && ~islogging(obj)% && ...
+      %(~strcmpi(info.AdaptorName,'gdcam') 
     break;
   end
   pause(.5);

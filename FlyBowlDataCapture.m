@@ -112,7 +112,7 @@ catch ME,
       s{end+1} = ['Log file location: ',handles.LogFileName];
     end
     s{end+1} = 'Please create a Jira ticket with this information.';
-    uiwait(msgbox(s,'Error During Data Capture'));
+    uiwait(myerrordlg(s,'Error During Data Capture'));
     handles.IsProcessingError = true;
     guidata(hObject,handles);
   end

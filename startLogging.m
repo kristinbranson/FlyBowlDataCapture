@@ -51,11 +51,10 @@ end
 if strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
   set(handles.vid.Source,'fmfFileName',handles.FileName);
   set(handles.vid.Source,'LogFlag',1)
+else
+  % open video files for writing
+  handles = openVideoFile(handles);
 end
-
-
-% open video files for writing
-handles = openVideoFile(handles);
 
 % video callbacks
 handles.vid.framesacquiredfcn = {@writeFrame,handles.figure_main};

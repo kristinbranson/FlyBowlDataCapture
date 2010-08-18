@@ -93,6 +93,6 @@ TempProbeTypes,K,K
 # if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
 TempProbeReject60Hz,0
 # whether to read temperature or not
-DoRecordTemp,1
+DoRecordTemp,0
 # Line Names to add to the list in Sage
 ExtraLineNames,DL-wildtype

@@ -73,9 +73,6 @@ axis(handles.axes_PreviewVideo,'image');
 % Error function
 set(handles.vid,'ErrorFcn',@vidError);
 
-% timeout time
-set(handles.vid.Source,'FrameTimeOut',20000);
-
 % Set up the update preview window function.
 setappdata(handles.hImage_Preview,'UpdatePreviewWindowFcn',@UpdatePreview);
 setappdata(handles.hImage_Preview,'LastPreviewUpdateTime',-inf);
