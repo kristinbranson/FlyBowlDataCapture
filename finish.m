@@ -8,7 +8,7 @@
 
 try
 
-global MasterTempRecordInfo;
+global MasterTempRecordInfo; %#ok<*TLEV>
 
 if ~isempty(MasterTempRecordInfo) && ...
     exist(MasterTempRecordInfo.IsMasterFile,'file'),
@@ -36,5 +36,21 @@ end
 
 catch ME
   fprintf('Error checking whether we really want to stop Master Temperature Recorder:\n');
+  getReport(ME)
+end
+
+
+try
+
+global FBDC_IsCameraRunningFiles;
+
+for i = 1:length(FBDC_IsCameraRunningFiles),
+  if exist(FBDC_IsCameraRunningFiles{i},'file'),
+    delete(FBDC_IsCameraRunningFile);
+  end
+end
+
+catch ME
+  fprintf('Error checking for IsCameraRunningFile:\n');
   getReport(ME)
 end

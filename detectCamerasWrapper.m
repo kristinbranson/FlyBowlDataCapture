@@ -1,6 +1,6 @@
 function handles = detectCamerasWrapper(handles)
 
-handles.IsCameraInitialized = false;
+handles = unsetCamera(handles);
 handles = detectCameras(handles);
 
 % if no devices found

@@ -1,10 +1,11 @@
 function handles = clearVideoInput(handles)
 
-if handles.IsCameraInitialized,
-  % stop the preview if it is on
-  handles.IsCameraInitialized = false;
+if isfield(handles,'vid') && isvalid(handles.vid) && handles.IsCameraInitialized,
+  handles = unsetCamera(handles);
   % delete preview image
-  delete(handles.hImage_Preview);
+  if isfield(handles,'hImage_Preview') && ishandle(handles.hImage_Preview),
+    delete(handles.hImage_Preview);
+  end
   % delete the video input
   delete(handles.vid);
   set(handles.pushbutton_InitializeCamera,'Visible','on');

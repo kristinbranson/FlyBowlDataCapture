@@ -1,19 +1,41 @@
 function handles = detectCameras(handles)
 
+handles.DetectCameras_Params = ...
+  struct('DataDir','.DetectCamerasData',...
+  'IsCameraRunningFileStr','IsCameraRunning');
+
+handles.IsCameraRunningFiles = dir(fullfile(handles.DetectCameras_Params.DataDir,'*.mat'));
+handles.IsCameraRunning = ~isempty(handles.IsCameraRunningFiles);
+
 handles = clearVideoInput(handles);
 
 % reset image acquisition
 imaqreset;
 
-handles.DeviceIDs = {};
+%handles.DeviceIDs = {};
 
 % check for adaptor
-try
-  adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
-catch
-  s = sprintf('Adaptor %s not registered, or no %s compatable camera found',handles.params.Imaq_Adaptor,handles.params.Imaq_Adaptor);
-  uiwait(errordlg(s,'Error loading imaq adaptor'));
-  return;
+if handles.IsCameraRunning,
+  try
+    filename = fullfile(handles.DetectCameras_Params.DataDir,...
+      handles.IsCameraRunningFiles(end).name);
+    handles = addToStatus(handles,...
+      sprintf('Another camera is in operation, so reading adaptorinfo from %s. If this seems wrong, exit all FlyBowlDataCapture GUIs and run "CleanSemaphores"',filename));
+
+    load(filename,'adaptorinfo');
+  catch
+    s = sprintf('Could not load adaptor info from %s',filename);
+    uiwait(errordlg(s,'Error loading imaq adaptor'));
+    return;
+  end
+else
+  try
+    adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
+  catch
+    s = sprintf('Adaptor %s not registered, or no %s compatable camera found',handles.params.Imaq_Adaptor,handles.params.Imaq_Adaptor);
+    uiwait(errordlg(s,'Error loading imaq adaptor'));
+    return;
+  end
 end
 
 % check for device
@@ -51,3 +73,5 @@ for i = 1:length(handles.DeviceIDs),
     handles.DeviceIDs(i));
   handles.DeviceNames{i} = strrep(handles.DeviceNames{i},' ','_');
 end
+
+handles.adaptorinfo = adaptorinfo;

@@ -1051,6 +1051,7 @@ if ~strcmp(oldname,handles.FileName),
 end
 
 handles = resetTempProbe(handles);
+handles = unsetCamera(handles);
 
 guidata(hObject,handles);
 
@@ -1409,6 +1410,7 @@ if isfield(handles,'StopTimer') && isvalid(handles.StopTimer),
 end
 
 % delete vid object
+handles = clearVideoInput(handles);
 if isfield(handles,'vid') && isvalid(handles.vid),
   delete(handles.vid);
 end

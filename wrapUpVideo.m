@@ -4,11 +4,18 @@ fprintf('Removing frames acquired function\n');
 % remove frames acquired function
 obj.framesacquiredfcn = '';
 
+info = imaqhwinfo(obj);
+
 % set stop function to default
 fprintf('Removing stop function\n');
 obj.stopfcn = '';
+
+% stop
 fprintf('Calling stop\n');
 stop(obj);
+if strcmpi(info.AdaptorName,'gdcam')
+  set(obj.Source,'LogFlag',0);
+end
 
 % wait a few seconds
 pause(3);
@@ -23,27 +30,33 @@ while true,
 end
 fprintf('Running = Off.\n');
 
-fprintf('Cleaning up remaining frames\n');
-% clean up remaining frames
-if obj.framesavailable > 0,
-  fprintf('Removing %d frames from buffer.\n',obj.framesavailable);
-  getdata(obj,obj.framesavailable);
+if ~strcmpi(info.AdaptorName,'gdcam'),
+
+  fprintf('Cleaning up remaining frames\n');
+  % clean up remaining frames
+  if obj.framesavailable > 0,
+    fprintf('Removing %d frames from buffer.\n',obj.framesavailable);
+    getdata(obj,obj.framesavailable);
+  end
+  
+  % wait a few seconds
+  pause(3);
+  
+  % close file
+  fprintf('Closing file.\n');
+  handles = guidata(hObject);
+  switch handles.params.FileType,
+    case 'avi'
+      handles.logger.aviobj = close(handles.logger.aviobj);
+    case 'fmf'
+      fseek(handles.logger.fid,20,-1);
+      fwrite(handles.logger.fid,handles.FrameCount,'uint64');
+      fclose(handles.logger.fid);
+  end
+  
 end
 
-% wait a few seconds
-pause(3);
-
-% close file
-fprintf('Closing file.\n');
 handles = guidata(hObject);
-switch handles.params.FileType,
-  case 'avi'
-    handles.logger.aviobj = close(handles.logger.aviobj);
-  case 'fmf'
-    fseek(handles.logger.fid,20,-1);
-    fwrite(handles.logger.fid,handles.FrameCount,'uint64');
-    fclose(handles.logger.fid);
-end
 
 % close temperature file
 fclose(handles.TempFid);

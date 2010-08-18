@@ -60,6 +60,12 @@ if handles.nBands == 1,
 end
 axis(handles.axes_PreviewVideo,'image');
 
+% Error function
+set(handles.vid,'ErrorFcn',@vidError);
+
+% timeout time
+set(handles.vid.Source,'FrameTimeOut',20000);
+
 % Set up the update preview window function.
 setappdata(handles.hImage_Preview,'UpdatePreviewWindowFcn',@UpdatePreview);
 setappdata(handles.hImage_Preview,'LastPreviewUpdateTime',-inf);
@@ -79,3 +85,19 @@ handles = addToStatus(handles,{'Video preview started.'});
 
 % set preview status
 set(handles.text_Status_Preview,'String','On','BackgroundColor',handles.Status_Preview_bkgdcolor);
+
+% write a semaphore to file saying that we should not call
+% imaqhwinfo('dcam')
+adaptorinfo = handles.adaptorinfo; %#ok<NASGU>
+handles.IsCameraRunningFile = fullfile(handles.DetectCameras_Params.DataDir,...
+  sprintf('%s_%s.mat',handles.DetectCameras_Params.IsCameraRunningFileStr,datestr(now,30)));
+if ~exist(handles.DetectCameras_Params.DataDir,'file'),
+  mkdir(handles.DetectCameras_Params.DataDir);
+end
+save(handles.IsCameraRunningFile,'adaptorinfo');
+global FBDC_IsCameraRunningFiles; 
+if isempty(FBDC_IsCameraRunningFiles),
+  FBDC_IsCameraRunningFiles = {handles.IsCameraRunningFile};
+else
+  FBDC_IsCameraRunningFiles{end+1} = handles.IsCameraRunningFile;
+end
