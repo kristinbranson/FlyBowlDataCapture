@@ -45,7 +45,7 @@ end
 
 
 % --- Executes just before FlyBowlDataCapture is made visible.
-function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin)
+function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#ok<*INUSL>
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -70,7 +70,7 @@ if ~ischar(filestr) || isempty(filestr),
   return;
 end
 handles.params_file = fullfile(pathstr,filestr);
-if ~exist(handles.params_file),
+if ~exist(handles.params_file,'file'),
   error('File %s does not exist',handles.params_file);
 end
 
@@ -119,7 +119,7 @@ catch ME,
 end
 
 % --- Outputs from this function are returned to the command line.
-function varargout = FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles) 
+function FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -141,7 +141,7 @@ catch ME
 end
 
 % --- Executes on selection change in popupmenu_Assay_Experimenter.
-function popupmenu_Assay_Experimenter_Callback(hObject, eventdata, handles)
+function popupmenu_Assay_Experimenter_Callback(hObject, eventdata, handles) %#ok<*DEFNU>
 % hObject    handle to popupmenu_Assay_Experimenter (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -164,7 +164,7 @@ handles = ChangedMetaData(handles);
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu_Assay_Experimenter_CreateFcn(hObject, eventdata, handles)
+function popupmenu_Assay_Experimenter_CreateFcn(hObject, eventdata, handles) %#ok<*INUSD>
 % hObject    handle to popupmenu_Assay_Experimenter (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
