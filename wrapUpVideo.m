@@ -59,7 +59,9 @@ end
 handles = guidata(hObject);
 
 % close temperature file
-fclose(handles.TempFid);
+if handles.params.DoRecordTemp ~= 0,
+  fclose(handles.TempFid);
+end
 
 % no longer recording
 fprintf('No longer recording.\n');

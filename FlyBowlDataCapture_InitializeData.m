@@ -99,7 +99,7 @@ try
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
     'FrameRatePlotYLim','TempPlotYLim','DoQuerySage','Imaq_FrameRate',...
     'Imaq_Shutter','Imaq_Gain','TempProbePeriod','TempProbeChannels',...
-    'TempProbeReject60Hz'};
+    'TempProbeReject60Hz','DoRecordTemp'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -636,6 +636,10 @@ set(handles.popupmenu_TempProbeID,'String',cellstr(num2str(handles.TempProbeIDs(
 
 handles.TempProbe_IsInitialized = false;
 
+if handles.params.DoRecordTemp == 0,
+  set(handles.popupmenu_TempProbeID,'Enable','off');
+end
+
 %% Shift Fly Temp
 handles.ShiftFlyTemp_Time_datenum = -1;
 handles.ShiftFlyTemp_bkgdcolor = [.153,.227,.373];
@@ -667,6 +671,17 @@ if isempty(handles.DeviceID),
   set(handles.pushbutton_InitializeCamera,'Enable','off');
 else
   set(handles.pushbutton_InitializeCamera,'Enable','on');
+end
+
+%% Initialize Temperature Probe
+
+handles.InitializeTempProbe_bkgdcolor = [.071,.212,.141];
+set(handles.pushbutton_InitializeCamera,'BackgroundColor',handles.InitializeCamera_bkgdcolor,...
+  'String','Initialize Camera','Visible','on');
+if (handles.params.DoRecordTemp == 0) || isempty(handles.TempProbeIDs),
+  set(handles.pushbutton_InitializeTempProbe,'Enable','off','String','No Temp Probe');
+else
+  set(handles.pushbutton_InitializeTempProbe,'Enable','on');
 end
 
 %% Abort
@@ -711,8 +726,7 @@ set(handles.text_Status_FrameRate,'String','N/A',...
 
 %% Temperature and humidity
 
-% TODO: for now, this is set statically
-handles.MetaData_RoomTemperature = handles.params.MetaData_RoomTemperatureSetPoint;
+handles.MetaData_RoomTemperature = nan;
 % TODO: for now, this is set statically
 handles.MetaData_RoomHumidity = handles.params.MetaData_RoomHumiditySetPoint;
 

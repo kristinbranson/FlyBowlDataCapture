@@ -2,6 +2,9 @@ function success = TempProbe_GrabTemp(obj,event,hObject) %#ok<INUSL>
 
 success = false;
 handles = guidata(hObject);
+if handles.params.DoRecordTemp == 0,
+  return;
+end
 try
   fid = fopen(handles.TempProbe_ChannelFileName,'r');
   if fid <= 0,

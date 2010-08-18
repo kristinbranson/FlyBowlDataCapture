@@ -1,7 +1,9 @@
 function handles = renameVideoFile(handles)
 
 oldfilename = handles.FileName;
-oldtempfilename = handles.TempFileName;
+if handles.params.DoRecordTemp ~= 0,
+  oldtempfilename = handles.TempFileName;
+end
 
 % construct experiment name, directory
 handles = setExperimentName(handles);
@@ -38,19 +40,20 @@ else
   warning(cell2mat(s));
 end
 
-filestr = 'temperature.txt';
-newfilename = fullfile(handles.ExperimentDirectory,filestr);
-[success,msg] = movefile(oldtempfilename,newfilename,'f');
-if success,
-  %fprintf('Successfully renamed file from %s to %s\n',oldfilename,handles.FileName);
-  handles.TempFileName = newfilename;
-  %fprintf('Renamed successfully\n');
-else
-  s = {sprintf('Temperature record temporarily stored to %s. ',oldtempfilename),...
-    sprintf('Could not rename %s. ',handles.TempFileName),...
-    msg};
-  uiwait(errordlg(s,'Error renaming file'));
-  handles = addToStatus(handles,s);
-  warning(cell2mat(s));
+if handles.params.DoRecordTemp ~= 0,
+  filestr = 'temperature.txt';
+  newfilename = fullfile(handles.ExperimentDirectory,filestr);
+  [success,msg] = movefile(oldtempfilename,newfilename,'f');
+  if success,
+    %fprintf('Successfully renamed file from %s to %s\n',oldfilename,handles.FileName);
+    handles.TempFileName = newfilename;
+    %fprintf('Renamed successfully\n');
+  else
+    s = {sprintf('Temperature record temporarily stored to %s. ',oldtempfilename),...
+      sprintf('Could not rename %s. ',handles.TempFileName),...
+      msg};
+    uiwait(errordlg(s,'Error renaming file'));
+    handles = addToStatus(handles,s);
+    warning(cell2mat(s));
+  end
 end
-

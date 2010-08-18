@@ -7,10 +7,15 @@ if nfiles > 0,
 else
   fprintf('No semaphores in .DetectCamerasData\n');
 end
-nfiles = length(dir('.TempRecordData\*'));
+files = dir('.TempRecordData\*');
+files = {files.name};
+files = setdiff(files,{'.','..'});
+nfiles = length(files);
 if nfiles > 0,
   fprintf('Deleting %d files from .TempRecordData\n',nfiles);
-  delete('.TempRecordData\*');
+  for i = 1:length(files),
+    delete(files{i});
+  end
 else
   fprintf('No semaphores in .TempRecordData\n');
 end

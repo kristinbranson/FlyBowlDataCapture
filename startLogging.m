@@ -22,14 +22,16 @@ filestr = sprintf('FBDC_temperature_%s_%d.txt',...
   handles.RandomNumber);
 handles.TempFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
 handles.TempFid = -1;
-try
-  handles.TempFid = fopen(handles.TempFileName,'w');
-catch
-end
-if handles.TempFid <= 0,
-  s = sprintf('Could not open temperature file %s',handles.TempFileName);
-  uiwait(errordlg(s,'Error opening temperature file'));
-  error(s);
+if handles.params.DoRecordTemp ~= 0,
+  try
+    handles.TempFid = fopen(handles.TempFileName,'w');
+  catch
+  end
+  if handles.TempFid <= 0,
+    s = sprintf('Could not open temperature file %s',handles.TempFileName);
+    uiwait(errordlg(s,'Error opening temperature file'));
+    error(s);
+  end
 end
 
 % copied from gVision/StartStop.m

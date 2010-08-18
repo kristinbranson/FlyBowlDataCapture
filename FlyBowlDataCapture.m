@@ -883,7 +883,7 @@ set(hObject,'BackgroundColor',handles.grayed_bkgdcolor,...
   'String',sprintf('Load: %s',datestr(handles.FliesLoaded_Time_datenum,13)));
 
 % enable recording if camera is initialized
-if handles.IsCameraInitialized && handles.TempProbe_IsInitialized,
+if handles.IsCameraInitialized && (handles.TempProbe_IsInitialized || (handles.params.DoRecordTemp == 0)),
   set(handles.pushbutton_StartRecording,'Enable','on','BackgroundColor',handles.StartRecording_bkgdcolor);
 end
 
@@ -1137,7 +1137,7 @@ function pushbutton_InitializeCamera_Callback(hObject, eventdata, handles)
 handles = setCamera(handles);
 set(hObject,'Visible','off');
 
-if handles.FliesLoaded_Time_datenum > 0 && handles.TempProbe_IsInitialized,
+if handles.FliesLoaded_Time_datenum > 0 && (handles.TempProbe_IsInitialized || (handles.params.DoRecordTemp == 0)),
   set(handles.pushbutton_StartRecording,'Enable','on','BackgroundColor',handles.StartRecording_bkgdcolor);
 end
 
@@ -1511,7 +1511,9 @@ function pushbutton_InitializeTempProbe_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
+if handles.params.DoRecordTemp == 0,
+  return;
+end
 success = initializeTempProbe(hObject);
 if success,
   set(hObject,'Visible','off');

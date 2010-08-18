@@ -4,6 +4,10 @@ success = false;
 
 handles = guidata(hObject);
 
+if handles.params.DoRecordTemp == 0,
+  return;
+end
+
 handles.TempProbe_NChannelsTotal = 8;
 handles.TempProbe_Channels = handles.TempProbeIDs;
 

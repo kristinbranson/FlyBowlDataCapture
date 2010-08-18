@@ -1,5 +1,8 @@
 function handles = tryRecordStartTemp(handles)
 
+if handles.params.DoRecordTemp == 0,
+  return;
+end
 lasttemp = handles.Status_Temp_History(2,end);
 if ~isnan(lasttemp),
   handles.MetaData_RoomTemperature = lasttemp;
