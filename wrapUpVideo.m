@@ -1,24 +1,30 @@
-function wrapUpVideo(obj,event,hObject) %#ok<INUSL>
+function wrapUpVideo(obj,event,hObject,AdaptorName) %#ok<INUSL>
 
-fprintf('Removing frames acquired function\n');
-% remove frames acquired function
-obj.framesacquiredfcn = '';
+fprintf('Getting info\n');
+%info = imaqhwinfo(obj);
 
-info = imaqhwinfo(obj);
+if strcmpi(AdaptorName,'gdcam')
+  fprintf('Setting log flag to 0\n');
+  set(obj.Source,'LogFlag',0);
+  pause(10);
+end
+
+if ~strcmpi(AdaptorName,'gdcam'),
+  fprintf('Removing frames acquired function\n');
+  % remove frames acquired function
+  obj.framesacquiredfcn = '';
+end
 
 % set stop function to default
 fprintf('Removing stop function\n');
 obj.stopfcn = '';
 
 % stop
-if strcmpi(info.AdaptorName,'gdcam')
-  fprintf('Settings log flag to 0\n');
-  set(obj.Source,'LogFlag',0);
-end
 fprintf('Calling stop\n');
 stop(obj);
 
 % wait a few seconds
+fprintf('Pausing for 3 seconds\n');
 pause(3);
 
 % wait until actually stopped
@@ -26,14 +32,14 @@ fprintf('Waiting for Running == Off...\n');
 %if strcmpi(info.AdapdorName,'gdcam'),
 while true,
   if ~isrunning(obj) && ~islogging(obj)% && ...
-      %(~strcmpi(info.AdaptorName,'gdcam') 
+      %(~strcmpi(AdaptorName,'gdcam') 
     break;
   end
   pause(.5);
 end
 fprintf('Running = Off.\n');
 
-if ~strcmpi(info.AdaptorName,'gdcam'),
+if ~strcmpi(AdaptorName,'gdcam'),
 
   fprintf('Cleaning up remaining frames\n');
   % clean up remaining frames

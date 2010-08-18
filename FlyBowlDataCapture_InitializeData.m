@@ -99,12 +99,12 @@ try
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
     'FrameRatePlotYLim','TempPlotYLim','DoQuerySage','Imaq_FrameRate',...
     'Imaq_Shutter','Imaq_Gain','TempProbePeriod','TempProbeChannels',...
-    'TempProbeReject60Hz','DoRecordTemp'};
+    'TempProbeReject60Hz','DoRecordTemp','gdcamPreviewFrameInterval'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
     else
-      fprintf('Parameter %s not set in parameter file.\n',handles.params.(numeric_params{i}));
+      fprintf('Parameter %s not set in parameter file.\n',numeric_params{i});
     end
   end
   

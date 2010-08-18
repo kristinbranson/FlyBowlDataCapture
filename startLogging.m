@@ -61,7 +61,9 @@ handles.vid.framesacquiredfcn = {@writeFrame,handles.figure_main};
 handles.vid.framesacquiredfcncount = 1;
 
 % function called when video recording stops
-handles.vid.stopfcn = {@wrapUpVideo,handles.figure_main};
+if ~strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
+  handles.vid.stopfcn = {@wrapUpVideo,handles.figure_main,handles.params.Imaq_Adaptor};
+end
 
 % for computing fps
 handles.writeFrame_time = 0;
@@ -70,7 +72,7 @@ PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
 PreviewParams.IsRecording = true;
 
 % create a timer for stopping 
-handles.StopTimer = timer('TimerFcn',{@Stop_RecordTimer,handles.vid,handles.figure_main},...
+handles.StopTimer = timer('TimerFcn',{@Stop_RecordTimer,handles.vid,handles.figure_main,handles.params.Imaq_Adaptor},...
   'StartDelay',handles.params.RecordTime,...
   'TasksToExecute',1,...
   'Name','FBDC_RecordTimer');

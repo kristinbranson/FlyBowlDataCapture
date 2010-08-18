@@ -42,6 +42,11 @@ if isfield(handles.params,'Imaq_Gain') && handles.params.Imaq_Gain > 0 && ...
   set(handles.vid.source,'Gain',handles.params.Imaq_Gain);
 end
 
+% set previewFrameInterval if gdcam
+if strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
+  set(handles.vid.source,'previewFrameInterval',handles.params.gdcamPreviewFrameInterval);
+end
+
 % set ROI if necessary
 if isfield(handles.params,'Imaq_ROIPosition'),
   set(handles.vid,'ROIPosition',handles.params.Imaq_ROIPosition);
