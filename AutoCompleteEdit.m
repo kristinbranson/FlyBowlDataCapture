@@ -117,14 +117,17 @@ if ~isempty(event) && strcmpi(get(event,'Cause'),'TRAVERSAL_FORWARD'),
   s = ss{v};
   set(hauto.listbox,'Visible','off');
   set(hauto.Parent,'String',s);
+  eventdata.String = s;
+else
+  eventdata.String = get(hauto.Parent,'String');
 end
 
 set(hauto.listbox,'Visible','off');
 if ~isempty(hauto.Callback),
   if iscell(hauto.Callback),
-    feval(hauto.Callback{1},hauto.Parent,event,hauto.Callback{2:end});
+    feval(hauto.Callback{1},hauto.Parent,eventdata,hauto.Callback{2:end});
   else
-    feval(hauto.Callback,hauto.Parent,event);
+    feval(hauto.Callback,hauto.Parent,eventdata);
   end
 end
 

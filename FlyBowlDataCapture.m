@@ -187,7 +187,11 @@ function edit_Fly_LineName_Callback(hObject, eventdata, handles)
 
 % grab value
 drawnow;
-newname = get(handles.edit_Fly_LineName,'String');
+if isfield(eventdata,'String'),
+  newname = eventdata.String;
+else
+  newname = get(handles.edit_Fly_LineName,'String');
+end
 i = find(strcmpi(newname,handles.Fly_LineNames));
 isvalid = ~isempty(i);
 if ~isvalid,
