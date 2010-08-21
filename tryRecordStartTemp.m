@@ -8,5 +8,5 @@ if ~isnan(lasttemp),
   handles.MetaData_RoomTemperature = lasttemp;
   handles.StartTempRecorded = true;
   handles.MetaDataNeedsSave = true;
-  handles = addToStatus(handles,sprintf('Recorded start temperature %f,lasttemp'));
+  addToStatus(handles,sprintf('Recorded start temperature %f,lasttemp',lasttemp));
 end

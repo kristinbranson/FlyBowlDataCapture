@@ -149,11 +149,11 @@ end
 %handles.Status_MaxNLines = 50;
 handles.IsTmpLogFile = true;
 handles.LogFileName = fullfile(handles.params.TmpOutputDirectory,sprintf('TmpLog_%s.txt',datestr(now,30)));
-handles.Status = {};
+set(handles.edit_Status,'String',{});
 s = {
   sprintf('FlyBowlDataCapture v. %s',handles.version)
   '--------------------------------------'};
-handles = addToStatus(handles,s,-1);
+addToStatus(handles,s,-1);
 
 %% Figure position
 
@@ -195,12 +195,12 @@ handles.isdefault.Fly_LineName = true;
 if handles.params.DoQuerySage,
   try
     handles.db = connectToSAGE(handles.SageParamsFile);
-    handles = addToStatus(handles,{'Connected to Sage.'});
+    addToStatus(handles,{'Connected to Sage.'});
   catch ME
     warndlg(['Could not connect to Sage: ',getReport(ME)],'Could not connect to Sage');
     handles.db = [];
     handles.params.DoQuerySage = false;
-    handles = addToStatus(handles,{'Could not connect to Sage. Turning off querying Sage.'});
+    addToStatus(handles,{'Could not connect to Sage. Turning off querying Sage.'});
   end
 end
 
@@ -777,4 +777,4 @@ set(handles.axes_PreviewVideo,'xtick',[],'ytick',[]);
 %% Initialization complete
 handles.GUIInitialization_Time_datenum = now;
 handles.GUIIsInitialized = true;
-handles = addToStatus(handles,{'GUI initialization finished.'},handles.GUIInitialization_Time_datenum);
+addToStatus(handles,{'GUI initialization finished.'},handles.GUIInitialization_Time_datenum);

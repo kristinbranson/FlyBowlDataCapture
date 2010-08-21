@@ -227,7 +227,7 @@ if isvalid,
   
 else
   
-  handles = addToStatus(handles,{sprintf('Invalid line name %s switched back to %s.',...
+  addToStatus(handles,{sprintf('Invalid line name %s switched back to %s.',...
     newname,handles.Fly_LineName)});
   set(handles.edit_Fly_LineName,'BackgroundColor',handles.shouldchange_bkgdcolor);
 
@@ -864,7 +864,7 @@ set(handles.pushbutton_FliesLoaded,'BackgroundColor',handles.FliesLoaded_bkgdcol
 set(handles.pushbutton_StartRecording,'Enable','off','BackgroundColor',handles.grayed_bkgdcolor);
 
 % add to status log
-handles = addToStatus(handles,{'Shifted fly temperature.'},handles.ShiftFlyTemp_Time_datenum);
+addToStatus(handles,{'Shifted fly temperature.'},handles.ShiftFlyTemp_Time_datenum);
 
 handles = ChangedMetaData(handles);
 
@@ -888,7 +888,7 @@ if handles.IsCameraInitialized && (handles.TempProbe_IsInitialized || (handles.p
 end
 
 % add to status log
-handles = addToStatus(handles,{'Flies loaded.'},handles.FliesLoaded_Time_datenum);
+addToStatus(handles,{'Flies loaded.'},handles.FliesLoaded_Time_datenum);
 
 handles = ChangedMetaData(handles);
 
@@ -1047,7 +1047,7 @@ handles = DisableGUI(handles);
 oldname = handles.FileName;
 handles = renameVideoFile(handles);
 if ~strcmp(oldname,handles.FileName),
-  handles = addToStatus(handles,{sprintf('Renamed %s -> %s.',oldname,handles.FileName)});
+  addToStatus(handles,{sprintf('Renamed %s -> %s.',oldname,handles.FileName)});
 end
 
 handles = resetTempProbe(handles);
@@ -1379,12 +1379,12 @@ if ~handles.FinishedRecording && handles.GUIIsInitialized,
     didcancel = true;
     return;
   end
-  handles = addToStatus(handles,{'Capture aborted.'});
+  addToStatus(handles,{'Capture aborted.'});
 end
 
 % recording stopped in the middle
 if handles.IsRecording,
-  handles = addToStatus(handles,sprintf('Video recording canceled after %f seconds',(now-handles.StartRecording_Time_datenum)*86400));
+  addToStatus(handles,sprintf('Video recording canceled after %f seconds',(now-handles.StartRecording_Time_datenum)*86400));
 end
 
 % stop logging
@@ -1425,6 +1425,8 @@ handles = resetTempProbe(handles);
 
 % save figure
 handles = RecordConfiguration(handles);
+
+guidata(hObject,handles);
 
 function handles = EnableGUI(handles)
 

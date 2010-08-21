@@ -46,9 +46,9 @@ else
     if strcmp(handles.params.FileType,'fmf') && ...
         isempty(fopen(handles.logger.fid)),
       fprintf('File is closed, not writing\n');
-      handles = addToStatus(handles,{'Warning: writeFrame called after writing finished. Disabling FramesAcquiredFcn.'});
+      addToStatus(handles,{'Warning: writeFrame called after writing finished. Disabling FramesAcquiredFcn.'});
     else
-      handles = addToStatus(handles,sprintf('Error writing frame %d.',handles.FrameCount+1));
+      addToStatus(handles,sprintf('Error writing frame %d.',handles.FrameCount+1));
       getReport(ME)
     end
     handles.vid.framesacquiredfcn = '';

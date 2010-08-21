@@ -93,7 +93,7 @@ preview(handles.vid, handles.hImage_Preview);
 handles.IsCameraInitialized = true;
 
 % add to status log
-handles = addToStatus(handles,{'Video preview started.'});
+addToStatus(handles,{'Video preview started.'});
 
 % set preview status
 set(handles.text_Status_Preview,'String','On','BackgroundColor',handles.Status_Preview_bkgdcolor);

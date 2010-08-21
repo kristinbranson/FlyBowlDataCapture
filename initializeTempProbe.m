@@ -25,7 +25,7 @@ handles.TempProbe_Params = ...
 % check for master temperature recorder, create if necessary
 [handles,success1] = GetMasterTempRecorderInfo(handles);
 if ~success1,
-  handles = addToStatus(handles,'Unable to start temperature recording.');
+  addToStatus(handles,'Unable to start temperature recording.');
   guidata(hObject,handles);
   return;
 end

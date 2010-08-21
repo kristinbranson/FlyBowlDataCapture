@@ -1,38 +1,26 @@
 function wrapUpVideo(obj,event,hObject,AdaptorName) %#ok<INUSL>
 
-fprintf('Getting info\n');
-%info = imaqhwinfo(obj);
-
 if strcmpi(AdaptorName,'gdcam')
-  fprintf('Setting log flag to 0\n');
   set(obj.Source,'LogFlag',0);
-  pause(10);
-end
-
-if ~strcmpi(AdaptorName,'gdcam'),
-  fprintf('Removing frames acquired function\n');
+else
   % remove frames acquired function
   obj.framesacquiredfcn = '';
+
+  % % set stop function to default
+  % fprintf('Removing stop function\n');
+  % obj.stopfcn = '';
 end
 
-% set stop function to default
-fprintf('Removing stop function\n');
-obj.stopfcn = '';
-
 % stop
-fprintf('Calling stop\n');
 stop(obj);
 
 % wait a few seconds
-fprintf('Pausing for 3 seconds\n');
 pause(3);
 
 % wait until actually stopped
 fprintf('Waiting for Running == Off...\n');
-%if strcmpi(info.AdapdorName,'gdcam'),
 while true,
   if ~isrunning(obj) && ~islogging(obj)% && ...
-      %(~strcmpi(AdaptorName,'gdcam') 
     break;
   end
   pause(.5);
@@ -84,9 +72,8 @@ handles = renameVideoFile(handles);
 guidata(hObject,handles);
 fprintf('Renamed to %s\n',handles.FileName);
 % add to status log
-handles = addToStatus(handles,{sprintf('Finished recording. Video file moved from %s to %s.',...
+addToStatus(handles,{sprintf('Finished recording. Video file moved from %s to %s.',...
   oldname,handles.FileName)});
-guidata(hObject,handles);
 
 PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
 PreviewParams.IsRecording = false;

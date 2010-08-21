@@ -97,7 +97,7 @@ handles.MetaDataNeedsSave = false;
 set(handles.pushbutton_SaveMetaData,'BackgroundColor',handles.grayed_bkgdcolor);
 
 % write to log file
-handles = addToStatus(handles,{sprintf('Saved MetaData to file %s.',...
+addToStatus(handles,{sprintf('Saved MetaData to file %s.',...
     handles.MetaDataFileName)});
 
 % % write the extra metadata file

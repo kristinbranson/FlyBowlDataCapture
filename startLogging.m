@@ -61,9 +61,9 @@ handles.vid.framesacquiredfcn = {@writeFrame,handles.figure_main};
 handles.vid.framesacquiredfcncount = 1;
 
 % function called when video recording stops
-if ~strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
-  handles.vid.stopfcn = {@wrapUpVideo,handles.figure_main,handles.params.Imaq_Adaptor};
-end
+%if ~strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
+%  handles.vid.stopfcn = {@wrapUpVideo,handles.figure_main,handles.params.Imaq_Adaptor};
+%end
 
 % for computing fps
 handles.writeFrame_time = 0;
@@ -83,13 +83,13 @@ guidata(hObject,handles);
 start(handles.vid);
 
 % add to status log
-handles = addToStatus(handles,{sprintf('Started recording to file %s.',handles.FileName)},...
+addToStatus(handles,{sprintf('Started recording to file %s.',handles.FileName)},...
   handles.StartRecording_Time_datenum);
 
 % set recording status
 set(handles.text_Status_Recording,'String','On','BackgroundColor',handles.Status_Recording_bkgdcolor);
 
-guidata(hObject,handles);
+%guidata(hObject,handles);
 
 PreviewParams.StartRecording_Time_datenum = handles.StartRecording_Time_datenum;
 setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
