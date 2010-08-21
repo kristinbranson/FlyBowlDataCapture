@@ -25,7 +25,7 @@ if exist(newfilename,'file') && ~exist(oldfilename,'file'),
 end
 
 addToStatus(handles,sprintf('Renaming movie file from %s to %s',oldfilename,newfilename));
-[success,msg] = renamefile(oldfilename,newfilename,'f');
+[success,msg] = renamefile(oldfilename,newfilename);
 if success,
   %fprintf('Successfully renamed file from %s to %s\n',oldfilename,handles.FileName);
   handles.IsTmpFileName = false;
@@ -43,7 +43,7 @@ end
 if handles.params.DoRecordTemp ~= 0,
   filestr = 'temperature.txt';
   newfilename = fullfile(handles.ExperimentDirectory,filestr);
-  [success,msg] = renamefile(oldtempfilename,newfilename,'f');
+  [success,msg] = renamefile(oldtempfilename,newfilename);
   if success,
     %fprintf('Successfully renamed file from %s to %s\n',oldfilename,handles.FileName);
     handles.TempFileName = newfilename;
