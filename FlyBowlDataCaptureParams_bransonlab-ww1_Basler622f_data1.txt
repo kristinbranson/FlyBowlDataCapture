@@ -56,15 +56,15 @@ Imaq_Gain,200
 # Video file type
 FileType,fmf
 # Number of seconds to record
-RecordTime,20
+RecordTime,900
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,.1
 # Directory to store video to
-OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1
+OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data3
 # Prefix of movie file
 MovieFilePrefix,movie
 # Directory to temporarily store video to
-TmpOutputDirectory,C:\Users\labadmin\Documents\FlyBowl\tmpdata1
+TmpOutputDirectory,C:\Users\labadmin\Documents\FlyBowl\tmpdata3
 # Name of file to store metadata to
 MetaDataFileName,Metadata.xml
 # Name of file to store log to
