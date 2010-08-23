@@ -1,7 +1,13 @@
-function handles = addToStatus(handles,s,datenum)
+function addToStatus(handles,s,datenum)
 
 if nargin <=1,
   return;
+end
+
+if isstruct(handles),
+  hObject = handles.edit_Status;
+else
+  hObject = handles;
 end
 
 if ~iscell(s),
@@ -15,9 +21,13 @@ end
 if datenum > 0,
   s{1} = sprintf('%s: %s',datestr(datenum,handles.secondformat),s{1});
 end
+Status_String = get(hObject,'String');
 s = textwrap(handles.edit_Status,s);
-handles.Status(end+1:end+length(s)) = s;
-set(handles.edit_Status,'String',handles.Status);
+if ~iscell(Status_String),
+  Status_String = {Status_String};
+end
+Status_String(end+1:end+length(s)) = s;
+set(handles.edit_Status,'String',Status_String);
 
 % write to log file
 fid = fopen(handles.LogFileName,'a');

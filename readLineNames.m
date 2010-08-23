@@ -15,10 +15,14 @@ if ~exist(handles.linename_file,'file') || (nargin > 1 && doforce),
     return;
   catch ME
     errordlg(['Cannot query for line names: ',getReport(ME)],'Error reading line names');
-    handles = addToStatus(handles,{'Could not refresh line names from Sage.'});
+    addToStatus(handles,{'Could not refresh line names from Sage.'});
 
   end
 end
 
 handles.Fly_LineNames = importdata(handles.linename_file);
-handles = addToStatus(handles,{'Read line names from file.'});
+addToStatus(handles,{'Read line names from file.'});
+
+if isfield(handles.params,'ExtraLineNames'),
+  handles.Fly_LineNames = cat(1,handles.Fly_LineNames,handles.params.ExtraLineNames(:));
+end

@@ -45,7 +45,7 @@ end
 
 
 % --- Executes just before FlyBowlDataCapture is made visible.
-function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin)
+function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#ok<*INUSL>
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -70,7 +70,7 @@ if ~ischar(filestr) || isempty(filestr),
   return;
 end
 handles.params_file = fullfile(pathstr,filestr);
-if ~exist(handles.params_file),
+if ~exist(handles.params_file,'file'),
   error('File %s does not exist',handles.params_file);
 end
 
@@ -112,14 +112,14 @@ catch ME,
       s{end+1} = ['Log file location: ',handles.LogFileName];
     end
     s{end+1} = 'Please create a Jira ticket with this information.';
-    uiwait(msgbox(s,'Error During Data Capture'));
+    uiwait(myerrordlg(s,'Error During Data Capture'));
     handles.IsProcessingError = true;
     guidata(hObject,handles);
   end
 end
 
 % --- Outputs from this function are returned to the command line.
-function varargout = FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles) 
+function FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -141,7 +141,7 @@ catch ME
 end
 
 % --- Executes on selection change in popupmenu_Assay_Experimenter.
-function popupmenu_Assay_Experimenter_Callback(hObject, eventdata, handles)
+function popupmenu_Assay_Experimenter_Callback(hObject, eventdata, handles) %#ok<*DEFNU>
 % hObject    handle to popupmenu_Assay_Experimenter (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -164,7 +164,7 @@ handles = ChangedMetaData(handles);
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu_Assay_Experimenter_CreateFcn(hObject, eventdata, handles)
+function popupmenu_Assay_Experimenter_CreateFcn(hObject, eventdata, handles) %#ok<*INUSD>
 % hObject    handle to popupmenu_Assay_Experimenter (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
@@ -187,7 +187,11 @@ function edit_Fly_LineName_Callback(hObject, eventdata, handles)
 
 % grab value
 drawnow;
-newname = get(handles.edit_Fly_LineName,'String');
+if isfield(eventdata,'String'),
+  newname = eventdata.String;
+else
+  newname = get(handles.edit_Fly_LineName,'String');
+end
 i = find(strcmpi(newname,handles.Fly_LineNames));
 isvalid = ~isempty(i);
 if ~isvalid,
@@ -223,7 +227,7 @@ if isvalid,
   
 else
   
-  handles = addToStatus(handles,{sprintf('Invalid line name %s switched back to %s.',...
+  addToStatus(handles,{sprintf('Invalid line name %s switched back to %s.',...
     newname,handles.Fly_LineName)});
   set(handles.edit_Fly_LineName,'BackgroundColor',handles.shouldchange_bkgdcolor);
 
@@ -860,7 +864,7 @@ set(handles.pushbutton_FliesLoaded,'BackgroundColor',handles.FliesLoaded_bkgdcol
 set(handles.pushbutton_StartRecording,'Enable','off','BackgroundColor',handles.grayed_bkgdcolor);
 
 % add to status log
-handles = addToStatus(handles,{'Shifted fly temperature.'},handles.ShiftFlyTemp_Time_datenum);
+addToStatus(handles,{'Shifted fly temperature.'},handles.ShiftFlyTemp_Time_datenum);
 
 handles = ChangedMetaData(handles);
 
@@ -879,12 +883,12 @@ set(hObject,'BackgroundColor',handles.grayed_bkgdcolor,...
   'String',sprintf('Load: %s',datestr(handles.FliesLoaded_Time_datenum,13)));
 
 % enable recording if camera is initialized
-if handles.IsCameraInitialized && handles.TempProbe_IsInitialized,
+if handles.IsCameraInitialized && (handles.TempProbe_IsInitialized || (handles.params.DoRecordTemp == 0)),
   set(handles.pushbutton_StartRecording,'Enable','on','BackgroundColor',handles.StartRecording_bkgdcolor);
 end
 
 % add to status log
-handles = addToStatus(handles,{'Flies loaded.'},handles.FliesLoaded_Time_datenum);
+addToStatus(handles,{'Flies loaded.'},handles.FliesLoaded_Time_datenum);
 
 handles = ChangedMetaData(handles);
 
@@ -1043,7 +1047,7 @@ handles = DisableGUI(handles);
 oldname = handles.FileName;
 handles = renameVideoFile(handles);
 if ~strcmp(oldname,handles.FileName),
-  handles = addToStatus(handles,{sprintf('Renamed %s -> %s.',oldname,handles.FileName)});
+  addToStatus(handles,{sprintf('Renamed %s -> %s.',oldname,handles.FileName)});
 end
 
 handles = resetTempProbe(handles);
@@ -1133,7 +1137,7 @@ function pushbutton_InitializeCamera_Callback(hObject, eventdata, handles)
 handles = setCamera(handles);
 set(hObject,'Visible','off');
 
-if handles.FliesLoaded_Time_datenum > 0 && handles.TempProbe_IsInitialized,
+if handles.FliesLoaded_Time_datenum > 0 && (handles.TempProbe_IsInitialized || (handles.params.DoRecordTemp == 0)),
   set(handles.pushbutton_StartRecording,'Enable','on','BackgroundColor',handles.StartRecording_bkgdcolor);
 end
 
@@ -1375,12 +1379,12 @@ if ~handles.FinishedRecording && handles.GUIIsInitialized,
     didcancel = true;
     return;
   end
-  handles = addToStatus(handles,{'Capture aborted.'});
+  addToStatus(handles,{'Capture aborted.'});
 end
 
 % recording stopped in the middle
 if handles.IsRecording,
-  handles = addToStatus(handles,sprintf('Video recording canceled after %f seconds',(now-handles.StartRecording_Time_datenum)*86400));
+  addToStatus(handles,sprintf('Video recording canceled after %f seconds',(now-handles.StartRecording_Time_datenum)*86400));
 end
 
 % stop logging
@@ -1421,6 +1425,8 @@ handles = resetTempProbe(handles);
 
 % save figure
 handles = RecordConfiguration(handles);
+
+guidata(hObject,handles);
 
 function handles = EnableGUI(handles)
 
@@ -1507,7 +1513,9 @@ function pushbutton_InitializeTempProbe_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
+if handles.params.DoRecordTemp == 0,
+  return;
+end
 success = initializeTempProbe(hObject);
 if success,
   set(hObject,'Visible','off');

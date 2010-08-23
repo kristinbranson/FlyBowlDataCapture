@@ -4,7 +4,7 @@ handles = unsetCamera(handles);
 handles = detectCameras(handles);
 
 % if no devices found
-if isempty(handles.DeviceIDs),
+if ~isfield(handles,'DeviceIDs') || isempty(handles.DeviceIDs),
   handles.DeviceID = [];
   set(handles.popupmenu_DeviceID,'Enable','off','String','No devices found','Value',1,...
     'BackgroundColor',handles.shouldchange_bkgdcolor);
@@ -22,4 +22,7 @@ else
     'Value',find(handles.DeviceID == handles.DeviceIDs,1),...
     'BackgroundColor',handles.isdefault_bkgdcolor,...
     'Enable','on');
+  
+  % enable initialize camera button
+  set(handles.pushbutton_InitializeCamera,'Enable','on');
 end

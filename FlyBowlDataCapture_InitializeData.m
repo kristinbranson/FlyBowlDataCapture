@@ -99,12 +99,12 @@ try
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
     'FrameRatePlotYLim','TempPlotYLim','DoQuerySage','Imaq_FrameRate',...
     'Imaq_Shutter','Imaq_Gain','TempProbePeriod','TempProbeChannels',...
-    'TempProbeReject60Hz'};
+    'TempProbeReject60Hz','DoRecordTemp','gdcamPreviewFrameInterval'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
     else
-      fprintf('Parameter %s not set in parameter file.\n',handles.params.(numeric_params{i}));
+      fprintf('Parameter %s not set in parameter file.\n',numeric_params{i});
     end
   end
   
@@ -149,11 +149,11 @@ end
 %handles.Status_MaxNLines = 50;
 handles.IsTmpLogFile = true;
 handles.LogFileName = fullfile(handles.params.TmpOutputDirectory,sprintf('TmpLog_%s.txt',datestr(now,30)));
-handles.Status = {};
+set(handles.edit_Status,'String',{});
 s = {
   sprintf('FlyBowlDataCapture v. %s',handles.version)
   '--------------------------------------'};
-handles = addToStatus(handles,s,-1);
+addToStatus(handles,s,-1);
 
 %% Figure position
 
@@ -195,12 +195,12 @@ handles.isdefault.Fly_LineName = true;
 if handles.params.DoQuerySage,
   try
     handles.db = connectToSAGE(handles.SageParamsFile);
-    handles = addToStatus(handles,{'Connected to Sage.'});
+    addToStatus(handles,{'Connected to Sage.'});
   catch ME
     warndlg(['Could not connect to Sage: ',getReport(ME)],'Could not connect to Sage');
     handles.db = [];
     handles.params.DoQuerySage = false;
-    handles = addToStatus(handles,{'Could not connect to Sage. Turning off querying Sage.'});
+    addToStatus(handles,{'Could not connect to Sage. Turning off querying Sage.'});
   end
 end
 
@@ -636,6 +636,10 @@ set(handles.popupmenu_TempProbeID,'String',cellstr(num2str(handles.TempProbeIDs(
 
 handles.TempProbe_IsInitialized = false;
 
+if handles.params.DoRecordTemp == 0,
+  set(handles.popupmenu_TempProbeID,'Enable','off');
+end
+
 %% Shift Fly Temp
 handles.ShiftFlyTemp_Time_datenum = -1;
 handles.ShiftFlyTemp_bkgdcolor = [.153,.227,.373];
@@ -667,6 +671,17 @@ if isempty(handles.DeviceID),
   set(handles.pushbutton_InitializeCamera,'Enable','off');
 else
   set(handles.pushbutton_InitializeCamera,'Enable','on');
+end
+
+%% Initialize Temperature Probe
+
+handles.InitializeTempProbe_bkgdcolor = [.071,.212,.141];
+set(handles.pushbutton_InitializeCamera,'BackgroundColor',handles.InitializeCamera_bkgdcolor,...
+  'String','Initialize Camera','Visible','on');
+if (handles.params.DoRecordTemp == 0) || isempty(handles.TempProbeIDs),
+  set(handles.pushbutton_InitializeTempProbe,'Enable','off','String','No Temp Probe');
+else
+  set(handles.pushbutton_InitializeTempProbe,'Enable','on');
 end
 
 %% Abort
@@ -711,8 +726,7 @@ set(handles.text_Status_FrameRate,'String','N/A',...
 
 %% Temperature and humidity
 
-% TODO: for now, this is set statically
-handles.MetaData_RoomTemperature = handles.params.MetaData_RoomTemperatureSetPoint;
+handles.MetaData_RoomTemperature = nan;
 % TODO: for now, this is set statically
 handles.MetaData_RoomHumidity = handles.params.MetaData_RoomHumiditySetPoint;
 
@@ -763,4 +777,4 @@ set(handles.axes_PreviewVideo,'xtick',[],'ytick',[]);
 %% Initialization complete
 handles.GUIInitialization_Time_datenum = now;
 handles.GUIIsInitialized = true;
-handles = addToStatus(handles,{'GUI initialization finished.'},handles.GUIInitialization_Time_datenum);
+addToStatus(handles,{'GUI initialization finished.'},handles.GUIInitialization_Time_datenum);

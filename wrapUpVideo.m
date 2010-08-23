@@ -1,21 +1,18 @@
-function wrapUpVideo(obj,event,hObject) %#ok<INUSL>
+function wrapUpVideo(obj,event,hObject,AdaptorName) %#ok<INUSL>
 
-fprintf('Removing frames acquired function\n');
-% remove frames acquired function
-obj.framesacquiredfcn = '';
+if strcmpi(AdaptorName,'gdcam')
+  set(obj.Source,'LogFlag',0);
+else
+  % remove frames acquired function
+  obj.framesacquiredfcn = '';
 
-info = imaqhwinfo(obj);
-
-% set stop function to default
-fprintf('Removing stop function\n');
-obj.stopfcn = '';
+  % % set stop function to default
+  % fprintf('Removing stop function\n');
+  % obj.stopfcn = '';
+end
 
 % stop
-fprintf('Calling stop\n');
 stop(obj);
-if strcmpi(info.AdaptorName,'gdcam')
-  set(obj.Source,'LogFlag',0);
-end
 
 % wait a few seconds
 pause(3);
@@ -23,14 +20,14 @@ pause(3);
 % wait until actually stopped
 fprintf('Waiting for Running == Off...\n');
 while true,
-  if ~isrunning(obj) && ~islogging(obj),
+  if ~isrunning(obj) && ~islogging(obj)% && ...
     break;
   end
   pause(.5);
 end
 fprintf('Running = Off.\n');
 
-if ~strcmpi(info.AdaptorName,'gdcam'),
+if ~strcmpi(AdaptorName,'gdcam'),
 
   fprintf('Cleaning up remaining frames\n');
   % clean up remaining frames
@@ -59,7 +56,9 @@ end
 handles = guidata(hObject);
 
 % close temperature file
-fclose(handles.TempFid);
+if handles.params.DoRecordTemp ~= 0,
+  fclose(handles.TempFid);
+end
 
 % no longer recording
 fprintf('No longer recording.\n');
@@ -73,9 +72,8 @@ handles = renameVideoFile(handles);
 guidata(hObject,handles);
 fprintf('Renamed to %s\n',handles.FileName);
 % add to status log
-handles = addToStatus(handles,{sprintf('Finished recording. Video file moved from %s to %s.',...
+addToStatus(handles,{sprintf('Finished recording. Video file moved from %s to %s.',...
   oldname,handles.FileName)});
-guidata(hObject,handles);
 
 PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
 PreviewParams.IsRecording = false;

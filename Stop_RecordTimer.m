@@ -1,3 +1,3 @@
-function Stop_RecordTimer(obj, event, vid, hObject) %#ok<INUSD,INUSL>
+function Stop_RecordTimer(obj, event, vid, hObject, AdaptorName) %#ok<INUSL>
 
-stop(vid);
+wrapUpVideo(vid,event,hObject,AdaptorName);

@@ -1,5 +1,9 @@
 function handles = resetTempProbe(handles)
 
+if handles.params.DoRecordTemp == 0,
+  return;
+end
+
 if isfield(handles,'TempProbe_IsInitialized') && handles.TempProbe_IsInitialized,
   try
     stop(handles.TempProbe_timer);

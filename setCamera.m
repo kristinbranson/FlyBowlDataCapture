@@ -42,6 +42,16 @@ if isfield(handles.params,'Imaq_Gain') && handles.params.Imaq_Gain > 0 && ...
   set(handles.vid.source,'Gain',handles.params.Imaq_Gain);
 end
 
+% set previewFrameInterval if gdcam
+if strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
+  set(handles.vid.source,'previewFrameInterval',handles.params.gdcamPreviewFrameInterval);
+end
+
+% set ROI if necessary
+if isfield(handles.params,'Imaq_ROIPosition'),
+  set(handles.vid,'ROIPosition',handles.params.Imaq_ROIPosition);
+end
+
 % get camera unique ID if available
 if any(strcmpi(srcparamnames,'UniqueID')),
   handles.DeviceUniqueID = get(handles.vid.source,'UniqueID');
@@ -52,7 +62,12 @@ end
 % maximum number of frames to record
 handles.FramesPerTrigger = handles.params.Imaq_FrameRate * handles.params.RecordTime;
 set(handles.vid,'FramesPerTrigger',handles.FramesPerTrigger,'Name','FBDC_VideoInput');
-tmp = zeros(handles.vidRes(2), handles.vidRes(1), handles.nBands,'uint8');
+if isfield(handles.params,'Imaq_ROIPosition'),
+  sz = handles.params.Imaq_ROIPosition([4,3]);
+else
+  sz = handles.vidRes([2,1]);
+end
+tmp = zeros(sz(1), sz(2), handles.nBands,'uint8');
 tmp(1,1,:) = 255;
 handles.hImage_Preview = image( tmp , 'Parent', handles.axes_PreviewVideo); 
 if handles.nBands == 1,
@@ -62,9 +77,6 @@ axis(handles.axes_PreviewVideo,'image');
 
 % Error function
 set(handles.vid,'ErrorFcn',@vidError);
-
-% timeout time
-set(handles.vid.Source,'FrameTimeOut',20000);
 
 % Set up the update preview window function.
 setappdata(handles.hImage_Preview,'UpdatePreviewWindowFcn',@UpdatePreview);
@@ -81,7 +93,7 @@ preview(handles.vid, handles.hImage_Preview);
 handles.IsCameraInitialized = true;
 
 % add to status log
-handles = addToStatus(handles,{'Video preview started.'});
+addToStatus(handles,{'Video preview started.'});
 
 % set preview status
 set(handles.text_Status_Preview,'String','On','BackgroundColor',handles.Status_Preview_bkgdcolor);
