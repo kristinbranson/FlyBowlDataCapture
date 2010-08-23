@@ -59,6 +59,8 @@ FileType,fmf
 RecordTime,900
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,.1
+# for gdcam, number of frames between sends to Matlab
+gdcamPreviewFrameInterval,5
 # Directory to store video to
 OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data3
 # Prefix of movie file
