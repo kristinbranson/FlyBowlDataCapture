@@ -40,13 +40,13 @@ RedoFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technica
 # List of possible Review flags
 ReviewFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes
 # Camera adaptor
-#Imaq_Adaptor,dcam
-Imaq_Adaptor,gdcam
+Imaq_Adaptor,dcam
+#Imaq_Adaptor,gdcam
 # Device name
 Imaq_DeviceName,A622f
 # Video format
-#Imaq_VideoFormat,F7_Y8_1280x1024
-Imaq_VideoFormat,Format 7, Mode 0
+Imaq_VideoFormat,F7_Y8_1280x1024
+#Imaq_VideoFormat,Format 7, Mode 0
 # Video ROI Position
 Imaq_ROIPosition,0,0,1024,1024
 # Frame rate we expect
