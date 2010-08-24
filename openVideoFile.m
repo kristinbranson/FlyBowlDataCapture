@@ -19,6 +19,6 @@ switch handles.params.FileType,
 
     fwrite(handles.logger.fid,sz(1),'uint32');
     fwrite(handles.logger.fid,sz(2),'uint32');
-    fwrite(handles.logger.fid,prod(handles.vidRes)+8,'uint64');
+    fwrite(handles.logger.fid,prod(sz)+8,'uint64');
     fwrite(handles.logger.fid,0,'uint64');
 end
