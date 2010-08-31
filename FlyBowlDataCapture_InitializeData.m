@@ -99,7 +99,8 @@ try
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
     'FrameRatePlotYLim','TempPlotYLim','DoQuerySage','Imaq_FrameRate',...
     'Imaq_Shutter','Imaq_Gain','TempProbePeriod','TempProbeChannels',...
-    'TempProbeReject60Hz','DoRecordTemp','gdcamPreviewFrameInterval'};
+    'TempProbeReject60Hz','DoRecordTemp','gdcamPreviewFrameInterval',...
+    'Imaq_MaxFrameRate'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -738,7 +739,8 @@ handles.Status_FrameRate_MaxSecondsPlot = handles.Status_FrameRate_MaxNFramesPlo
 handles.Status_FrameRate_History = nan(2,handles.Status_FrameRate_MaxNFramesPlot);
 handles.hLine_Status_FrameRate = plot(handles.axes_Status_FrameRate,...
   handles.Status_FrameRate_History(1,:)-handles.Status_FrameRate_History(1,end),...
-  handles.Status_FrameRate_History(2,:),'color',[0,1,0]);
+  handles.Status_FrameRate_History(2,:),'.-','color',[0,1,0]);
+set(handles.hLine_Status_FrameRate,'UserData',handles.Status_FrameRate_History);
 hylabel = ylabel(handles.axes_Status_FrameRate,'fps');
 set(hylabel,'Units','pixels');
 pos = get(hylabel,'Position');
@@ -758,7 +760,7 @@ handles.Status_Temp_MaxSecondsPlot = handles.Status_Temp_MaxSamplesPlot * ...
 
 handles.Status_Temp_History = nan(2,handles.Status_Temp_MaxSamplesPlot);
 handles.hLine_Status_Temp = plot(handles.axes_Status_Temp,handles.Status_Temp_History(1,:),...
-  handles.Status_Temp_History(2,:),'color',[0,1,0]);
+  handles.Status_Temp_History(2,:),'.-','color',[0,1,0]);
 hylabel = ylabel(handles.axes_Status_Temp,'Temp (C)');
 set(hylabel,'Units','pixels');
 pos = get(hylabel,'Position');

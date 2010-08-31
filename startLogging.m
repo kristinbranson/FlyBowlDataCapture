@@ -51,14 +51,19 @@ end
 if strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
   set(handles.vid.Source,'fmfFileName',handles.FileName);
   set(handles.vid.Source,'LogFlag',1)
+elseif strcmpi(handles.params.Imaq_Adaptor,'udcam'),
+  set(handles.vid.Source,'ufmfFileName',handles.FileName);
+  set(handles.vid.Source,'nFramesTarget',handles.params.RecordTime*handles.params.Imaq_MaxFrameRate);
 else
   % open video files for writing
   handles = openVideoFile(handles);
 end
 
 % video callbacks
-handles.vid.framesacquiredfcn = {@writeFrame,handles.figure_main};
-handles.vid.framesacquiredfcncount = 1;
+if ~strcmpi(handles.params.Imaq_Adaptor,'udcam'),
+  handles.vid.framesacquiredfcn = {@writeFrame,handles.figure_main};
+  handles.vid.framesacquiredfcncount = 1;
+end
 
 % function called when video recording stops
 %if ~strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
@@ -80,7 +85,11 @@ handles.StopTimer = timer('TimerFcn',{@Stop_RecordTimer,handles.vid,handles.figu
 guidata(hObject,handles);
 
 % start recording
-start(handles.vid);
+if ~strcmpi(handles.params.Imaq_Adaptor,'udcam'),
+  start(handles.vid);
+else
+  % nothing to do
+end
 
 % add to status log
 addToStatus(handles,{sprintf('Started recording to file %s.',handles.FileName)},...

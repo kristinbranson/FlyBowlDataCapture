@@ -82,11 +82,15 @@ set(handles.vid,'ErrorFcn',@vidError);
 setappdata(handles.hImage_Preview,'UpdatePreviewWindowFcn',@UpdatePreview);
 setappdata(handles.hImage_Preview,'LastPreviewUpdateTime',-inf);
 PreviewParams = struct;
+PreviewParams.AdaptorName = handles.params.Imaq_Adaptor;
 PreviewParams.PreviewUpdatePeriod = handles.params.PreviewUpdatePeriod/86400;
 PreviewParams.pushbutton_Done = handles.pushbutton_Done;
 PreviewParams.RecordTimeDays = handles.params.RecordTime/86400;
 PreviewParams.StartRecording_Time_datenum = handles.StartRecording_Time_datenum;
 PreviewParams.IsRecording = handles.IsRecording;
+PreviewParams.text_Status_FrameRate = handles.text_Status_FrameRate;
+PreviewParams.hLine_Status_FrameRate = handles.hLine_Status_FrameRate;
+
 setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
 
 preview(handles.vid, handles.hImage_Preview); 

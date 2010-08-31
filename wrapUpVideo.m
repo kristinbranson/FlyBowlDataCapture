@@ -2,6 +2,8 @@ function wrapUpVideo(obj,event,hObject,AdaptorName) %#ok<INUSL>
 
 if strcmpi(AdaptorName,'gdcam')
   set(obj.Source,'LogFlag',0);
+elseif strcmpi(AdaptorName,'udcam')
+  set(obj.Source,'nFramesTarget',0);
 else
   % remove frames acquired function
   obj.framesacquiredfcn = '';
@@ -12,7 +14,11 @@ else
 end
 
 % stop
-stop(obj);
+if ~strcmpi(AdaptorName,'udcam')
+  stop(obj);
+else
+  % nothing to do
+end
 
 % wait a few seconds
 pause(3);
@@ -27,7 +33,7 @@ while true,
 end
 fprintf('Running = Off.\n');
 
-if ~strcmpi(AdaptorName,'gdcam'),
+if ~(strcmpi(AdaptorName,'gdcam') || strcmpi(AdaptorName,'udcam')),
 
   fprintf('Cleaning up remaining frames\n');
   % clean up remaining frames
