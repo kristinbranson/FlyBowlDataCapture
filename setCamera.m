@@ -51,6 +51,48 @@ end
 if isfield(handles.params,'Imaq_ROIPosition'),
   set(handles.vid,'ROIPosition',handles.params.Imaq_ROIPosition);
 end
+if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
+  if isfield(handles.params,'UFMFMaxFracFgCompress'),
+    set(handles.vid.Source,'maxFracFgCompress',handles.params.UFMFMaxFracFgCompress);
+  end
+  if isfield(handles.params,'UFMFMaxBGNFrames'),
+    set(handles.vid.Source,'maxBGNFrames',handles.params.UFMFMaxBGNFrames);
+  end
+  if isfield(handles.params,'UFMFBGUpdatePeriod'),
+    set(handles.vid.Source,'BGUpdatePeriod',handles.params.UFMFBGUpdatePeriod);
+  end
+  if isfield(handles.params,'UFMFBGKeyFramePeriod'),
+    set(handles.vid.Source,'BGKeyFramePeriod',handles.params.UFMFBGKeyFramePeriod);
+  end
+  if isfield(handles.params,'UFMFBoxLength'),
+    set(handles.vid.Source,'boxLength',handles.params.UFMFBoxLength);
+  end
+  if isfield(handles.params,'UFMFBackSubThresh'),
+    set(handles.vid.Source,'backSubThresh',handles.params.UFMFBackSubThresh);
+  end
+  if isfield(handles.params,'UFMFNFramesInit'),
+    set(handles.vid.Source,'nFramesInit',handles.params.UFMFNFramesInit);
+  end
+  if isfield(handles.params,'UFMFLogFileName'),
+    set(handles.vid.Source,'debugFileName',handles.params.UFMFLogFileName);
+  end
+  if isfield(handles.params,'UFMFStatFileName'),
+    handles.params.UFMFStatFilename = strtrim(handles.params.UFMFStatFileName);
+    set(handles.vid.Source,'statFileName',handles.params.UFMFStatFileName);
+  end
+  if isfield(handles.params,'UFMFPrintStats'),
+    set(handles.vid.Source,'printStats',handles.params.UFMFPrintStats);
+  end
+  if isfield(handles.params,'UFMFStatStreamPrintFreq'),
+    set(handles.vid.Source,'statStreamPrintFreq',handles.params.UFMFStatStreamPrintFreq);
+  end
+  if isfield(handles.params,'UFMFStatComputeFrameErrorFreq'),
+    set(handles.vid.Source,'statComputeFrameErrorFreq',handles.params.UFMFStatComputeFrameErrorFreq);
+  end
+  if isfield(handles.params,'UFMFStatPrintTimings'),
+    set(handles.vid.Source,'statComputeFrameErrorFreq',handles.params.UFMFStatComputeFrameErrorFreq);
+  end
+end
 
 % get camera unique ID if available
 if any(strcmpi(srcparamnames,'UniqueID')),
