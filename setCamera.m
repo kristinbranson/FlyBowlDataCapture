@@ -21,13 +21,24 @@ catch
   error(s);
 end
 
-% TODO: set properties like shutter speed
-% vid_src = getselectedsource(vid);
-
 handles.vidRes = get(handles.vid, 'VideoResolution'); 
 handles.nBands = get(handles.vid, 'NumberOfBands'); 
 srcparams = get(handles.vid.source);
 srcparamnames = fieldnames(srcparams);
+
+% get name for device
+if(any(strcmpi(srcparamnames,'UniqueID'))),
+  handles.CameraUniqueID = get(handles.vid.source,'UniqueID');
+else
+  handles.CameraUniqueID = sprintf('%d',handles.DeviceID);
+end
+handles.DeviceName = sprintf('Adaptor_%s___Name_%s___Format_%s___DeviceID_%d___UniqueID_%s',...
+     handles.params.Imaq_Adaptor,...
+     handles.params.Imaq_DeviceName,...
+     handles.params.Imaq_VideoFormat,...
+     handles.DeviceID,...
+     handles.CameraUniqueID);
+addToStatus(handles,{sprintf('DeviceName = %s',handles.DeviceName)});
 
 % read frame rate from videoinput if possible
 if any(strcmpi(srcparamnames,'FrameRate')),

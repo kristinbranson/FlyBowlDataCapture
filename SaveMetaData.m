@@ -32,11 +32,15 @@ fprintf(fid,'shiftflytemp_time="%f" ',shift_time);
 fprintf(fid,'fliesloaded_time="%f" ',load_time);
 fprintf(fid,'>\n');
 
-fprintf(fid,'  <apparatus type="rig" id="%s">\n',handles.Assay_Rig);
-fprintf(fid,'    <apparatus type="plate" id="%s">\n',handles.Assay_Plate);
-fprintf(fid,'      <apparatus type="bowl" id="%s">\n',handles.Assay_Bowl);
+fprintf(fid,'  <apparatus rig_id="%s" plate_id="%s" bowl_id="%s">\n',handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Bowl);
+fprintf(fid,'    <camera adaptor="%s" device_name="%s" format="%s" device_id="%d" unique_id="%s" />\n',...
+  handles.params.Imaq_Adaptor,...
+  handles.params.Imaq_DeviceName,...
+  handles.params.Imaq_VideoFormat,...
+  handles.DeviceID,...
+  handles.CameraUniqueID);
 
-fprintf(fid,'        <flies line="%s" ',handles.Fly_LineName);
+fprintf(fid,'    <flies line="%s" ',handles.Fly_LineName);
 fprintf(fid,'effector="%s" ',handles.params.MetaData_Effector);
 fprintf(fid,'cross-date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyy-mm-dd'));
 fprintf(fid,'age="%f,%f" ',minage,maxage);
@@ -45,7 +49,7 @@ fprintf(fid,'count="0">\n');
 
 % choose rearing protocol based on activity peak time
 i = find(strcmp(handles.Rearing_ActivityPeak,handles.Rearing_ActivityPeaks),1);
-fprintf(fid,'          <rearing_protocol="%s" ',handles.params.MetaData_RearingProtocols{i});
+fprintf(fid,'      <rearing_protocol="%s" ',handles.params.MetaData_RearingProtocols{i});
 fprintf(fid,'incubator="%s" ',handles.Rearing_IncubatorID);
 % i = find(strcmp(handles.Rearing_ActivityPeak,handles.Rearing_ActivityPeaks),1);
 % fprintf(fid,'lightson="%s" ',handles.params.Rearing_LightsOns{i});
@@ -53,40 +57,38 @@ fprintf(fid,'incubator="%s" ',handles.Rearing_IncubatorID);
 fprintf(fid,'/>\n');
 
 % always same sorting protocol
-fprintf(fid,'          <handling_protocol="%s" ',handles.params.MetaData_SortingHandlingProtocols{1});
+fprintf(fid,'      <handling_protocol="%s" ',handles.params.MetaData_SortingHandlingProtocols{1});
 fprintf(fid,'type="sorting" ');
 fprintf(fid,'handler="%s" ',handles.PreAssayHandling_SortingHandler);
 fprintf(fid,'time="%f" ',sorting_time);
 fprintf(fid,'/>\n');
 
 % always same starvation protocol
-fprintf(fid,'          <handling_protocol="%s" ',handles.params.MetaData_StarvationHandlingProtocols{1});
+fprintf(fid,'      <handling_protocol="%s" ',handles.params.MetaData_StarvationHandlingProtocols{1});
 fprintf(fid,'type="starvation" ');
 fprintf(fid,'handler="%s" ',handles.PreAssayHandling_StarvationHandler);
 fprintf(fid,'time="%f" ',starvation_time);
 fprintf(fid,'/>\n');
 
-fprintf(fid,'        </flies>\n');
-fprintf(fid,'        <environment temperature="%f" ',handles.MetaData_RoomTemperature);
+fprintf(fid,'    </flies>\n');
+fprintf(fid,'    <environment temperature="%f" ',handles.MetaData_RoomTemperature);
 fprintf(fid,'humidity="%f" />\n',handles.MetaData_RoomHumidity);
 tmp = strtrim(handles.BehaviorNotes);
 if ~isempty(tmp) && ~strcmpi(tmp,'None'),
-  fprintf(fid,'        <note type="behavioral"> %s </note>\n',handles.BehaviorNotes);
+  fprintf(fid,'    <note type="behavioral"> %s </note>\n',handles.BehaviorNotes);
 end
 tmp = strtrim(handles.TechnicalNotes);
 if ~isempty(tmp) && ~strcmpi(tmp,'None'),
-  fprintf(fid,'        <note type="technical"> %s </note>\n',handles.TechnicalNotes);
+  fprintf(fid,'    <note type="technical"> %s </note>\n',handles.TechnicalNotes);
 end
 % no other note right now
 %fprintf(fid,'        <note type="other"> </note>\n');
 if ~strcmpi(handles.ReviewFlag,'None'),
-  fprintf(fid,'        <flag type="review" reason="%s"/>\n',upper(handles.ReviewFlag));
+  fprintf(fid,'    <flag type="review" reason="%s"/>\n',upper(handles.ReviewFlag));
 end
 if ~strcmpi(handles.RedoFlag,'None'),
-  fprintf(fid,'        <flag type="redo" reason="%s"/>\n',upper(handles.RedoFlag));
+  fprintf(fid,'    <flag type="redo" reason="%s"/>\n',upper(handles.RedoFlag));
 end
-fprintf(fid,'      </apparatus>\n');
-fprintf(fid,'    </apparatus>\n');
 fprintf(fid,'  </apparatus>\n');
 fprintf(fid,'</experiment>\n');
 
