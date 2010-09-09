@@ -8,6 +8,11 @@ handles = tryRecordStartTemp(handles);
 
 handles = SaveMetaData(handles);
 
+% reserve this camera  
+load(handles.IsCameraRunningFile,'DevicesUsed');
+DevicesUsed(end+1) = handles.DeviceID; %#ok<NASGU>
+save('-append',handles.IsCameraRunningFile,'DevicesUsed');
+
 % create a temporary name for the video
 %handles.RandomNumber = randi(9999,1);
 filestr = sprintf('FBDC_movie_%s_%d.%s',...

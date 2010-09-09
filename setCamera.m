@@ -173,16 +173,19 @@ set(handles.text_Status_Preview,'String','On','BackgroundColor',handles.Status_P
 
 % write a semaphore to file saying that we should not call
 % imaqhwinfo('dcam')
-adaptorinfo = handles.adaptorinfo; %#ok<NASGU>
-handles.IsCameraRunningFile = fullfile(handles.DetectCameras_Params.DataDir,...
-  sprintf('%s_%s.mat',handles.DetectCameras_Params.IsCameraRunningFileStr,datestr(now,30)));
-if ~exist(handles.DetectCameras_Params.DataDir,'file'),
-  mkdir(handles.DetectCameras_Params.DataDir);
-end
-save(handles.IsCameraRunningFile,'adaptorinfo');
-global FBDC_IsCameraRunningFiles; 
-if isempty(FBDC_IsCameraRunningFiles),
-  FBDC_IsCameraRunningFiles = {handles.IsCameraRunningFile};
+%handles.IsCameraRunningFile = fullfile(handles.DetectCameras_Params.DataDir,...
+%  sprintf('%s_%s.mat',handles.DetectCameras_Params.IsCameraRunningFileStr,datestr(now,30)));
+if ~exist(handles.IsCameraRunningFile,'file'),
+
+  if ~exist(handles.DetectCameras_Params.DataDir,'file'),
+    mkdir(handles.DetectCameras_Params.DataDir);
+  end
+  adaptorinfo = handles.adaptorinfo; %#ok<NASGU>
+  DevicesUsed = []; %#ok<NASGU>
+  timestamp = datestr(now,30); %#ok<NASGU>
+  save(handles.IsCameraRunningFile,'adaptorinfo','DevicesUsed','timestamp');
+  addToStatus(handles,{sprintf('Creating IsCameraRunning semaphore file %s.',handles.IsCameraRunningFile)});
+
 else
-  FBDC_IsCameraRunningFiles{end+1} = handles.IsCameraRunningFile;
+  
 end
