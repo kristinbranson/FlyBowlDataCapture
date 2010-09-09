@@ -1,5 +1,9 @@
 function handles = setCamera(handles)
 
+% for temporary names
+handles.RandomNumber = randi(9999,1);
+handles.SetCamera_Time_datenum = now;
+
 if ~isfield(handles,'DeviceID'), 
   pause(2);
 end
@@ -52,6 +56,19 @@ if isfield(handles.params,'Imaq_ROIPosition'),
   set(handles.vid,'ROIPosition',handles.params.Imaq_ROIPosition);
 end
 if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
+
+  % create a temporary name for the log file
+  filestr = sprintf('FBDC_UFMF_Log_%s_%d.txt',...
+    datestr(handles.SetCamera_Time_datenum,30),...
+    handles.RandomNumber);
+  handles.TmpUFMFLogFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
+
+  % create a temporary name for the diagnostics file
+  filestr = sprintf('FBDC_UFMF_Diagnostics_%s_%d.txt',...
+    datestr(handles.SetCamera_Time_datenum,30),...
+    handles.RandomNumber);
+  handles.TmpUFMFStatFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
+    
   if isfield(handles.params,'UFMFMaxFracFgCompress'),
     set(handles.vid.Source,'maxFracFgCompress',handles.params.UFMFMaxFracFgCompress);
   end
@@ -74,11 +91,10 @@ if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
     set(handles.vid.Source,'nFramesInit',handles.params.UFMFNFramesInit);
   end
   if isfield(handles.params,'UFMFLogFileName'),
-    set(handles.vid.Source,'debugFileName',handles.params.UFMFLogFileName);
+    set(handles.vid.Source,'debugFileName',handles.TmpUFMFLogFileName);
   end
   if isfield(handles.params,'UFMFStatFileName'),
-    handles.params.UFMFStatFilename = strtrim(handles.params.UFMFStatFileName);
-    set(handles.vid.Source,'statFileName',handles.params.UFMFStatFileName);
+    set(handles.vid.Source,'statFileName',handles.TmpUFMFStatFileName);
   end
   if isfield(handles.params,'UFMFPrintStats'),
     set(handles.vid.Source,'printStats',handles.params.UFMFPrintStats);

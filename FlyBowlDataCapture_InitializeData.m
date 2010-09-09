@@ -58,6 +58,11 @@ for tmp = imaqfind('Name','FBDC_VideoInput'),
   delete(tmp{1});
 end
 
+%% reset experiment name
+
+handles.ExperimentName = '';
+handles.ExperimentDirectory = '';
+
 %% parse parameter file
 
 % open the parameter file
