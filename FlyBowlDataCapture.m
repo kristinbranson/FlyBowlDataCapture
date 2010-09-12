@@ -1113,6 +1113,14 @@ newdevid = handles.DeviceIDs(get(hObject,'Value'));
 
 if newdevid ~= handles.DeviceID,
 
+  % check if this camera is currently in use
+  [isInUse,handles] = checkDeviceInUse(handles,newdevid,true);
+  if isInUse,
+    set(hObject,'Value',find(handles.DeviceID==handles.DeviceIDs,1));
+    guidata(hObject,handles);
+    return;
+  end
+  
   % if we've already initialized the camera, uninitialize
   handles = clearVideoInput(handles);
   

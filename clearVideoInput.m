@@ -8,5 +8,8 @@ if isfield(handles,'vid') && isvalid(handles.vid) && handles.IsCameraInitialized
   end
   % delete the video input
   delete(handles.vid);
+  if isfield(handles,'IsCameraRunningFile') && exist(handles.IsCameraRunningFile','file'),
+    delete(handles.IsCameraRunningFile);
+  end
   set(handles.pushbutton_InitializeCamera,'Visible','on');
 end

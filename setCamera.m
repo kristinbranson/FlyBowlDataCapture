@@ -12,7 +12,14 @@ if ~isfield(handles,'DeviceID'),
   error('DeviceID not yet set');
 end
 
+% check if this device is in use now
+[isInUse,handles] = checkDeviceInUse(handles,handles.DeviceID,true);
+if isInUse,
+  return;
+end
+  
 try
+  %handles.vid = videoinput_kb(handles.DetectCameras_Params,handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
   handles.vid = videoinput(handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
 catch
   s = sprintf('Could not initialize device id %d with format %s and adaptor %s. Try redetecting cameras.',...
@@ -150,6 +157,7 @@ set(handles.vid,'ErrorFcn',@vidError);
 % Set up the update preview window function.
 setappdata(handles.hImage_Preview,'UpdatePreviewWindowFcn',@UpdatePreview);
 setappdata(handles.hImage_Preview,'LastPreviewUpdateTime',-inf);
+%setappdata(handles.hImage_Preview,'NoChangeInTimestamp',0);
 PreviewParams = struct;
 PreviewParams.AdaptorName = handles.params.Imaq_Adaptor;
 PreviewParams.PreviewUpdatePeriod = handles.params.PreviewUpdatePeriod/86400;
@@ -165,6 +173,17 @@ setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
 preview(handles.vid, handles.hImage_Preview); 
 handles.IsCameraInitialized = true;
 
+% set up timer to check if preview is not being updated
+CheckPreviewParams.hImage_Preview = handles.hImage_Preview;
+CheckPreviewParams.MaxPreviewUpdatePeriod = 3;
+CheckPreviewParams.figure_main = handles.figure_main;
+handles.CheckPreviewTimer = timer('ExecutionMode','FixedRate',...
+  'Period',1,...
+  'TimerFcn',{@CheckPreview,CheckPreviewParams},...
+  'StartDelay',1,...
+  'Name','FBDC_CheckPreview_Timer');
+start(handles.CheckPreviewTimer);
+
 % add to status log
 addToStatus(handles,{'Video preview started.'});
 
@@ -173,19 +192,16 @@ set(handles.text_Status_Preview,'String','On','BackgroundColor',handles.Status_P
 
 % write a semaphore to file saying that we should not call
 % imaqhwinfo('dcam')
-%handles.IsCameraRunningFile = fullfile(handles.DetectCameras_Params.DataDir,...
-%  sprintf('%s_%s.mat',handles.DetectCameras_Params.IsCameraRunningFileStr,datestr(now,30)));
-if ~exist(handles.IsCameraRunningFile,'file'),
-
-  if ~exist(handles.DetectCameras_Params.DataDir,'file'),
-    mkdir(handles.DetectCameras_Params.DataDir);
-  end
-  adaptorinfo = handles.adaptorinfo; %#ok<NASGU>
-  DevicesUsed = []; %#ok<NASGU>
-  timestamp = datestr(now,30); %#ok<NASGU>
-  save(handles.IsCameraRunningFile,'adaptorinfo','DevicesUsed','timestamp');
-  addToStatus(handles,{sprintf('Creating IsCameraRunning semaphore file %s.',handles.IsCameraRunningFile)});
-
+adaptorinfo = handles.adaptorinfo; %#ok<NASGU>
+handles.IsCameraRunningFile = fullfile(handles.DetectCameras_Params.DataDir,...
+  sprintf('%s_%s_%d.mat',handles.DetectCameras_Params.IsCameraRunningFileStr,handles.params.Imaq_Adaptor,handles.DeviceID));
+if ~exist(handles.DetectCameras_Params.DataDir,'file'),
+  mkdir(handles.DetectCameras_Params.DataDir);
+end
+save(handles.IsCameraRunningFile,'adaptorinfo');
+global FBDC_IsCameraRunningFiles; 
+if isempty(FBDC_IsCameraRunningFiles),
+  FBDC_IsCameraRunningFiles = {handles.IsCameraRunningFile};
 else
-  
+  FBDC_IsCameraRunningFiles{end+1} = handles.IsCameraRunningFile;
 end

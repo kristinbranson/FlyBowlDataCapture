@@ -7,3 +7,7 @@ if isfield(handles,'IsCameraRunningFile') && ...
   global FBDC_IsCameraRunningFiles; 
   FBDC_IsCameraRunningFiles = setdiff(FBDC_IsCameraRunningFiles,{handles.IsCameraRunningFile});
 end
+if isfield(handles,'CheckPreviewTimer'),
+  stop(handles.CheckPreviewTimer);
+  delete(handles.CheckPreviewTimer);
+end

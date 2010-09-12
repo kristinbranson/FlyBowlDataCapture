@@ -4,10 +4,8 @@ handles.DetectCameras_Params = ...
   struct('DataDir','.DetectCamerasData',...
   'IsCameraRunningFileStr','IsCameraRunning');
 
-% name of lock file
-handles.IsCameraRunningFile = fullfile(handles.DetectCameras_Params.DataDir,...
-  sprintf('%s.mat',handles.DetectCameras_Params.IsCameraRunningFileStr));
-handles.IsCameraRunning = exist(handles.IsCameraRunningFile,'file');
+handles.IsCameraRunningFiles = dir(fullfile(handles.DetectCameras_Params.DataDir,'*.mat'));
+handles.IsCameraRunning = ~isempty(handles.IsCameraRunningFiles);
 
 handles = clearVideoInput(handles);
 
@@ -19,15 +17,12 @@ imaqreset;
 % check for adaptor
 if handles.IsCameraRunning,
   try
-    load(handles.IsCameraRunningFile,'adaptorinfo','DevicesUsed','timestamp');
+    filename = fullfile(handles.DetectCameras_Params.DataDir,...
+      handles.IsCameraRunningFiles(end).name);
     addToStatus(handles,...
-      sprintf('Another camera is in operation, and devices %s are in use, so reading adaptorinfo from %s, written at time %s. If this seems wrong, exit all FlyBowlDataCapture GUIs and run "CleanSemaphores"',...
-      handles.IsCameraRunningFile,timestamp));
-    if ~strcmpi(handles.params.Imaq_Adaptor,adaptorinfo.AdaptorName), %#ok<NODEF>
-      s = sprintf('Adaptor %s requested, but other camera(s) are running adaptor %s. Cannot detect cameras.',handles.params.Imaq_Adaptor,adaptorinfo.AdaptorName);
-      uiwait(errordlg(s,'Error loading imaq adaptor'));
-      return;
-    end
+      sprintf('Another camera is in operation, so reading adaptorinfo from %s. If this seems wrong, exit all FlyBowlDataCapture GUIs and run "CleanSemaphores"',filename));
+
+    load(filename,'adaptorinfo');
   catch
     s = sprintf('Could not load adaptor info from %s',filename);
     uiwait(errordlg(s,'Error loading imaq adaptor'));
@@ -35,9 +30,11 @@ if handles.IsCameraRunning,
   end
 else
   try
+    %adaptorinfo =
+    %imaqhwinfo_kb(handles.DetectCameras_Params,handles.params.Imaq_Adaptor);
     adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
-    DevicesUsed = [];
-  catch
+  catch ME
+    getReport(ME)
     s = sprintf('Adaptor %s not registered, or no %s compatable camera found',handles.params.Imaq_Adaptor,handles.params.Imaq_Adaptor);
     uiwait(errordlg(s,'Error loading imaq adaptor'));
     return;
@@ -67,8 +64,7 @@ if ~any(devidx),
   uiwait(errordlg(s,'Camera format not found'));
 end  
 
-% don't allow devices already in use to be selected
-handles.DeviceIDs = setdiff(cell2mat(adaptorinfo.DeviceIDs(devidx)),DevicesUsed);
+handles.DeviceIDs = cell2mat(adaptorinfo.DeviceIDs(devidx));
 
 % % make names for each device
 % handles.DeviceNames = cell(size(handles.DeviceIDs));
