@@ -30,8 +30,11 @@ if handles.IsCameraRunning,
   end
 else
   try
+    %adaptorinfo =
+    %imaqhwinfo_kb(handles.DetectCameras_Params,handles.params.Imaq_Adaptor);
     adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
-  catch
+  catch ME
+    getReport(ME)
     s = sprintf('Adaptor %s not registered, or no %s compatable camera found',handles.params.Imaq_Adaptor,handles.params.Imaq_Adaptor);
     uiwait(errordlg(s,'Error loading imaq adaptor'));
     return;
