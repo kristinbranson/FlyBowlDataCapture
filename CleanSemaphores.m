@@ -19,3 +19,11 @@ if nfiles > 0,
 else
   fprintf('No semaphores in .TempRecordData\n');
 end
+
+nfiles = length(dir(fullfile('.GUIInstances','*.mat')));
+if nfiles > 0,
+  fprintf('Deleting %d semaphores from .GUIInstances\n',nfiles);
+  delete(fullfile('.GUIInstances','*.mat'));
+else
+  fprintf('No semaphores in .GUIInstances\n');
+end

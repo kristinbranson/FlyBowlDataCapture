@@ -3,11 +3,11 @@ function handles = FlyBowlDataCapture_InitializeData(handles)
 % version
 handles.version = '0.1';
 
+% for unique names
+handles.RandomNumber = randi(9999,1);
+
 % comment character in params file
 comment_char = '#';
-
-% name of rc file
-handles.rcfile = '.FlyBowlDataCapture_rc.mat';
 
 % background color if value has not been changed from defaults
 handles.isdefault_bkgdcolor = [0,.2,.2];
@@ -40,6 +40,8 @@ handles.hourformat = 15;
 % format for second
 handles.secondformat = 13;
 
+handles.GUIInstanceDir = '.GUIInstances';
+
 % earliest time that someone should be working
 handles.minhour = rem(datenum('06:00'),1);
 handles.maxhour = rem(datenum('23:00'),1);
@@ -62,6 +64,9 @@ end
 
 handles.ExperimentName = '';
 handles.ExperimentDirectory = '';
+
+%% get GUI instance
+handles = getGUIInstance(handles);
 
 %% parse parameter file
 
@@ -120,7 +125,7 @@ try
   
   % some values are not lists
   notlist_params = {'Imaq_Adaptor','Imaq_DeviceName','Imaq_VideoFormat',...
-    'FileType','OutputDirectory','TmpOutputDirectory','MetaData_AssayName',...
+    'FileType','MetaData_AssayName',...
     'MetaData_Effector','MetaDataFileName','MovieFilePrefix','LogFileName',...
     'UFMFLogFileName','UFMFStatFileName'};
   for i = 1:length(notlist_params),
@@ -136,17 +141,38 @@ try
     end
   end
   
+  % parameters that are selected by GUI instance
+  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory'};
+  for i = 1:length(GUIInstance_params),
+    fn = GUIInstance_params{i};
+    j = mod(handles.GUIi,length(handles.params.(fn)))+1;
+    handles.params.(fn) = handles.params.(fn){j};
+  end
+
 catch ME
   uiwait(errordlg({'Error parsing parameter file:',getReport(ME)},'Error reading parameters'));
   rethrow(ME);
 end
-
+  
 %% Read previous values
 
 previous_values = struct;
 if exist(handles.rcfile,'file'),
   try
     previous_values = load(handles.rcfile);
+    handles.GUIInstance_prev = {
+      'Assay_Rig'
+      'Assay_Plate'
+      'Assay_Bowl'
+      'DeviceID'
+      'TempProbeID'
+      'FigurePositionHistory'
+      };
+    for i = 1:length(handles.GUIInstance_prev),
+      fn = handles.GUIInstance_prev{i};
+      j = mod(handles.GUIi,length(previous_values.(fn)))+1;
+      previous_values.(fn) = handles.params.(fn){j};
+    end
   catch
   end
 end

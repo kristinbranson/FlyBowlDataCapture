@@ -46,7 +46,7 @@ global FBDC_IsCameraRunningFiles;
 
 for i = 1:length(FBDC_IsCameraRunningFiles),
   if exist(FBDC_IsCameraRunningFiles{i},'file'),
-    delete(FBDC_IsCameraRunningFile);
+    delete(FBDC_IsCameraRunningFiles{i});
   end
 end
 
@@ -54,3 +54,17 @@ catch ME
   fprintf('Error checking for IsCameraRunningFile:\n');
   getReport(ME)
 end
+
+try
+
+global FBDC_GUIInstanceFileName;
+
+if ~isempty(FBDC_GUIInstanceFileName) && exist(FBDC_GUIInstanceFileName,'file'),
+  delete(FBDC_GUIInstaceFileName);
+end
+
+catch ME
+  fprintf('Error checking for GUIiNstanceFile:\n');
+  getReport(ME)
+end
+

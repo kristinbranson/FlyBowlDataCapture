@@ -1,7 +1,6 @@
 function handles = setCamera(handles)
 
 % for temporary names
-handles.RandomNumber = randi(9999,1);
 handles.SetCamera_Time_datenum = now;
 
 if ~isfield(handles,'DeviceID'), 

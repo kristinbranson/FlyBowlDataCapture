@@ -62,8 +62,18 @@ try
   
 handles.output = hObject;
 
+% name of rc file
+handles.rcfile = '.FlyBowlDataCapture_rc.mat';
+
 % file containing parameters we may want to change some day
-handles.params_file = 'FlyBowlDataCaptureParams.txt';
+if exist(handles.rcfile,'file'),
+  try
+    handles.params_file = load(handles.rcfile,'params_file');
+  catch
+    handles.params_file = 'FlyBowlDataCaptureParams.txt';
+  end
+end
+
 [filestr,pathstr] = uigetfile('*.txt','Choose Parameter File',handles.params_file);
 if ~ischar(filestr) || isempty(filestr),
   uiresume(handles.figure_main);
@@ -1162,6 +1172,10 @@ function figure_main_CloseRequestFcn(hObject, eventdata, handles)
 [handles,didcancel] = CloseExperiment(handles);
 if didcancel,
   return;
+end
+if isfield(handles,'GUIInstanceFileName') && ...
+    exist(handles.GUIInstanceFileName,'file'),
+  delete(handles.GUIInstanceFileName);
 end
 guidata(hObject,handles);
 uiresume(handles.figure_main);
