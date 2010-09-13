@@ -8,17 +8,22 @@ handles = tryRecordStartTemp(handles);
 
 handles = SaveMetaData(handles);
 
+% reserve this camera  
+load(handles.IsCameraRunningFile,'DevicesUsed');
+DevicesUsed(end+1) = handles.DeviceID; %#ok<NASGU>
+save('-append',handles.IsCameraRunningFile,'DevicesUsed');
+
 % create a temporary name for the video
-handles.RandomNumber = randi(9999,1);
+%handles.RandomNumber = randi(9999,1);
 filestr = sprintf('FBDC_movie_%s_%d.%s',...
-  datestr(handles.StartRecording_Time_datenum,30),...
+  datestr(handles.SetCamera_Time_datenum,30),...
   handles.RandomNumber,handles.params.FileType);
 handles.FileName = fullfile(handles.params.TmpOutputDirectory,filestr);
 handles.IsTmpFileName = true;
 
 % create a temporary name for the temperature
 filestr = sprintf('FBDC_temperature_%s_%d.txt',...
-  datestr(handles.StartRecording_Time_datenum,30),...
+  datestr(handles.SetCamera_Time_datenum,30),...
   handles.RandomNumber);
 handles.TempFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
 handles.TempFid = -1;

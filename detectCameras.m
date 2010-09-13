@@ -30,8 +30,11 @@ if handles.IsCameraRunning,
   end
 else
   try
+    %adaptorinfo =
+    %imaqhwinfo_kb(handles.DetectCameras_Params,handles.params.Imaq_Adaptor);
     adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
-  catch
+  catch ME
+    getReport(ME)
     s = sprintf('Adaptor %s not registered, or no %s compatable camera found',handles.params.Imaq_Adaptor,handles.params.Imaq_Adaptor);
     uiwait(errordlg(s,'Error loading imaq adaptor'));
     return;
@@ -63,15 +66,15 @@ end
 
 handles.DeviceIDs = cell2mat(adaptorinfo.DeviceIDs(devidx));
 
-% make names for each device
-handles.DeviceNames = cell(size(handles.DeviceIDs));
-for i = 1:length(handles.DeviceIDs),
-  handles.DeviceNames{i} = sprintf('Adaptor_%s___Name_%s___Format_%s___DeviceID_%d',...
-    handles.params.Imaq_Adaptor,...
-    handles.params.Imaq_DeviceName,...
-    handles.params.Imaq_VideoFormat,...
-    handles.DeviceIDs(i));
-  handles.DeviceNames{i} = strrep(handles.DeviceNames{i},' ','_');
-end
+% % make names for each device
+% handles.DeviceNames = cell(size(handles.DeviceIDs));
+% for i = 1:length(handles.DeviceIDs),
+%   handles.DeviceNames{i} = sprintf('Adaptor_%s___Name_%s___Format_%s___DeviceID_%d',...
+%     handles.params.Imaq_Adaptor,...
+%     handles.params.Imaq_DeviceName,...
+%     handles.params.Imaq_VideoFormat,...
+%     handles.DeviceIDs(i));
+%   handles.DeviceNames{i} = strrep(handles.DeviceNames{i},' ','_');
+% end
 
 handles.adaptorinfo = adaptorinfo;

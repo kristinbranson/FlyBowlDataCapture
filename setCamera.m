@@ -1,5 +1,9 @@
 function handles = setCamera(handles)
 
+% for temporary names
+handles.RandomNumber = randi(9999,1);
+handles.SetCamera_Time_datenum = now;
+
 if ~isfield(handles,'DeviceID'), 
   pause(2);
 end
@@ -8,7 +12,14 @@ if ~isfield(handles,'DeviceID'),
   error('DeviceID not yet set');
 end
 
+% check if this device is in use now
+[isInUse,handles] = checkDeviceInUse(handles,handles.DeviceID,true);
+if isInUse,
+  return;
+end
+  
 try
+  %handles.vid = videoinput_kb(handles.DetectCameras_Params,handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
   handles.vid = videoinput(handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
 catch
   s = sprintf('Could not initialize device id %d with format %s and adaptor %s. Try redetecting cameras.',...
@@ -17,13 +28,24 @@ catch
   error(s);
 end
 
-% TODO: set properties like shutter speed
-% vid_src = getselectedsource(vid);
-
 handles.vidRes = get(handles.vid, 'VideoResolution'); 
 handles.nBands = get(handles.vid, 'NumberOfBands'); 
 srcparams = get(handles.vid.source);
 srcparamnames = fieldnames(srcparams);
+
+% get name for device
+if(any(strcmpi(srcparamnames,'UniqueID'))),
+  handles.CameraUniqueID = get(handles.vid.source,'UniqueID');
+else
+  handles.CameraUniqueID = sprintf('%d',handles.DeviceID);
+end
+handles.DeviceName = sprintf('Adaptor_%s___Name_%s___Format_%s___DeviceID_%d___UniqueID_%s',...
+     handles.params.Imaq_Adaptor,...
+     handles.params.Imaq_DeviceName,...
+     handles.params.Imaq_VideoFormat,...
+     handles.DeviceID,...
+     handles.CameraUniqueID);
+addToStatus(handles,{sprintf('DeviceName = %s',handles.DeviceName)});
 
 % read frame rate from videoinput if possible
 if any(strcmpi(srcparamnames,'FrameRate')),
@@ -50,6 +72,60 @@ end
 % set ROI if necessary
 if isfield(handles.params,'Imaq_ROIPosition'),
   set(handles.vid,'ROIPosition',handles.params.Imaq_ROIPosition);
+end
+if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
+
+  % create a temporary name for the log file
+  filestr = sprintf('FBDC_UFMF_Log_%s_%d.txt',...
+    datestr(handles.SetCamera_Time_datenum,30),...
+    handles.RandomNumber);
+  handles.TmpUFMFLogFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
+
+  % create a temporary name for the diagnostics file
+  filestr = sprintf('FBDC_UFMF_Diagnostics_%s_%d.txt',...
+    datestr(handles.SetCamera_Time_datenum,30),...
+    handles.RandomNumber);
+  handles.TmpUFMFStatFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
+    
+  if isfield(handles.params,'UFMFMaxFracFgCompress'),
+    set(handles.vid.Source,'maxFracFgCompress',handles.params.UFMFMaxFracFgCompress);
+  end
+  if isfield(handles.params,'UFMFMaxBGNFrames'),
+    set(handles.vid.Source,'maxBGNFrames',handles.params.UFMFMaxBGNFrames);
+  end
+  if isfield(handles.params,'UFMFBGUpdatePeriod'),
+    set(handles.vid.Source,'BGUpdatePeriod',handles.params.UFMFBGUpdatePeriod);
+  end
+  if isfield(handles.params,'UFMFBGKeyFramePeriod'),
+    set(handles.vid.Source,'BGKeyFramePeriod',handles.params.UFMFBGKeyFramePeriod);
+  end
+  if isfield(handles.params,'UFMFBoxLength'),
+    set(handles.vid.Source,'boxLength',handles.params.UFMFBoxLength);
+  end
+  if isfield(handles.params,'UFMFBackSubThresh'),
+    set(handles.vid.Source,'backSubThresh',handles.params.UFMFBackSubThresh);
+  end
+  if isfield(handles.params,'UFMFNFramesInit'),
+    set(handles.vid.Source,'nFramesInit',handles.params.UFMFNFramesInit);
+  end
+  if isfield(handles.params,'UFMFLogFileName'),
+    set(handles.vid.Source,'debugFileName',handles.TmpUFMFLogFileName);
+  end
+  if isfield(handles.params,'UFMFStatFileName'),
+    set(handles.vid.Source,'statFileName',handles.TmpUFMFStatFileName);
+  end
+  if isfield(handles.params,'UFMFPrintStats'),
+    set(handles.vid.Source,'printStats',handles.params.UFMFPrintStats);
+  end
+  if isfield(handles.params,'UFMFStatStreamPrintFreq'),
+    set(handles.vid.Source,'statStreamPrintFreq',handles.params.UFMFStatStreamPrintFreq);
+  end
+  if isfield(handles.params,'UFMFStatComputeFrameErrorFreq'),
+    set(handles.vid.Source,'statComputeFrameErrorFreq',handles.params.UFMFStatComputeFrameErrorFreq);
+  end
+  if isfield(handles.params,'UFMFStatPrintTimings'),
+    set(handles.vid.Source,'statComputeFrameErrorFreq',handles.params.UFMFStatComputeFrameErrorFreq);
+  end
 end
 
 % get camera unique ID if available
@@ -81,6 +157,7 @@ set(handles.vid,'ErrorFcn',@vidError);
 % Set up the update preview window function.
 setappdata(handles.hImage_Preview,'UpdatePreviewWindowFcn',@UpdatePreview);
 setappdata(handles.hImage_Preview,'LastPreviewUpdateTime',-inf);
+%setappdata(handles.hImage_Preview,'NoChangeInTimestamp',0);
 PreviewParams = struct;
 PreviewParams.AdaptorName = handles.params.Imaq_Adaptor;
 PreviewParams.PreviewUpdatePeriod = handles.params.PreviewUpdatePeriod/86400;
@@ -96,6 +173,17 @@ setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
 preview(handles.vid, handles.hImage_Preview); 
 handles.IsCameraInitialized = true;
 
+% set up timer to check if preview is not being updated
+CheckPreviewParams.hImage_Preview = handles.hImage_Preview;
+CheckPreviewParams.MaxPreviewUpdatePeriod = 3;
+CheckPreviewParams.figure_main = handles.figure_main;
+handles.CheckPreviewTimer = timer('ExecutionMode','FixedRate',...
+  'Period',1,...
+  'TimerFcn',{@CheckPreview,CheckPreviewParams},...
+  'StartDelay',1,...
+  'Name','FBDC_CheckPreview_Timer');
+start(handles.CheckPreviewTimer);
+
 % add to status log
 addToStatus(handles,{'Video preview started.'});
 
@@ -106,7 +194,7 @@ set(handles.text_Status_Preview,'String','On','BackgroundColor',handles.Status_P
 % imaqhwinfo('dcam')
 adaptorinfo = handles.adaptorinfo; %#ok<NASGU>
 handles.IsCameraRunningFile = fullfile(handles.DetectCameras_Params.DataDir,...
-  sprintf('%s_%s.mat',handles.DetectCameras_Params.IsCameraRunningFileStr,datestr(now,30)));
+  sprintf('%s_%s_%d.mat',handles.DetectCameras_Params.IsCameraRunningFileStr,handles.params.Imaq_Adaptor,handles.DeviceID));
 if ~exist(handles.DetectCameras_Params.DataDir,'file'),
   mkdir(handles.DetectCameras_Params.DataDir);
 end

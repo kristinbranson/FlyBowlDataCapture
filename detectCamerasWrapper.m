@@ -17,6 +17,11 @@ else
     handles.DeviceID = handles.DeviceIDs(1);
   end
   
+  [isInUse,handles,DeviceIDsLeft] = checkDeviceInUse(handles,handles.DeviceID,false);
+  if isInUse && ~isempty(DeviceIDsLeft),
+    handles.DeviceID = DeviceIDsLeft(1);
+  end
+  
   % set possible values, current value, color to default
   set(handles.popupmenu_DeviceID,'String',cellstr(num2str(handles.DeviceIDs(:))),...
     'Value',find(handles.DeviceID == handles.DeviceIDs,1),...
