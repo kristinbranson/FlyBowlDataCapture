@@ -89,7 +89,7 @@ FrameRatePlotYLim,0,35
 # Limits of y-axis for temperature plot
 TempPlotYLim,15,45
 # Whether to try to connect over the network to Sage to query line names
-DoQuerySage,0
+DoQuerySage,1
 # Time in between temperature readings
 TempProbePeriod,1
 # Which channels have temperature probes

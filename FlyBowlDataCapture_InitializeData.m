@@ -49,6 +49,8 @@ handles.GUIInstanceDir = '.GUIInstances';
 handles.minhour = rem(datenum('06:00'),1);
 handles.maxhour = rem(datenum('23:00'),1);
 
+handles.SAGECodeDir = '../SAGE/MATLABInterface/Trunk';
+
 %% delete existing imaqs and timers
 
 tmp = timerfind('Name','FBDC_RecordTimer');
@@ -209,21 +211,17 @@ set(handles.popupmenu_Assay_Experimenter,'String',handles.Assay_Experimenters,..
 
 % whether this has been changed or not
 handles.isdefault.Fly_LineName = true;
-
-% connect to Sage
-if handles.params.DoQuerySage,
+handles.IsSage = exist(handles.SAGECodeDir,'file');
+if handles.IsSage,
   try
-    handles.db = connectToSAGE(handles.SageParamsFile);
-    addToStatus(handles,{'Connected to Sage.'});
-  catch ME
-    warndlg(['Could not connect to Sage: ',getReport(ME)],'Could not connect to Sage');
-    handles.db = [];
-    handles.params.DoQuerySage = false;
-    addToStatus(handles,{'Could not connect to Sage. Turning off querying Sage.'});
+    addpath(handles.SAGECodeDir);
+  catch
+    handles.IsSage = false;
   end
 end
-
-% read the line names cached in handles.linename_file; sort by something?
+if ~handles.IsSage,
+  addToStatus(handles,{sprintf('SAGE code directory %s could not be added to the path.',handles.SAGECodeDir)});
+end
 handles = readLineNames(handles,false);
 
 % if line name not stored in rc file, choose first line name
