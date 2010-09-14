@@ -39,6 +39,7 @@ hauto = struct;
   myparse(varargin,'maxheight',5,...
   'Callback','');
 hauto.maxheight = min(hauto.maxheight,length(choices));
+hauto.DEBUG = false;
 
 hauto.Parent = hObject;
 hauto.hjava = findjobj(hObject);
@@ -69,6 +70,9 @@ set(hauto.hjava_listbox,'FocusLostCallback',@(h,event) FocusLostListbox(h,event,
 
 function warnings = ResetChoices(hauto,choices)
 
+if hauto.DEBUG,
+  fprintf('Reset choices called.\n');
+end
 warnings = '';
 oldvisible = get(hauto.listbox,'Visible');
 
@@ -93,22 +97,54 @@ set(hauto.listbox,'Visible',oldvisible);
 
 function MousePressedAutoCompleteEdit(hObject,event,hauto) %#ok<*INUSL>
 
+if hauto.DEBUG,
+  fprintf('MousePressedAutoCompleteEdit called,\nevent = ');
+  disp(event); fprintf('\n');
+end
+
 matchStringChoices(hauto);
 set(hauto.listbox,'Visible','on');
 
 function FocusGainedAutoCompleteEdit(hObject,event,hauto)
 
+if hauto.DEBUG,
+  fprintf('FocusGainedAutoCompleteEdit called,\nevent = ');
+  disp(event); fprintf('\n');
+end
+
 %matchStringChoices(hauto);
 set(hauto.listbox,'Visible','on');
 
-function FocusLostListbox(hObject,event,hauto) %#ok<INUSD>
+function FocusLostListbox(hObject,event,hauto) 
+
+if hauto.DEBUG,
+  fprintf('FocusLostListbox called,\nevent = ');
+  disp(event); fprintf('\n');
+end
 
 set(hObject,'Visible','off');
 
 function FocusLostAutoCompleteEdit(hObject,event,hauto)
 
+if hauto.DEBUG,
+  fprintf('FocusLostAutoCompleteEdit called,\nevent = ');
+  disp(event); fprintf('\n');
+end
+
 if ~ishandle(hauto.listbox),
   return;
+end
+
+if strcmpi(get(hauto.listbox,'Visible'),'on'),
+  CurrentObject = get(get(hauto.Parent,'parent'),'CurrentObject');
+  if ismember(CurrentObject,[hauto.listbox,hauto.Parent])
+    return;
+  else
+    if hauto.DEBUG,
+      fprintf('CurrentObject = %f:\n',get(get(hauto.Parent,'parent'),'CurrentObject'));
+      disp(get(get(get(hauto.Parent,'parent'),'CurrentObject')));
+    end
+  end
 end
 
 if ~isempty(event) && strcmpi(get(event,'Cause'),'TRAVERSAL_FORWARD'),
@@ -133,6 +169,11 @@ end
 
 function KeyPressedAutoCompleteEdit(hObject,event,hauto)
 
+if hauto.DEBUG,
+  fprintf('KeyPressedAutoCompleteEdit called,\nevent = ');
+  disp(event); fprintf('\n');
+end
+
 KeyCode = get(event,'KeyCode');
 if KeyCode == 40, % down
   value = get(hauto.listbox,'Value');
@@ -145,8 +186,9 @@ elseif KeyCode == 38, % up
   if value > 1,
     set(hauto.listbox,'Value',value-1);
   end
-elseif KeyCode == 10, % enter
+elseif KeyCode == 10 || KeyCode == 9, % enter or tab
   ListBoxCallback(hauto.listbox,[],hauto);
+elseif KeyCode == 16, % shift
 else 
   matchStringChoices(hauto);
 end
@@ -156,6 +198,12 @@ function matchStringChoices(hauto)
 caretpos = get(hauto.hjava,'CaretPosition');
 string = get(hauto.hjava,'Text');
 string1 = string(1:caretpos);
+
+if hauto.DEBUG,
+  fprintf('matchStringChoices called: %s <caret> %s\n',string1,string(caretpos+1:end));
+end
+
+
 choices = getappdata(hauto.listbox,'AllChoices');
 %string2 = string(caretpos+1:end);
 
@@ -190,6 +238,11 @@ set(hauto.listbox,'String',choices(matchi),'Value',value,'Visible','on','Positio
 
 function ListBoxCallback(hObject,event,hauto)
 
+if hauto.DEBUG,
+  fprintf('ListBoxCallback called,\nevent = ');
+  disp(event); fprintf('\n');
+end
+
 v = get(hauto.listbox,'Value');
 ss = get(hauto.listbox,'String');
 s = ss{v};
@@ -198,3 +251,12 @@ drawnow;
 set(hauto.hjava,'SelectionStart',0,'SelectionEnd',length(s));
 matchStringChoices(hauto);
 set(hauto.listbox,'Visible','off');
+
+eventdata.String = s;
+if ~isempty(hauto.Callback),
+  if iscell(hauto.Callback),
+    feval(hauto.Callback{1},hauto.Parent,eventdata,hauto.Callback{2:end});
+  else
+    feval(hauto.Callback,hauto.Parent,eventdata);
+  end
+end

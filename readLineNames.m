@@ -26,3 +26,4 @@ addToStatus(handles,{'Read line names from file.'});
 if isfield(handles.params,'ExtraLineNames'),
   handles.Fly_LineNames = cat(1,handles.Fly_LineNames,handles.params.ExtraLineNames(:));
 end
+handles.Fly_LineNames = unique(handles.Fly_LineNames);

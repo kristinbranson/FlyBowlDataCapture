@@ -215,6 +215,9 @@ function edit_Fly_LineName_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns edit_Fly_LineName contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from edit_Fly_LineName
 
+%fprintf('edit_Fly_LineName called, event = ');
+%disp(eventdata)
+
 % grab value
 drawnow;
 if isfield(eventdata,'String'),
@@ -231,7 +234,7 @@ else
   % multiple matches, check for case sensitivity
   if length(i) > 1,
     % how many letters are exactly shared
-    nmatches = sum(char(handles.Fly_LineNames(i))==newname,2,'double');
+    nmatches = sum(char(handles.Fly_LineNames(i))==repmat(newname,[length(i),1]),2,'double');
     % choose the maximum number of exact matches
     [~,i1] = max(nmatches);
     i = i(i1);
@@ -259,6 +262,8 @@ else
   
   addToStatus(handles,{sprintf('Invalid line name %s switched back to %s.',...
     newname,handles.Fly_LineName)});
+  %fprintf('Invalid line name %s switched back to %s.',...
+  %  newname,handles.Fly_LineName);
   set(handles.edit_Fly_LineName,'BackgroundColor',handles.shouldchange_bkgdcolor);
 
 end
