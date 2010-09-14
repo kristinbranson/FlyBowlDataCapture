@@ -54,7 +54,7 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 
 % Choose default command line output for FlyBowlDataCapture
 
-handles.DEBUG = false;
+handles.DEBUG = true;
 handles.IsProcessingError = false;
 guidata(hObject,handles);
 
@@ -65,13 +65,33 @@ handles.output = hObject;
 % name of rc file
 handles.rcfile = '.FlyBowlDataCapture_rc.mat';
 
-% file containing parameters we may want to change some day
+% Read previous values
+
+handles.previous_values = struct;
 if exist(handles.rcfile,'file'),
   try
-    handles.params_file = load(handles.rcfile,'params_file');
+    handles.previous_values = load(handles.rcfile);
+    handles.GUIInstance_prev = {
+      'Assay_Rig'
+      'Assay_Plate'
+      'Assay_Bowl'
+      'DeviceID'
+      'TempProbeID'
+      'FigurePositionHistory'
+      };
+    for i = 1:length(handles.GUIInstance_prev),
+      fn = handles.GUIInstance_prev{i};
+      j = mod(handles.GUIi-1,length(previous_values.(fn)))+1;
+      previous_values.(fn) = handles.params.(fn){j};
+    end
   catch
-    handles.params_file = 'FlyBowlDataCaptureParams.txt';
   end
+end
+
+if isfield(handles.previous_values,'params_file'),
+  handles.params_file = handles.previous_values.params_file;
+else
+  handles.params_file = 'FlyBowlDataCaptureParams.txt';
 end
 
 [filestr,pathstr] = uigetfile('*.txt','Choose Parameter File',handles.params_file);
@@ -114,7 +134,7 @@ catch ME,
   
   if handles.DEBUG,
     getReport(ME)
-    rethrow ME;
+    rethrow(ME);
   else
     s = {'Error during data capture:',getReport(ME)};
     if exist('handles','var') && isstruct(handles) && ...
@@ -1317,6 +1337,10 @@ function menu_Quit_Callback(hObject, eventdata, handles)
 [handles,didcancel] = CloseExperiment(handles);
 if didcancel,
   return;
+end
+if isfield(handles,'GUIInstanceFileName') && ...
+    exist(handles.GUIInstanceFileName,'file'),
+  delete(handles.GUIInstanceFileName);
 end
 
 guidata(hObject,handles);

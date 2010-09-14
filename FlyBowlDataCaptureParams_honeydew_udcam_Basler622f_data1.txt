@@ -66,11 +66,11 @@ PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
 gdcamPreviewFrameInterval,2
 # Directory to store video to
-OutputDirectory,E:\Data\FlyBowl\Test
+OutputDirectory,E:\Data\FlyBowl\Test1,E:\Data\FlyBowl\Test2
 # Prefix of movie file
 MovieFilePrefix,movie
 # Directory to temporarily store video to
-TmpOutputDirectory,E:\Data\FlyBowl\Test
+TmpOutputDirectory,E:\Data\FlyBowl\Test1,E:\Data\FlyBowl\Test2
 # Name of file to store metadata to
 MetaDataFileName,Metadata.xml
 # Name of file to store log to

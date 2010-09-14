@@ -1,5 +1,12 @@
 function handles = RecordConfiguration(handles)
 
+if exist(handles.rcfile,'file'),
+  rc = load(handles.rcfile);
+else
+  rc = struct;
+end
+GUIi = handles.GUIi;
+
 % convert absolute dates to offsets from now
 handles.PreAssayHandling_CrossDateOff = floor(handles.now) - handles.PreAssayHandling_CrossDate_datenum;
 handles.PreAssayHandling_DOBStartOff = floor(handles.now) - handles.PreAssayHandling_DOBStart_datenum;
@@ -7,16 +14,8 @@ handles.PreAssayHandling_DOBEndOff = floor(handles.now) - handles.PreAssayHandli
 handles.PreAssayHandling_SortingDateOff = floor(handles.now) - handles.PreAssayHandling_SortingDate_datenum;
 handles.PreAssayHandling_StarvationDateOff = floor(handles.now) - handles.PreAssayHandling_StarvationDate_datenum;
 
-%working here
-
 % get current figure position
-FigurePosition = get(handles.figure_main,'Position');
-if ~isfield(handles,'FigurePositionHistory'),
-  handles.FigurePositionHistory = {};
-end
-for i = length(handles.FigurePositionHistory)+1:handles.GUIi,
-  handles.FigurePositionHistory{i} = FigurePosition;
-end
+handles.FigurePosition = get(handles.figure_main,'Position');
 
 fns = {
   'params_file'
@@ -38,11 +37,30 @@ fns = {
   'Assay_Bowl'
   'DeviceID'
   'TempProbeID'
-  'FigurePositionHistory'
+  'FigurePosition'
   };
+for i = 1:length(fns),
+  fn = fns{i};
+  if ~isfield(handles,fn),
+    continue;
+  end
+  if ismember(fn,handles.GUIInstance_prev),
+    if ~isfield(rc,fn),
+      rc.(fn) = {};
+    end
+    if ~iscell(rc.(fn)),
+      rc.(fn) = {rc.(fn)};
+    end
+    for j = length(rc.(fn))+1:GUIi,
+      rc.(fn){i} = handles.(fn);
+    end
+  else
+    rc.(fn) = handles.(fn);
+  end
+  
+end
 
-handlefns = fieldnames(handles);
-fnsmissing = setdiff(fns,handlefns);
+fnsmissing = setdiff(fns,fieldnames(rc));
 if ~isempty(fnsmissing),
   warning('Missing previous value: %s.\n',fnsmissing{:}); %#ok<WNTAG>
 end
