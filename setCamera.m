@@ -98,8 +98,8 @@ if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
   if isfield(handles.params,'UFMFBGKeyFramePeriod'),
     set(handles.vid.Source,'BGKeyFramePeriod',handles.params.UFMFBGKeyFramePeriod);
   end
-  if isfield(handles.params,'UFMFBoxLength'),
-    set(handles.vid.Source,'boxLength',handles.params.UFMFBoxLength);
+  if isfield(handles.params,'UFMFMaxBoxLength'),
+    set(handles.vid.Source,'boxLength',handles.params.UFMFMaxBoxLength);
   end
   if isfield(handles.params,'UFMFBackSubThresh'),
     set(handles.vid.Source,'backSubThresh',handles.params.UFMFBackSubThresh);

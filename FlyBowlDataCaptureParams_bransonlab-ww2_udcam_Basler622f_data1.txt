@@ -60,7 +60,7 @@ Imaq_Gain,200
 # Video file type
 FileType,ufmf
 # Number of seconds to record
-RecordTime,20
+RecordTime,500
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
@@ -123,8 +123,8 @@ UFMFBGUpdatePeriod,1
 # number of seconds between spitting out a new background model
 UFMFBGKeyFramePeriod,100
 # max length of box stored during compression
-UFMFMaxBoxLength,30
+UFMFMaxBoxLength,5
 # threshold for background subtraction
-UFMFBackSubThresh,10
+UFMFBackSubThresh,15
 # first nFramesInit will be output raw
 UFMFNFramesInit,100
