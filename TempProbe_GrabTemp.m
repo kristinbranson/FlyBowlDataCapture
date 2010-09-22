@@ -40,7 +40,7 @@ end
 if handles.IsRecording,
   % TODO ??? Error while evaluating TimerFcn for timer 'FBDC_USBTC08_Timer' 
   % Reference to non-existent field 'StartTempRecorded'.
-  if ~handles.StartTempRecorded,
+  if ~isfield(handles,'StartTempRecorded') || ~handles.StartTempRecorded,
     handles = tryRecordStartTemp(handles);
   end
   fprintf(handles.TempFid,'%f,%f\n',timestamp,temp);

@@ -125,6 +125,14 @@ if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
   if isfield(handles.params,'UFMFStatPrintTimings'),
     set(handles.vid.Source,'statComputeFrameErrorFreq',handles.params.UFMFStatComputeFrameErrorFreq);
   end
+  if isfield(handles.params,'UFMFBGKeyFramePeriodInit'),
+    v = get(handles.vid.Source,'bgKeyFramePeriodInit');
+    l = min(length(v),length(handles.params.UFMFBGKeyFramePeriodInit));
+    v(:) = 0;
+    v(1:l) = handles.params.UFMFBGKeyFramePeriodInit(1:l);
+    set(handles.vid.Source,'bgKeyFramePeriodInit',v);
+  end
+
 end
 
 % get camera unique ID if available
