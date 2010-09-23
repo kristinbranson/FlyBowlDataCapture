@@ -38,9 +38,8 @@ if overflow ~= 0,
   addToStatus(handles,sprintf('Temp probe channel %d overflowed\n', handles.TempProbeID));
 end
 if handles.IsRecording,
-  % TODO ??? Error while evaluating TimerFcn for timer 'FBDC_USBTC08_Timer' 
-  % Reference to non-existent field 'StartTempRecorded'.
-  if ~isfield(handles,'StartTempRecorded') || ~handles.StartTempRecorded,
+  if ~isfield(handles,'StartTempRecorded') || ~handles.StartTempRecorded || ...
+      ~isfield(handles,'StartHumidRecorded') || ~handles.StartHumidRecorded,
     handles = tryRecordStartTemp(handles);
   end
   fprintf(handles.TempFid,'%f,%f\n',timestamp,temp);
