@@ -27,3 +27,18 @@ if nfiles > 0,
 else
   fprintf('No semaphores in .GUIInstances\n');
 end
+
+
+
+files = dir('.PreconRecordData\*');
+files = {files.name};
+files = setdiff(files,{'.','..'});
+nfiles = length(files);
+if nfiles > 0,
+  fprintf('Deleting %d files from .PreconRecordData\n',nfiles);
+  for i = 1:length(files),
+    delete(files{i});
+  end
+else
+  fprintf('No semaphores in .PreconRecordData\n');
+end

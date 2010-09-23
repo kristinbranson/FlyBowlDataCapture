@@ -63,3 +63,21 @@ catch ME
   getReport(ME)
 end
 
+try
+  
+  global FBDC_PreconSemaphoreFiles;
+  if ~isempty(FBDC_PreconSemaphoreFiles),
+    FBDC_PreconSemaphoreFiles = unique(FBDC_PreconSemaphoreFiles);
+    for i = 1:length(FBDC_PreconSemaphoreFiles),
+      if exist(FBDC_PreconSemaphoreFiles{i},'file'),
+        fprintf('Deleting %s\n',FBDC_PreconSemaphoreFiles{i});
+        delete(FBDC_PreconSemaphoreFiles{i});
+      end
+    end
+    FBDC_PreconSemaphoreFiles = {};
+  end
+  
+catch ME
+  fprintf('Error checking for Precon semaphore files:\n');
+  getReport(ME);
+end
