@@ -54,10 +54,11 @@ Imaq_FrameRate,30
 # Maximum frame rate we will get
 Imaq_MaxFrameRate,31
 # Shutter period
-Imaq_Shutter,100
+Imaq_Shutter,45
 # Gain
-Imaq_Gain,200
+Imaq_Gain,100
 # Video file type
+#FileType,fmf
 FileType,ufmf
 # Number of seconds to record
 RecordTime,20
@@ -66,11 +67,11 @@ PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
 gdcamPreviewFrameInterval,2
 # Directory to store video to
-OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1
+OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1,D:\data2
 # Prefix of movie file
 MovieFilePrefix,movie
 # Directory to temporarily store video to
-TmpOutputDirectory,C:\Users\labadmin\Documents\FlyBowl\tmpdata1
+TmpOutputDirectory,C:\Users\labadmin\Documents\FlyBowl\tmpdata1,D:\tmpdata2
 # Name of file to store metadata to
 MetaDataFileName,Metadata.xml
 # Name of file to store log to
@@ -89,7 +90,7 @@ FrameRatePlotYLim,0,35
 # Limits of y-axis for temperature plot
 TempPlotYLim,15,45
 # Whether to try to connect over the network to Sage to query line names
-DoQuerySage,0
+DoQuerySage,1
 # Time in between temperature readings
 TempProbePeriod,1
 # Which channels have temperature probes
@@ -99,7 +100,13 @@ TempProbeTypes,K,K
 # if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
 TempProbeReject60Hz,0
 # whether to read temperature or not
-DoRecordTemp,0
+DoRecordTemp,1
+# number of temperature and humidity samples to read from the Precon probe
+# set to 0 if no Precon sensor
+NPreconSamples,5
+# which serial port to connect to -- I have no idea how to figure this out 
+# automatically
+PreconSensorSerialPort,COM3
 # Line Names to add to the list in Sage
 ExtraLineNames,DL-wildtype
 # Log file for writing ufmf
@@ -109,9 +116,9 @@ UFMFStatFileName,ufmf_diagnostics.txt
 # Whether to compute UFMF diagnostics
 UFMFPrintStats,1
 # number of frames between outputting per-frame compression statistics: 0 means don't print, 1 means every frame
-UFMFStatStreamPrintFreq,1
+UFMFStatStreamPrintFreq,30
 # number of frames between computing statistics of compression error. 0 means don't compute, 1 means every frame
-UFMFStatComputeFrameErrorFreq,10
+UFMFStatComputeFrameErrorFreq,30
 # whether to print information about the time each part of the computation takes
 UFMFStatPrintTimings,1
 # maximum fraction of pixels that can be foreground to try compressing frame
@@ -123,8 +130,10 @@ UFMFBGUpdatePeriod,1
 # number of seconds between spitting out a new background model
 UFMFBGKeyFramePeriod,100
 # max length of box stored during compression
-UFMFMaxBoxLength,30
+UFMFMaxBoxLength,5
 # threshold for background subtraction
-UFMFBackSubThresh,10
-# first nFramesInit will be output raw
+UFMFBackSubThresh,15
+# first nFramesInit we always update the background model
 UFMFNFramesInit,100
+# while ramping up the background model, use the following keyframe periods
+UFMFBGKeyFramePeriodInit,1,10,25,50,75

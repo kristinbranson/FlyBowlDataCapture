@@ -632,6 +632,7 @@ if ~isfield(handles.previous_values,'DeviceID'),
 end
 % by default, previous DeviceID
 handles.DeviceID = handles.previous_values.DeviceID;
+handles.CameraUniqueID = '';
 
 handles = detectCamerasWrapper(handles);
 
