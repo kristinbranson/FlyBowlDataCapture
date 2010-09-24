@@ -101,7 +101,11 @@ TempProbeReject60Hz,0
 # whether to read temperature or not
 DoRecordTemp,1
 # number of temperature and humidity samples to read from the Precon probe
-NPreconSamples,10
+# set to 0 if no Precon sensor
+NPreconSamples,5
+# which serial port to connect to -- I have no idea how to figure this out 
+# automatically
+PreconSensorSerialPort,COM3
 # Line Names to add to the list in Sage
 ExtraLineNames,DL-wildtype
 # Log file for writing ufmf

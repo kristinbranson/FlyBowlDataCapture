@@ -9,7 +9,7 @@ if handles.params.DoRecordTemp ~= 0,
     handles.MetaData_RoomTemperature = lasttemp;
     handles.StartTempRecorded = true;
     handles.MetaDataNeedsSave = true;
-    addToStatus(handles,sprintf('Recorded start temperature %f,lasttemp',lasttemp));
+    addToStatus(handles,sprintf('Recorded start temperature %f',lasttemp));
   end
 end
 

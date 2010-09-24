@@ -42,7 +42,11 @@ if handles.IsRecording,
       ~isfield(handles,'StartHumidRecorded') || ~handles.StartHumidRecorded,
     handles = tryRecordStartTemp(handles);
   end
-  fprintf(handles.TempFid,'%f,%f\n',timestamp,temp);
+  if ~isfield(handles,'TempFid'),
+    addToStatus(handles,{'TempFid not yet set. Skipping.'});
+  else
+    fprintf(handles.TempFid,'%f,%f\n',timestamp,temp);
+  end
 end
 guidata(handles.figure_main,handles);
 set(handles.hLine_Status_Temp,'XData',handles.Status_Temp_History(1,:)-handles.Status_Temp_History(1,end),...

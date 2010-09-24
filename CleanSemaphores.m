@@ -14,7 +14,7 @@ nfiles = length(files);
 if nfiles > 0,
   fprintf('Deleting %d files from .TempRecordData\n',nfiles);
   for i = 1:length(files),
-    delete(files{i});
+    delete(fullfile('.TempRecordData',files{i}));
   end
 else
   fprintf('No semaphores in .TempRecordData\n');

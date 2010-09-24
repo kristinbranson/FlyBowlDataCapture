@@ -11,7 +11,7 @@ success = 0;
 temp = nan;
 humid = nan;
 
-if ~isfield(handles,'PreconSensorSerialPort'),
+if ~isfield(handles.params,'PreconSensorSerialPort'),
   addToStatus(handles,{'PreconSensorSerialPort not set in parameters. Not reading initial temp/humidity.'});
   return;
 end
@@ -19,8 +19,8 @@ end
 handles.PreconRecordDir = '.PreconRecordData';
 handles.PreconInUseFileStr = 'InUse';
 handles.PreconReadingFileStr = 'PreconTempHumid.txt';
-handles.PreconInUseFile = fullfile(handles.PreconRecordDir,sprintf('%s_%s',handles.PreconInUseFileStr,handles.PreconSensorSerialPort));
-handles.PreconReadingFile = fullfile(handles.PreconRecordDir,sprintf('%s_%s',handles.PreconReadingFileStr,handles.PreconSensorSerialPort));
+handles.PreconInUseFile = fullfile(handles.PreconRecordDir,sprintf('%s_%s',handles.PreconInUseFileStr,handles.params.PreconSensorSerialPort));
+handles.PreconReadingFile = fullfile(handles.PreconRecordDir,sprintf('%s_%s',handles.PreconReadingFileStr,handles.params.PreconSensorSerialPort));
 
 % in use, try again later
 if exist(handles.PreconInUseFile,'file'),
@@ -86,9 +86,9 @@ FBDC_PreconSemaphoreFiles{end+1} = handles.PreconInUseFile;
 fprintf(fid,datestr(now));
 fclose(fid);
 try
-  psobj = PreconSensor(handles.PreconSensorSerialPort);
+  psobj = PreconSensor(handles.params.PreconSensorSerialPort);
 catch ME,
-  addToStatus(handles,{sprintf('Failed to initialize PreconSensor object with port %s',handles.PreconSensorSerialPort),...
+  addToStatus(handles,{sprintf('Failed to initialize PreconSensor object with port %s',handles.params.PreconSensorSerialPort),...
     getReport(ME,'basic','hyperlinks','off')});
   delete(handles.PreconInUseFile);
   FBDC_PreconSemaphoreFiles(end) = [];
@@ -96,7 +96,7 @@ catch ME,
 end
 [success1,errormsg] = open(psobj);
 if ~success1,
-  addToStatus(handles,{sprintf('Error opening Precon sensor with port %s:',handles.PreconSensorSerialPort),errormsg});
+  addToStatus(handles,{sprintf('Error opening Precon sensor with port %s:',handles.params.PreconSensorSerialPort),errormsg});
   delete(handles.PreconInUseFile);
   FBDC_PreconSemaphoreFiles(end) = [];
   return;
@@ -131,4 +131,7 @@ FBDC_PreconSemaphoreFiles(end-1) = [];
 
 temp = nanmean(temp);
 humid = nanmean(humid);
+
+addToStatus(handles,{sprintf('Read start temperature %f and humidity %f from Precon sensor',temp,humid)});
+
 success = 1;
