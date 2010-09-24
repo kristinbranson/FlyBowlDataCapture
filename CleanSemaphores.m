@@ -37,7 +37,7 @@ nfiles = length(files);
 if nfiles > 0,
   fprintf('Deleting %d files from .PreconRecordData\n',nfiles);
   for i = 1:length(files),
-    delete(files{i});
+    delete(fullfile('.PreconRecordData',files{i}));
   end
 else
   fprintf('No semaphores in .PreconRecordData\n');

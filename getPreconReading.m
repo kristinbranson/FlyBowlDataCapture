@@ -18,9 +18,9 @@ end
 
 handles.PreconRecordDir = '.PreconRecordData';
 handles.PreconInUseFileStr = 'InUse';
-handles.PreconReadingFileStr = 'PreconTempHumid.txt';
-handles.PreconInUseFile = fullfile(handles.PreconRecordDir,sprintf('%s_%s',handles.PreconInUseFileStr,handles.params.PreconSensorSerialPort));
-handles.PreconReadingFile = fullfile(handles.PreconRecordDir,sprintf('%s_%s',handles.PreconReadingFileStr,handles.params.PreconSensorSerialPort));
+handles.PreconReadingFileStr = 'PreconTempHumid';
+handles.PreconInUseFile = fullfile(handles.PreconRecordDir,sprintf('%s_%s.txt',handles.PreconInUseFileStr,handles.params.PreconSensorSerialPort));
+handles.PreconReadingFile = fullfile(handles.PreconRecordDir,sprintf('%s_%s.txt',handles.PreconReadingFileStr,handles.params.PreconSensorSerialPort));
 
 % in use, try again later
 if exist(handles.PreconInUseFile,'file'),

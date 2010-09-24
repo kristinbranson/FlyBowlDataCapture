@@ -1,5 +1,7 @@
 function addToStatus(handles,s,datenum)
 
+ColsWrap = 57;
+
 if nargin <=1,
   return;
 end
@@ -22,7 +24,7 @@ if datenum > 0,
   s{1} = sprintf('%s: %s',datestr(datenum,handles.secondformat),s{1});
 end
 Status_String = get(hObject,'String');
-s = textwrap(handles.edit_Status,s);
+s = textwrap(handles.edit_Status,s,ColsWrap);
 if ~iscell(Status_String),
   Status_String = {Status_String};
 end

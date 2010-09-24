@@ -1,6 +1,10 @@
 function handles = tryRecordStartTemp(handles)
 
-if ~(isfield(handles,'StartTempRecorded') && handles.StartTempRecorded),
+if ~isfield(handles,'StartTempRecorded') || ~isfield(handles,'StartHumidRecorded'),
+  return;
+end
+
+if ~handles.StartTempRecorded,
 
 % record from Pico probe stream
 if handles.params.DoRecordTemp ~= 0,
@@ -15,7 +19,7 @@ end
 
 end
 
-if ~(isfield(handles,'StartHumidRecorded') && handles.StartHumidRecorded),
+if ~handles.StartHumidRecorded,
 
   % record from Precon probe
   if isfield(handles.params,'NPreconSamples') && ...
