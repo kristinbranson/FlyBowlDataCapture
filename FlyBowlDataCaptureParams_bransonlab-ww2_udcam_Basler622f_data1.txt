@@ -58,6 +58,7 @@ Imaq_Shutter,100
 # Gain
 Imaq_Gain,200
 # Video file type
+#FileType,fmf
 FileType,ufmf
 # Number of seconds to record
 RecordTime,150
