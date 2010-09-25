@@ -51,9 +51,10 @@ for i = 1:length(fns),
     if ~iscell(rc.(fn)),
       rc.(fn) = {rc.(fn)};
     end
-    for j = length(rc.(fn))+1:GUIi,
-      rc.(fn){i} = handles.(fn);
+    for j = length(rc.(fn))+1:GUIi-1,
+      rc.(fn){j} = handles.(fn);
     end
+    rc.(fn){GUIi} = handles.(fn);
   else
     rc.(fn) = handles.(fn);
   end
@@ -65,4 +66,4 @@ if ~isempty(fnsmissing),
   warning('Missing previous value: %s.\n',fnsmissing{:}); %#ok<WNTAG>
 end
 fns = setdiff(fns,fnsmissing);
-save(handles.rcfile,'-struct','handles',fns{:});
+save(handles.rcfile,'-struct','rc',fns{:});

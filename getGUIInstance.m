@@ -31,6 +31,8 @@ end
 if ~exist(handles.GUIInstanceDir,'file'),
   mkdir(handles.GUIInstanceDir);
 end
-save(handles.GUIInstanceFileName,'-struct','handles','RandomNumber','GUIi','now');
+GUIi = handles.GUIi;
+timestamp = now;
+save(handles.GUIInstanceFileName,'GUIi','timestamp');
 
 FBDC_GUIInstanceFileName = handles.GUIInstanceFileName;

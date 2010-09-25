@@ -7,10 +7,13 @@ if isfield(handles,'IsCameraRunningFile') && ...
   global FBDC_IsCameraRunningFiles; 
   FBDC_IsCameraRunningFiles = setdiff(FBDC_IsCameraRunningFiles,{handles.IsCameraRunningFile});
 end
-if isfield(handles,'CheckPreviewTimer'),
+if isfield(handles,'CheckPreviewTimer') && ~isempty(handles.CheckPreviewTimer),
   try
-    stop(handles.CheckPreviewTimer);
+    if strcmp(get(handles.CheckPreviewTimer,'Running'),'on'),
+      stop(handles.CheckPreviewTimer);
+    end
     delete(handles.CheckPreviewTimer);
+    handles.CheckPreviewTimer = [];
   catch ME
     addToStatus(handles,{'Error stopping/deleting CheckPreviewTimer:',getReport(ME,'basic','hyperlinks','off')});
   end

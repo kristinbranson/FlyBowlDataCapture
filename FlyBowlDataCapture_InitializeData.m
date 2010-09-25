@@ -43,8 +43,6 @@ handles.hourformat = 15;
 % format for second
 handles.secondformat = 13;
 
-handles.GUIInstanceDir = '.GUIInstances';
-
 % earliest time that someone should be working
 handles.minhour = rem(datenum('06:00'),1);
 handles.maxhour = rem(datenum('23:00'),1);
@@ -69,9 +67,6 @@ end
 
 handles.ExperimentName = '';
 handles.ExperimentDirectory = '';
-
-%% get GUI instance
-handles = getGUIInstance(handles);
 
 %% parse parameter file
 
@@ -177,13 +172,6 @@ s = {
   '--------------------------------------'};
 addToStatus(handles,s,-1);
 addToStatus(handles,{sprintf('GUI instance %d, writing to %s.',handles.GUIi,handles.params.OutputDirectory)});
-
-%% Figure position
-
-if isfield(handles.previous_values,'FigurePosition'),
-  handles.FigurePosition = handles.previous_values.FigurePosition;
-  set(handles.figure_main,'Units','Pixels','Position',handles.FigurePosition);
-end
 
 %% Experimenter
 

@@ -65,28 +65,11 @@ handles.output = hObject;
 % name of rc file
 handles.rcfile = '.FlyBowlDataCapture_rc.mat';
 
-% Read previous values
+% get GUI instance
+handles.GUIInstanceDir = '.GUIInstances';
+handles = getGUIInstance(handles);
 
-handles.previous_values = struct;
-if exist(handles.rcfile,'file'),
-  try
-    handles.previous_values = load(handles.rcfile);
-    handles.GUIInstance_prev = {
-      'Assay_Rig'
-      'Assay_Plate'
-      'Assay_Bowl'
-      'DeviceID'
-      'TempProbeID'
-      'FigurePositionHistory'
-      };
-    for i = 1:length(handles.GUIInstance_prev),
-      fn = handles.GUIInstance_prev{i};
-      j = mod(handles.GUIi-1,length(previous_values.(fn)))+1;
-      previous_values.(fn) = handles.params.(fn){j};
-    end
-  catch
-  end
-end
+handles = LoadPreviousValues(handles);
 
 if isfield(handles.previous_values,'params_file'),
   handles.params_file = handles.previous_values.params_file;
@@ -96,12 +79,23 @@ end
 
 [filestr,pathstr] = uigetfile('*.txt','Choose Parameter File',handles.params_file);
 if ~ischar(filestr) || isempty(filestr),
+  if isfield(handles,'GUIInstanceFileName') && ...
+      exist(handles.GUIInstanceFileName,'file'),
+    delete(handles.GUIInstanceFileName);
+  end
   uiresume(handles.figure_main);
   return;
 end
 handles.params_file = fullfile(pathstr,filestr);
 if ~exist(handles.params_file,'file'),
   error('File %s does not exist',handles.params_file);
+end
+
+% Figure position
+
+if isfield(handles.previous_values,'FigurePosition'),
+  handles.FigurePosition = handles.previous_values.FigurePosition;
+  set(handles.figure_main,'Units','Pixels','Position',handles.FigurePosition);
 end
 
 % initialize data
@@ -147,6 +141,34 @@ catch ME,
     guidata(hObject,handles);
   end
 end
+
+function handles = LoadPreviousValues(handles)
+
+% Read previous values
+handles.previous_values = struct;
+if exist(handles.rcfile,'file'),
+  try
+    handles.previous_values = load(handles.rcfile);
+    handles.GUIInstance_prev = {
+      'Assay_Rig'
+      'Assay_Plate'
+      'Assay_Bowl'
+      'DeviceID'
+      'TempProbeID'
+      'FigurePosition'
+      };
+    for i = 1:length(handles.GUIInstance_prev),
+      fn = handles.GUIInstance_prev{i};
+      if ischar(handles.previous_values.(fn)),
+        continue;
+      end
+      j = mod(handles.GUIi-1,length(handles.previous_values.(fn)))+1;
+      handles.previous_values.(fn) = handles.previous_values.(fn){j};
+    end
+  catch
+  end
+end
+
 
 % --- Outputs from this function are returned to the command line.
 function FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles) 
@@ -1395,6 +1417,9 @@ guidata(hObject,handles);
 
 handles = EnableGUI(handles);
 
+% reload previous values
+handles = LoadPreviousValues(handles);
+
 % initialize data
 handles = FlyBowlDataCapture_InitializeData(handles);
 
@@ -1476,6 +1501,11 @@ handles = resetTempProbe(handles);
 
 % save figure
 handles = RecordConfiguration(handles);
+
+% enable disabled menus
+set(handles.menu_File_New,'Enable','on');
+set(handles.menu_File_Close,'Enable','on');
+set(handles.menu_Quit,'Enable','on');
 
 guidata(hObject,handles);
 
