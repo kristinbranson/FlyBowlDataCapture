@@ -38,8 +38,7 @@ if overflow ~= 0,
   addToStatus(handles,sprintf('Temp probe channel %d overflowed\n', handles.TempProbeID));
 end
 if handles.IsRecording,
-  if ~isfield(handles,'StartTempRecorded') || ~handles.StartTempRecorded || ...
-      ~isfield(handles,'StartHumidRecorded') || ~handles.StartHumidRecorded,
+  if ~isfield(handles,'StartTempRecorded') || ~handles.StartTempRecorded,
     handles = tryRecordStartTemp(handles);
   end
   if ~isfield(handles,'TempFid'),

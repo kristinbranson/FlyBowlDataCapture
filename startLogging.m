@@ -4,7 +4,6 @@ handles = guidata(hObject);
 
 handles.StartRecording_Time_datenum = now;
 handles.StartTempRecorded = false;
-handles.StartHumidRecorded = false;
 handles = tryRecordStartTemp(handles);
 
 handles = SaveMetaData(handles);

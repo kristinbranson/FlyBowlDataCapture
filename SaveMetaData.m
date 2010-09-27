@@ -11,9 +11,6 @@ if fid < 0,
   error(s);
 end
 
-% in days
-minage = floor(handles.StartRecording_Time_datenum - handles.PreAssayHandling_DOBEnd_datenum - 1); % -1 is for late in the day births
-maxage = ceil(handles.StartRecording_Time_datenum - handles.PreAssayHandling_DOBStart_datenum);
 % in hours
 sorting_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_SortingTime_datenum)*24;
 starvation_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_StarvationTime_datenum)*24;
@@ -29,7 +26,7 @@ fprintf(fid,'<?xml version="1.0"?>\n');
 fprintf(fid,'<experiment assay="%s" ',handles.params.MetaData_AssayName);
 % always same experiment protocol
 fprintf(fid,'protocol="%s" ',handles.params.MetaData_ExpProtocols{1});
-fprintf(fid,'datetime="%s" ',datestr(handles.StartRecording_Time_datenum,'yyyy-mm-ddTHH:MM:SS'));
+fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,'yyyy-mm-ddTHH:MM:SS'));
 fprintf(fid,'aborted="%d" ',didabort);
 fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 fprintf(fid,'shiftflytemp_time="%f" ',shift_time);
@@ -46,32 +43,29 @@ fprintf(fid,'    <camera adaptor="%s" device_name="%s" format="%s" device_id="%d
 fprintf(fid,'    <computer id="%s" harddrive_id="%s" output_directory="%s"/>\n',handles.ComputerName,handles.params.HardDriveName,handles.params.OutputDirectory);
 fprintf(fid,'    <flies line="%s" ',handles.Fly_LineName);
 fprintf(fid,'effector="%s" ',handles.params.MetaData_Effector);
-fprintf(fid,'crossdate="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyy-mm-dd'));
-fprintf(fid,'age="%f,%f" ',minage,maxage);
+fprintf(fid,'gender="%s" ',handles.params.MetaData_Gender); 
+fprintf(fid,'cross_date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyy-mm-dd'));
+fprintf(fid,'hours_starved="%f" ',starvation_time);
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'count="0">\n');
 
-% choose rearing protocol based on activity peak time
-i = find(strcmp(handles.Rearing_ActivityPeak,handles.Rearing_ActivityPeaks),1);
-fprintf(fid,'      <rearing_protocol id="%s" ',handles.params.MetaData_RearingProtocols{i});
+% choose rearing protocol based on incubator ID
+i = find(strcmp(handles.Rearing_IncubatorID,handles.Rearing_IncubatorIDs),1);
+fprintf(fid,'      <rearing protocol="%s" ',handles.params.MetaData_RearingProtocols{i});
 fprintf(fid,'incubator="%s" ',handles.Rearing_IncubatorID);
-% i = find(strcmp(handles.Rearing_ActivityPeak,handles.Rearing_ActivityPeaks),1);
-% fprintf(fid,'lightson="%s" ',handles.params.Rearing_LightsOns{i});
-% fprintf(fid,'lightsoff="%s" ',handles.params.Rearing_LightsOffs{i});
 fprintf(fid,'/>\n');
 
 % always same sorting protocol
-fprintf(fid,'      <handling_protocol id="%s" ',handles.params.MetaData_SortingHandlingProtocols{1});
-fprintf(fid,'type="sorting" ');
+fprintf(fid,'      <handling type="sorting" protocol="%s" ',handles.params.MetaData_SortingHandlingProtocols{1});
 fprintf(fid,'handler="%s" ',handles.PreAssayHandling_SortingHandler);
 fprintf(fid,'time="%f" ',sorting_time);
+fprintf(fid,'datetime="%s" ',datestr(handles.PreAssayHandling_SortingTime_datenum,'yyyy-mm-ddTHH:MM:SS'));
 fprintf(fid,'/>\n');
 
 % always same starvation protocol
-fprintf(fid,'      <handling_protocol id="%s" ',handles.params.MetaData_StarvationHandlingProtocols{1});
-fprintf(fid,'type="starvation" ');
+fprintf(fid,'      <handling type="starvation" protocol="%s" ',handles.params.MetaData_StarvationHandlingProtocols{1});
 fprintf(fid,'handler="%s" ',handles.PreAssayHandling_StarvationHandler);
-fprintf(fid,'time="%f" ',starvation_time);
+fprintf(fid,'datetime="%s" ',datestr(handles.PreAssayHandling_StarvationTime_datenum,'yyyy-mm-ddTHH:MM:SS'));
 fprintf(fid,'/>\n');
 
 fprintf(fid,'    </flies>\n');

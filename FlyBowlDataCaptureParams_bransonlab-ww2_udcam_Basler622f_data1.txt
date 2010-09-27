@@ -2,23 +2,11 @@
 Assay_Experimenters,hirokawaj,robiea,bransonk
 # Expected number of flies
 NFlies,20
-# List of possible Activity Peak values
-Rearing_ActivityPeaks,10:00,15:00
-# These should correspond to activity peaks
-Rearing_LightsOns,08:00,13:00
-# These should correspond to activity peaks
-Rearing_LightsOffs,16:00,21:00
 # List of possible Incubator ID values
 Rearing_IncubatorIDs,1,2
 # Range of Cross Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_CrossDate_Range,4,10
-# Range of DOB Starts to show -- minimum and maximum number of days 
-# before today
-PreAssayHandling_DOBStart_Range,1,7
-# Range of DOB Ends to show -- minimum and maximum number of days 
-# before today
-PreAssayHandling_DOBEnd_Range,1,7
 # Range of Sorting Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_SortingDate_Range,0,3
@@ -85,6 +73,7 @@ MetaData_SortingHandlingProtocols,SortingProtocol0001
 MetaData_StarvationHandlingProtocols,StarvationProtocol0001
 MetaData_ExpProtocols,ExperimentProtocol0001
 MetaData_Effector,TrpA
+MetaData_Gender,b
 MetaData_RoomTemperatureSetPoint,29
 MetaData_RoomHumiditySetPoint,60
 # limits of y-axis for frame rate plot
@@ -105,7 +94,7 @@ TempProbeReject60Hz,0
 DoRecordTemp,0
 # number of temperature and humidity samples to read from the Precon probe
 # set to 0 if no Precon sensor
-NPreconSamples,0
+NPreconSamples,5
 # which serial port to connect to -- I have no idea how to figure this out 
 # automatically
 PreconSensorSerialPort,COM3

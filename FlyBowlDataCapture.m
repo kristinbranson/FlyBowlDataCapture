@@ -304,43 +304,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-% --- Executes on selection change in popupmenu_Rearing_ActivityPeak.
-function popupmenu_Rearing_ActivityPeak_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu_Rearing_ActivityPeak (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Rearing_ActivityPeak contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu_Rearing_ActivityPeak
-
-% grab value
-v = get(handles.popupmenu_Rearing_ActivityPeak,'Value');
-handles.Rearing_ActivityPeak = handles.Rearing_ActivityPeaks{v};
-
-% no longer default
-handles.isdefault.Rearing_ActivityPeak = false;
-
-% set color
-set(handles.popupmenu_Rearing_ActivityPeak,'BackgroundColor',handles.changed_bkgdcolor);
-
-handles = ChangedMetaData(handles);
-
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function popupmenu_Rearing_ActivityPeak_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu_Rearing_ActivityPeak (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
 % --- Executes on selection change in popupmenu_Rearing_IncubatorID.
 function popupmenu_Rearing_IncubatorID_Callback(hObject, eventdata, handles)
 % hObject    handle to popupmenu_Rearing_IncubatorID (see GCBO)
@@ -376,64 +339,17 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-% --- Executes on selection change in popupmenu_PreAssayHandling_DOBStart.
-function popupmenu_PreAssayHandling_DOBStart_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu_PreAssayHandling_DOBStart (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_DOBStart contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_DOBStart
-
-% grab value
-v = get(handles.popupmenu_PreAssayHandling_DOBStart,'Value');
-handles.PreAssayHandling_DOBStart = handles.PreAssayHandling_DOBStarts{v};
-handles.PreAssayHandling_DOBStart_datenum = datenum(handles.PreAssayHandling_DOBStart);
-
-% no longer default
-handles.isdefault.PreAssayHandling_DOBStart = false;
-
-% DOBEnd should be >= DOBStart
-if handles.PreAssayHandling_DOBEnd_datenum < handles.PreAssayHandling_DOBStart_datenum,
-
-  if handles.isdefault.PreAssayHandling_DOBEnd,
-  % set DOBEnd to be more than DOBStart if we haven't modified DOBEnd yet
-    handles.PreAssayHandling_DOBEnd_datenum = handles.PreAssayHandling_DOBStart_datenum;
-    handles.PreAssayHandling_DOBEnd = handles.PreAssayHandling_DOBStart;
-    set(handles.popupmenu_PreAssayHandling_DOBEnd,'Value',...
-      find(strcmp(handles.PreAssayHandling_DOBEnd,handles.PreAssayHandling_DOBEnds),1));
-  end
-
-end
-
-% highlight ordering errors
-handles = CheckOrderingErrors(handles);
-  
-handles = ChangedMetaData(handles);
-
-guidata(hObject,handles);
-
 function handles = CheckOrderingErrors(handles)
 
-handles.isOrderingError = false(1,5);
+handles.isOrderingError = false(1,3);
 
-% is CrossDate > DOBStart?
-if handles.PreAssayHandling_CrossDate_datenum > handles.PreAssayHandling_DOBStart_datenum,
+% is CrossDate > SortingTime?
+if handles.PreAssayHandling_CrossDate_datenum > handles.PreAssayHandling_SortingTime_datenum,
   handles.isOrderingError(1:2) = true;
-end
-
-% is DOBStart > DOBEnd?
-if handles.PreAssayHandling_DOBStart_datenum > handles.PreAssayHandling_DOBEnd_datenum,
-  handles.isOrderingError(2:3) = true;
-end
-% is DOBEnd > SortingTime?
-if handles.PreAssayHandling_DOBEnd_datenum > handles.PreAssayHandling_SortingTime_datenum,
-  handles.isOrderingError(3:4) = true;
 end
 % is SortingTime > StarvationTime?
 if handles.PreAssayHandling_SortingTime_datenum > handles.PreAssayHandling_StarvationTime_datenum,
-  handles.isOrderingError(4:5) = true;
+  handles.isOrderingError(2:3) = true;
 end
 
 % set background colors
@@ -449,27 +365,6 @@ else
 end
 
 if handles.isOrderingError(2),
-  set(handles.popupmenu_PreAssayHandling_DOBStart,'BackgroundColor',handles.shouldchange_bkgdcolor);
-else  
-  % no ordering error, set color to either isdefault or changed color
-  if handles.isdefault.PreAssayHandling_DOBStart,
-    set(handles.popupmenu_PreAssayHandling_DOBStart,'BackgroundColor',handles.isdefault_bkgdcolor);
-  else
-    set(handles.popupmenu_PreAssayHandling_DOBStart,'BackgroundColor',handles.changed_bkgdcolor);
-  end
-end
-
-if handles.isOrderingError(3),
-  set(handles.popupmenu_PreAssayHandling_DOBEnd,'BackgroundColor',handles.shouldchange_bkgdcolor);
-else
-  if handles.isdefault.PreAssayHandling_DOBEnd,
-    set(handles.popupmenu_PreAssayHandling_DOBEnd,'BackgroundColor',handles.isdefault_bkgdcolor);
-  else
-    set(handles.popupmenu_PreAssayHandling_DOBEnd,'BackgroundColor',handles.changed_bkgdcolor);
-  end
-end
-
-if handles.isOrderingError(4),
   set(handles.popupmenu_PreAssayHandling_SortingDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
   set(handles.edit_PreAssayHandling_SortingHour,'BackgroundColor',handles.shouldchange_bkgdcolor);
 else
@@ -485,7 +380,7 @@ else
   end
 end
 
-if handles.isOrderingError(5),
+if handles.isOrderingError(3),
   set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
   set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.shouldchange_bkgdcolor);
 else
@@ -500,69 +395,6 @@ else
     set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.changed_bkgdcolor);
   end
 end
-
-% --- Executes during object creation, after setting all properties.
-function popupmenu_PreAssayHandling_DOBStart_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu_PreAssayHandling_DOBStart (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in popupmenu_PreAssayHandling_DOBEnd.
-function popupmenu_PreAssayHandling_DOBEnd_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu_PreAssayHandling_DOBEnd (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_DOBEnd contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_DOBEnd
-
-% grab value
-v = get(handles.popupmenu_PreAssayHandling_DOBEnd,'Value');
-handles.PreAssayHandling_DOBEnd = handles.PreAssayHandling_DOBEnds{v};
-handles.PreAssayHandling_DOBEnd_datenum = datenum(handles.PreAssayHandling_DOBEnd);
-
-% no longer default
-handles.isdefault.PreAssayHandling_DOBEnd = false;
-
-% DOBEnd should be >= DOBStart
-if handles.PreAssayHandling_DOBEnd_datenum < handles.PreAssayHandling_DOBStart_datenum,
-
-  if handles.isdefault.PreAssayHandling_DOBStart,
-  % set DOBStart to be DOBEnd if we haven't modified DOBStart yet
-    handles.PreAssayHandling_DOBStart_datenum = handles.PreAssayHandling_DOBEnd_datenum;
-    handles.PreAssayHandling_DOBStart = handles.PreAssayHandling_DOBEnd;
-    set(handles.popupmenu_PreAssayHandling_DOBStart,'Value',...
-      find(strcmp(handles.PreAssayHandling_DOBStart,handles.PreAssayHandling_DOBStarts),1));
-  end
-  
-end
-
-% highlight ordering errors
-handles = CheckOrderingErrors(handles);
-
-handles = ChangedMetaData(handles);
-
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function popupmenu_PreAssayHandling_DOBEnd_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu_PreAssayHandling_DOBEnd (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
 
 % --- Executes on selection change in popupmenu_PreAssayHandling_SortingDate.
 function popupmenu_PreAssayHandling_SortingDate_Callback(hObject, eventdata, handles)
@@ -1446,6 +1278,7 @@ guidata(hObject,handles);
 function [handles,didcancel] = CloseExperiment(handles)
 
 hObject = handles.figure_main;
+didabort = false;
 didcancel = false;
 
 % if not done recording, then make sure user wants to stop prematurely
@@ -1456,6 +1289,7 @@ if ~handles.FinishedRecording && handles.GUIIsInitialized,
     return;
   end
   addToStatus(handles,{'Experiment aborted.'});
+  didabort = true;
 end
 
 % recording stopped in the middle
@@ -1481,7 +1315,7 @@ end
 handles.MetaDataNeedsSave = false;
 
 % create a file if there is an experiment directory
-if isfield(handles,'ExperimentDirectory') && exist(handles.ExperimentDirectory,'file') && didcancel,
+if isfield(handles,'ExperimentDirectory') && exist(handles.ExperimentDirectory,'file') && didabort,
   abortfilename = fullfile(handles.ExperimentDirectory,'ABORTED');
   try
     fid = fopen(abortfilename,'w');

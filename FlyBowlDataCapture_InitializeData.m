@@ -103,7 +103,6 @@ try
   
   % some values are numbers
   numeric_params = {'PreAssayHandling_CrossDate_Range',...
-    'PreAssayHandling_DOBStart_Range','PreAssayHandling_DOBEnd_Range',...
     'PreAssayHandling_SortingDate_Range','PreAssayHandling_StarvationDate_Range',...
     'Imaq_ROIPosition','NFlies','RecordTime','PreviewUpdatePeriod',...
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
@@ -126,7 +125,7 @@ try
   % some values are not lists
   notlist_params = {'Imaq_Adaptor','Imaq_DeviceName','Imaq_VideoFormat',...
     'FileType','MetaData_AssayName',...
-    'MetaData_Effector','MetaDataFileName','MovieFilePrefix','LogFileName',...
+    'MetaData_Effector','MetaData_Gender','MetaDataFileName','MovieFilePrefix','LogFileName',...
     'UFMFLogFileName','UFMFStatFileName','PreconSensorSerialPort'};
   for i = 1:length(notlist_params),
     fn = notlist_params{i};
@@ -234,30 +233,6 @@ set(handles.edit_Fly_LineName,'String',handles.Fly_LineName,...
 % we have not created the autofill version yet
 handles.isAutoComplete_edit_Fly_LineName = false;
 
-% TODO: make this an edit box that autofills
-
-%% Activity Peak
-
-% whether this has been changed or not
-handles.isdefault.Rearing_ActivityPeak = true;
-
-% possible values for ActivityPeaks
-handles.Rearing_ActivityPeaks = handles.params.Rearing_ActivityPeaks;
-
-% if ActivityPeak not stored in rc file, choose first ActivityPeak
-if ~isfield(handles.previous_values,'Rearing_ActivityPeak') || ...
-    ~ismember(handles.previous_values.Rearing_ActivityPeak,handles.Rearing_ActivityPeaks),
-  handles.previous_values.Rearing_ActivityPeak = handles.Rearing_ActivityPeaks{1};
-end
-
-% by default, previous ActivityPeak
-handles.Rearing_ActivityPeak = handles.previous_values.Rearing_ActivityPeak;
-
-% set possible values, current value, color to default
-set(handles.popupmenu_Rearing_ActivityPeak,'String',handles.Rearing_ActivityPeaks,...
-  'Value',find(strcmp(handles.Rearing_ActivityPeak,handles.Rearing_ActivityPeaks),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
-
 %% Incubator ID
 
 % whether this has been changed or not
@@ -305,60 +280,6 @@ handles.PreAssayHandling_CrossDate = datestr(handles.PreAssayHandling_CrossDate_
 % set possible values, current value, color to default
 set(handles.popupmenu_PreAssayHandling_CrossDate,'String',handles.PreAssayHandling_CrossDates,...
   'Value',find(strcmp(handles.PreAssayHandling_CrossDate,handles.PreAssayHandling_CrossDates),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
-
-%% DOB Start
-
-% whether this has been changed or not
-handles.isdefault.PreAssayHandling_DOBStart = true;
-
-% possible values for DOBStart
-minv = floor(handles.now) - handles.params.PreAssayHandling_DOBStart_Range(2);
-maxv = floor(handles.now) - handles.params.PreAssayHandling_DOBStart_Range(1);
-handles.PreAssayHandling_DOBStart_datenums = minv:maxv;
-handles.PreAssayHandling_DOBStarts = cellstr(datestr(handles.PreAssayHandling_DOBStart_datenums,handles.dateformat));
-
-% if DOBStart not stored in rc file, choose first date
-if ~isfield(handles.previous_values,'PreAssayHandling_DOBStartOff') || ...
-    handles.previous_values.PreAssayHandling_DOBStartOff > handles.params.PreAssayHandling_DOBStart_Range(2) || ...
-    handles.previous_values.PreAssayHandling_DOBStartOff < handles.params.PreAssayHandling_DOBStart_Range(1),
-  handles.previous_values.PreAssayHandling_DOBStartOff = handles.params.PreAssayHandling_DOBStart_Range(2);
-end
-
-% by default, previous offset
-handles.PreAssayHandling_DOBStart_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_DOBStartOff;
-handles.PreAssayHandling_DOBStart = datestr(handles.PreAssayHandling_DOBStart_datenum,handles.dateformat);
-
-% set possible values, current value, color to default
-set(handles.popupmenu_PreAssayHandling_DOBStart,'String',handles.PreAssayHandling_DOBStarts,...
-  'Value',find(strcmp(handles.PreAssayHandling_DOBStart,handles.PreAssayHandling_DOBStarts),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
-
-%% DOB End
-
-% whether this has been changed or not
-handles.isdefault.PreAssayHandling_DOBEnd = true;
-
-% possible values for DOBEnd
-minv = floor(handles.now) - handles.params.PreAssayHandling_DOBEnd_Range(2);
-maxv = floor(handles.now) - handles.params.PreAssayHandling_DOBEnd_Range(1);
-handles.PreAssayHandling_DOBEnd_datenums = minv:maxv;
-handles.PreAssayHandling_DOBEnds = cellstr(datestr(handles.PreAssayHandling_DOBEnd_datenums,handles.dateformat));
-
-% if DOBEnd not stored in rc file, choose first date
-if ~isfield(handles.previous_values,'PreAssayHandling_DOBEndOff') || ...
-    handles.previous_values.PreAssayHandling_DOBEndOff > handles.params.PreAssayHandling_DOBEnd_Range(2) || ...
-    handles.previous_values.PreAssayHandling_DOBEndOff < handles.params.PreAssayHandling_DOBEnd_Range(1),
-  handles.previous_values.PreAssayHandling_DOBEndOff = handles.params.PreAssayHandling_DOBEnd_Range(2);
-end
-
-% by default, previous offset
-handles.PreAssayHandling_DOBEnd_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_DOBEndOff;
-handles.PreAssayHandling_DOBEnd = datestr(handles.PreAssayHandling_DOBEnd_datenum,handles.dateformat);
-
-% set possible values, current value, color to default
-set(handles.popupmenu_PreAssayHandling_DOBEnd,'String',handles.PreAssayHandling_DOBEnds,...
-  'Value',find(strcmp(handles.PreAssayHandling_DOBEnd,handles.PreAssayHandling_DOBEnds),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Sorting Date
@@ -736,8 +657,7 @@ set(handles.text_Status_FrameRate,'String','N/A',...
 %% Temperature and humidity
 
 handles.MetaData_RoomTemperature = nan;
-% TODO: for now, this is set statically
-handles.MetaData_RoomHumidity = handles.params.MetaData_RoomHumiditySetPoint;
+handles.MetaData_RoomHumidity = nan;
 
 %% Plot frame rate
 

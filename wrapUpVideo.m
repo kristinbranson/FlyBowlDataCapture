@@ -1,5 +1,7 @@
 function wrapUpVideo(obj,event,hObject,AdaptorName) %#ok<INUSL>
 
+hwait = waitbar(0,'Closing video file. Please Wait.');
+
 if strcmpi(AdaptorName,'gdcam')
   set(obj.Source,'LogFlag',0);
 elseif strcmpi(AdaptorName,'udcam')
@@ -20,25 +22,31 @@ else
   % nothing to do
 end
 
+waitbar(.2);
+
 % wait a few seconds
 pause(3);
 
+waitbar(.5);
+
 % wait until actually stopped
-fprintf('Waiting for Running == Off...\n');
+%fprintf('Waiting for Running == Off...\n');
 while true,
   if ~isrunning(obj) && ~islogging(obj)% && ...
     break;
   end
   pause(.5);
 end
-fprintf('Running = Off.\n');
+%fprintf('Running = Off.\n');
+
+waitbar(.7);
 
 if ~(strcmpi(AdaptorName,'gdcam') || strcmpi(AdaptorName,'udcam')),
 
-  fprintf('Cleaning up remaining frames\n');
+  %fprintf('Cleaning up remaining frames\n');
   % clean up remaining frames
   if obj.framesavailable > 0,
-    fprintf('Removing %d frames from buffer.\n',obj.framesavailable);
+    %fprintf('Removing %d frames from buffer.\n',obj.framesavailable);
     getdata(obj,obj.framesavailable);
   end
   
@@ -46,7 +54,7 @@ if ~(strcmpi(AdaptorName,'gdcam') || strcmpi(AdaptorName,'udcam')),
   pause(3);
   
   % close file
-  fprintf('Closing file.\n');
+  %fprintf('Closing file.\n');
   handles = guidata(hObject);
   switch handles.params.FileType,
     case 'avi'
@@ -61,25 +69,29 @@ end
 
 handles = guidata(hObject);
 
+waitbar(.8);
+
 % close temperature file
 if handles.params.DoRecordTemp ~= 0,
   fclose(handles.TempFid);
 end
 
 % no longer recording
-fprintf('No longer recording.\n');
+%fprintf('No longer recording.\n');
 handles = guidata(hObject);
 handles.IsRecording = false;
 handles.FinishedRecording = true;
 
 oldname = handles.FileName;
-fprintf('Renaming file.\n');
+%fprintf('Renaming file.\n');
 handles = renameVideoFile(handles);
 guidata(hObject,handles);
-fprintf('Renamed to %s\n',handles.FileName);
+%fprintf('Renamed to %s\n',handles.FileName);
 % add to status log
 addToStatus(handles,{sprintf('Finished recording. Video file moved from %s to %s.',...
   oldname,handles.FileName)});
+
+waitbar(.9);
 
 PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
 PreviewParams.IsRecording = false;
@@ -107,3 +119,8 @@ set(handles.menu_File_Close,'Enable','on');
 set(handles.menu_Quit,'Enable','on');
 
 guidata(hObject,handles);
+
+waitbar(1);
+if ishandle(hwait),
+  delete(hwait);
+end
