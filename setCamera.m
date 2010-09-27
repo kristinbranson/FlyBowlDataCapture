@@ -173,6 +173,7 @@ PreviewParams.RecordTimeDays = handles.params.RecordTime/86400;
 PreviewParams.StartRecording_Time_datenum = handles.StartRecording_Time_datenum;
 PreviewParams.IsRecording = handles.IsRecording;
 PreviewParams.text_Status_FrameRate = handles.text_Status_FrameRate;
+PreviewParams.text_Status_FramesWritten = handles.text_Status_FramesWritten;
 PreviewParams.hLine_Status_FrameRate = handles.hLine_Status_FrameRate;
 
 setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);

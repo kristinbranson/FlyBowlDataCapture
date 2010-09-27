@@ -21,12 +21,16 @@ starvation_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandlin
 shift_time = (handles.StartRecording_Time_datenum - handles.ShiftFlyTemp_Time_datenum)*24*60*60;
 load_time = (handles.StartRecording_Time_datenum - handles.FliesLoaded_Time_datenum)*24*60*60;
 
+% was the experiment aborted
+didabort = ~handles.FinishedRecording;
+
 % write the main metadata file
 fprintf(fid,'<?xml version="1.0"?>\n');
 fprintf(fid,'<experiment assay="%s" ',handles.params.MetaData_AssayName);
 % always same experiment protocol
 fprintf(fid,'protocol="%s" ',handles.params.MetaData_ExpProtocols{1});
 fprintf(fid,'datetime="%s" ',datestr(handles.StartRecording_Time_datenum,'yyyy-mm-ddTHH:MM:SS'));
+fprintf(fid,'aborted="%d" ',didabort);
 fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 fprintf(fid,'shiftflytemp_time="%f" ',shift_time);
 fprintf(fid,'fliesloaded_time="%f" ',load_time);
@@ -39,17 +43,17 @@ fprintf(fid,'    <camera adaptor="%s" device_name="%s" format="%s" device_id="%d
   handles.params.Imaq_VideoFormat,...
   handles.DeviceID,...
   handles.CameraUniqueID);
-
+fprintf(fid,'    <computer id="%s" harddrive_id="%s" output_directory="%s"/>\n',handles.ComputerName,handles.params.HardDriveName,handles.params.OutputDirectory);
 fprintf(fid,'    <flies line="%s" ',handles.Fly_LineName);
 fprintf(fid,'effector="%s" ',handles.params.MetaData_Effector);
-fprintf(fid,'cross-date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyy-mm-dd'));
+fprintf(fid,'crossdate="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyy-mm-dd'));
 fprintf(fid,'age="%f,%f" ',minage,maxage);
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'count="0">\n');
 
 % choose rearing protocol based on activity peak time
 i = find(strcmp(handles.Rearing_ActivityPeak,handles.Rearing_ActivityPeaks),1);
-fprintf(fid,'      <rearing_protocol="%s" ',handles.params.MetaData_RearingProtocols{i});
+fprintf(fid,'      <rearing_protocol id="%s" ',handles.params.MetaData_RearingProtocols{i});
 fprintf(fid,'incubator="%s" ',handles.Rearing_IncubatorID);
 % i = find(strcmp(handles.Rearing_ActivityPeak,handles.Rearing_ActivityPeaks),1);
 % fprintf(fid,'lightson="%s" ',handles.params.Rearing_LightsOns{i});
@@ -57,14 +61,14 @@ fprintf(fid,'incubator="%s" ',handles.Rearing_IncubatorID);
 fprintf(fid,'/>\n');
 
 % always same sorting protocol
-fprintf(fid,'      <handling_protocol="%s" ',handles.params.MetaData_SortingHandlingProtocols{1});
+fprintf(fid,'      <handling_protocol id="%s" ',handles.params.MetaData_SortingHandlingProtocols{1});
 fprintf(fid,'type="sorting" ');
 fprintf(fid,'handler="%s" ',handles.PreAssayHandling_SortingHandler);
 fprintf(fid,'time="%f" ',sorting_time);
 fprintf(fid,'/>\n');
 
 % always same starvation protocol
-fprintf(fid,'      <handling_protocol="%s" ',handles.params.MetaData_StarvationHandlingProtocols{1});
+fprintf(fid,'      <handling_protocol id="%s" ',handles.params.MetaData_StarvationHandlingProtocols{1});
 fprintf(fid,'type="starvation" ');
 fprintf(fid,'handler="%s" ',handles.PreAssayHandling_StarvationHandler);
 fprintf(fid,'time="%f" ',starvation_time);
@@ -73,14 +77,8 @@ fprintf(fid,'/>\n');
 fprintf(fid,'    </flies>\n');
 fprintf(fid,'    <environment temperature="%f" ',handles.MetaData_RoomTemperature);
 fprintf(fid,'humidity="%f" />\n',handles.MetaData_RoomHumidity);
-tmp = strtrim(handles.BehaviorNotes);
-if ~isempty(tmp) && ~strcmpi(tmp,'None'),
-  fprintf(fid,'    <note type="behavioral"> %s </note>\n',handles.BehaviorNotes);
-end
-tmp = strtrim(handles.TechnicalNotes);
-if ~isempty(tmp) && ~strcmpi(tmp,'None'),
-  fprintf(fid,'    <note type="technical"> %s </note>\n',handles.TechnicalNotes);
-end
+fprintf(fid,'    <note type="behavioral">%s</note>\n',handles.BehaviorNotes);
+fprintf(fid,'    <note type="technical">%s</note>\n',handles.TechnicalNotes);
 % no other note right now
 %fprintf(fid,'        <note type="other"> </note>\n');
 if ~strcmpi(handles.ReviewFlag,'None'),

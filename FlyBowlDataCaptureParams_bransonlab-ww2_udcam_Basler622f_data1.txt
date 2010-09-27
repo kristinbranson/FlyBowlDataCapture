@@ -3,11 +3,11 @@ Assay_Experimenters,hirokawaj,robiea,bransonk
 # Expected number of flies
 NFlies,20
 # List of possible Activity Peak values
-Rearing_ActivityPeaks,10:00,16:00
+Rearing_ActivityPeaks,10:00,15:00
 # These should correspond to activity peaks
-Rearing_LightsOns,08:00,14:00
+Rearing_LightsOns,08:00,13:00
 # These should correspond to activity peaks
-Rearing_LightsOffs,16:00,22:00
+Rearing_LightsOffs,16:00,21:00
 # List of possible Incubator ID values
 Rearing_IncubatorIDs,1,2
 # Range of Cross Dates to show -- minimum and maximum number of days 
@@ -50,7 +50,7 @@ Imaq_VideoFormat,Format 7, Mode 0
 # Video ROI Position
 Imaq_ROIPosition,0,0,1024,1024
 # Frame rate we expect
-Imaq_FrameRate,30
+Imaq_FrameRate,30.4
 # Maximum frame rate we will get
 Imaq_MaxFrameRate,31
 # Shutter period
@@ -68,6 +68,8 @@ PreviewUpdatePeriod,0
 gdcamPreviewFrameInterval,2
 # Directory to store video to
 OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1,D:\data2
+# Names of hard drives, corresponding to the ordered OutputDirectory list
+HardDriveName,Internal_C,HD3
 # Prefix of movie file
 MovieFilePrefix,movie
 # Directory to temporarily store video to
@@ -83,7 +85,7 @@ MetaData_SortingHandlingProtocols,SortingProtocol0001
 MetaData_StarvationHandlingProtocols,StarvationProtocol0001
 MetaData_ExpProtocols,ExperimentProtocol0001
 MetaData_Effector,TrpA
-MetaData_RoomTemperatureSetPoint,25
+MetaData_RoomTemperatureSetPoint,29
 MetaData_RoomHumiditySetPoint,60
 # limits of y-axis for frame rate plot
 FrameRatePlotYLim,0,35

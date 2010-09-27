@@ -142,7 +142,7 @@ try
   end
   
   % parameters that are selected by GUI instance
-  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory'};
+  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory','HardDriveName'};
   for i = 1:length(GUIInstance_params),
     fn = GUIInstance_params{i};
     j = mod(handles.GUIi-1,length(handles.params.(fn)))+1;
@@ -159,6 +159,10 @@ if isempty(handles.params.TmpOutputDirectory),
   handles.params.TmpOutputDirectory = tempdir;
 end
 
+%% computer name
+[~,handles.ComputerName] = system('hostname');
+handles.ComputerName = strtrim(handles.ComputerName);
+
 %% Status window
 %handles.Status_MaxNLines = 50;
 handles.IsTmpLogFile = true;
@@ -171,8 +175,7 @@ s = {
   sprintf('FlyBowlDataCapture v. %s',handles.version)
   '--------------------------------------'};
 addToStatus(handles,s,-1);
-addToStatus(handles,{sprintf('GUI instance %d, writing to %s.',handles.GUIi,handles.params.OutputDirectory)});
-
+addToStatus(handles,{sprintf('GUI instance %d, writing to %s, random number %d.',handles.GUIi,handles.params.OutputDirectory,handles.RandomNumber)});
 %% Experimenter
 
 % whether this has been changed or not
@@ -682,8 +685,8 @@ end
 %% Initialize Temperature Probe
 
 handles.InitializeTempProbe_bkgdcolor = [.071,.212,.141];
-set(handles.pushbutton_InitializeCamera,'BackgroundColor',handles.InitializeCamera_bkgdcolor,...
-  'String','Initialize Camera','Visible','on');
+set(handles.pushbutton_InitializeTempProbe,'BackgroundColor',handles.InitializeTempProbe_bkgdcolor,...
+  'String','Init Temp Probe','Visible','on');
 if (handles.params.DoRecordTemp == 0) || isempty(handles.TempProbeIDs),
   set(handles.pushbutton_InitializeTempProbe,'Enable','off','String','No Temp Probe');
 else

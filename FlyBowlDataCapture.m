@@ -1455,7 +1455,7 @@ if ~handles.FinishedRecording && handles.GUIIsInitialized,
     didcancel = true;
     return;
   end
-  addToStatus(handles,{'Capture aborted.'});
+  addToStatus(handles,{'Experiment aborted.'});
 end
 
 % recording stopped in the middle
@@ -1466,7 +1466,8 @@ end
 % stop logging
 if handles.IsRecording && isfield(handles,'vid') && isvalid(handles.vid),
   guidata(hObject,handles);
-  stop(handles.vid);
+  wrapUpVideo(handles.vid,'',hObject,handles.params.Imaq_Adaptor);
+  %stop(handles.vid);
   handles = guidata(hObject);
 end
 
@@ -1478,6 +1479,18 @@ if handles.MetaDataNeedsSave,
   end
 end
 handles.MetaDataNeedsSave = false;
+
+% create a file if there is an experiment directory
+if isfield(handles,'ExperimentDirectory') && exist(handles.ExperimentDirectory,'file') && didcancel,
+  abortfilename = fullfile(handles.ExperimentDirectory,'ABORTED');
+  try
+    fid = fopen(abortfilename,'w');
+    fprintf(fid,datestr(now,30));
+    fclose(fid);
+  catch
+    addToStatus(handles,'Could not create abort file');
+  end
+end
 
 % stop experiment timer
 if isfield(handles,'StopTimer') && isvalid(handles.StopTimer),
@@ -1515,7 +1528,7 @@ chil = findobj(handles.figure_main,'type','uicontrol');
 handles.menus_disable = [handles.menu_Edit,handles.menu_File_SaveMetaData,handles.menu_File_Close];
 chil = [chil;handles.menus_disable'];
 for i = 1:length(chil),
-  if ishandle(chil(i)),
+  if ishandle(chil(i)) && ~strcmpi(get(chil(i),'Enable'),'on'),
     try
       set(chil(i),'Enable','on');
     catch

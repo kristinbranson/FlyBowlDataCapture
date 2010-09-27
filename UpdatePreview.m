@@ -7,8 +7,9 @@ lastupdate = getappdata(himage,'LastPreviewUpdateTime');
 if strcmpi(params.AdaptorName,'udcam'),
   currenttime = get(obj.Source,'lastCaptureTime');
   empFrameRate = get(obj.Source,'empFrameRate');
+  handles.FrameCount = get(obj.Source,'nFramesLogged');
   %set(handles.text_Status_Recording,'String',sprintf('%.1f s',handles.writeFrame_time));
-  %set(handles.text_Status_FramesWritten,'String',sprintf('%d',handles.FrameCount));
+  set(params.text_Status_FramesWritten,'String',sprintf('%d',handles.FrameCount));
   set(params.text_Status_FrameRate,'String',sprintf('%.2f Hz',empFrameRate));
   history = get(params.hLine_Status_FrameRate,'UserData');
   
