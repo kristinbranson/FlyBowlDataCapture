@@ -45,6 +45,8 @@ Imaq_MaxFrameRate,31
 Imaq_Shutter,100
 # Gain
 Imaq_Gain,200
+# Brightness
+Imaq_Brightness,8
 # Video file type
 #FileType,fmf
 FileType,ufmf

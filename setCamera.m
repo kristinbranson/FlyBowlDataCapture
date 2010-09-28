@@ -63,6 +63,12 @@ if isfield(handles.params,'Imaq_Gain') && handles.params.Imaq_Gain > 0 && ...
   set(handles.vid.source,'Gain',handles.params.Imaq_Gain);
 end
 
+% set shutter period if possible and necessary
+if isfield(handles.params,'Imaq_Brightness') && handles.params.Imaq_Brightness > 0 && ...
+    any(strcmpi(srcparamnames,'Brightness')),
+  set(handles.vid.source,'Brightness',handles.params.Imaq_Brightness);
+end
+
 % set previewFrameInterval if gdcam
 if strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
   set(handles.vid.source,'previewFrameInterval',handles.params.gdcamPreviewFrameInterval);
