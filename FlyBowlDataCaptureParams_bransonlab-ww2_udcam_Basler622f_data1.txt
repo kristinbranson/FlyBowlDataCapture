@@ -130,3 +130,5 @@ UFMFBackSubThresh,15
 UFMFNFramesInit,100
 # while ramping up the background model, use the following keyframe periods
 UFMFBGKeyFramePeriodInit,1,10,25,50,75
+# whether to display the video preview with the jet colormap
+ColormapPreview,0

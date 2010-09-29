@@ -181,6 +181,8 @@ PreviewParams.IsRecording = handles.IsRecording;
 PreviewParams.text_Status_FrameRate = handles.text_Status_FrameRate;
 PreviewParams.text_Status_FramesWritten = handles.text_Status_FramesWritten;
 PreviewParams.hLine_Status_FrameRate = handles.hLine_Status_FrameRate;
+PreviewParams.axes_PreviewVideo = handles.axes_PreviewVideo;
+PreviewParams.ColormapPreview = handles.params.ColormapPreview;
 
 setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
 
