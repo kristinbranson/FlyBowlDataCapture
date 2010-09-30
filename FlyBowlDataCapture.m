@@ -942,7 +942,21 @@ end
 handles = resetTempProbe(handles);
 handles = unsetCamera(handles);
 
+CloseQuickStatsFigures(handles);
+
 guidata(hObject,handles);
+
+function CloseQuickStatsFigures(handles)
+
+% delete quick stats figure
+if isfield(handles,'QuickStats'),
+  if ishandle(handles.QuickStats.fig),
+    delete(handles.QuickStats.fig);
+  end
+  if ishandle(handles.QuickStats.showufmf_handle),
+    delete(handles.QuickStats.showufmf_handle);
+  end
+end
 
 % --- Executes on key press with focus on popupmenu_Assay_Experimenter and none of its controls.
 function popupmenu_Assay_Experimenter_KeyPressFcn(hObject, eventdata, handles)
@@ -1272,6 +1286,7 @@ if didcancel,
   return;
 end
 handles = DisableGUI(handles);
+CloseQuickStatsFigures(handles);
 
 guidata(hObject,handles);
 

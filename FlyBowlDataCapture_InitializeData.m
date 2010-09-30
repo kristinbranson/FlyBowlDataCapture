@@ -48,6 +48,20 @@ handles.minhour = rem(datenum('06:00'),1);
 handles.maxhour = rem(datenum('23:00'),1);
 
 handles.SAGECodeDir = '../SAGE/MATLABInterface/Trunk';
+handles.JCtraxCodeDir = '../JCtrax';
+
+% add JCtrax to path
+miscdir = fullfile(handles.JCtraxCodeDir,'misc');
+if ~exist(miscdir,'file')
+  error('Directory %s required',miscdir);
+end
+addpath(miscdir);
+filehandlingdir = fullfile(handles.JCtraxCodeDir,'filehandling');
+if ~exist(filehandlingdir,'file')
+  error('Directory %s required',filehandlingdir);
+end
+addpath(miscdir);
+
 
 %% delete existing imaqs and timers
 
@@ -716,6 +730,8 @@ handles.ComputeQuickStatsParams = {...
   'FigHandle',100,...
   'GUIInstance',handles.GUIi,...
   'parent',handles.figure_main...
+  'SaveFileStr','QuickStats.png',...
+  'SaveDataStr','QuickStats.txt'...
   };
 
 %% Initialization complete
