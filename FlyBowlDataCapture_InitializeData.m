@@ -158,6 +158,10 @@ if isempty(handles.params.TmpOutputDirectory),
   handles.params.TmpOutputDirectory = tempdir;
 end
 
+%% movie file name
+
+handles.params.MovieFileStr = sprintf('%s.%s',handles.params.MovieFilePrefix,handles.params.FileType);
+
 %% computer name
 [~,handles.ComputerName] = system('hostname');
 handles.ComputerName = strtrim(handles.ComputerName);
@@ -703,6 +707,16 @@ set(handles.axes_Status_Temp,'Color',[0,0,0],...
 %% Preview axes
 
 set(handles.axes_PreviewVideo,'xtick',[],'ytick',[]);
+
+%% computeQuickStats parameters
+
+handles.ComputeQuickStatsParams = {...
+  'UFMFDiagnosticsFileStr',handles.params.UFMFStatFileName,...
+  'MovieFileStr',handles.params.MovieFileStr,...
+  'FigHandle',100,...
+  'GUIInstance',handles.GUIi,...
+  'parent',handles.figure_main...
+  };
 
 %% Initialization complete
 handles.GUIInitialization_Time_datenum = now;

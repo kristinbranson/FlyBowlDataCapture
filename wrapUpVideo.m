@@ -27,7 +27,7 @@ waitbar(.2);
 % wait a few seconds
 pause(3);
 
-waitbar(.5);
+waitbar(.4);
 
 % wait until actually stopped
 %fprintf('Waiting for Running == Off...\n');
@@ -39,7 +39,7 @@ while true,
 end
 %fprintf('Running = Off.\n');
 
-waitbar(.7);
+waitbar(.5);
 
 if ~(strcmpi(AdaptorName,'gdcam') || strcmpi(AdaptorName,'udcam')),
 
@@ -69,7 +69,7 @@ end
 
 handles = guidata(hObject);
 
-waitbar(.8);
+waitbar(.6);
 
 % close temperature file
 if handles.params.DoRecordTemp ~= 0,
@@ -91,11 +91,23 @@ guidata(hObject,handles);
 addToStatus(handles,{sprintf('Finished recording. Video file moved from %s to %s.',...
   oldname,handles.FileName)});
 
-waitbar(.9);
-
 PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
 PreviewParams.IsRecording = false;
 setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
+
+waitbar(.7);
+
+% show some simple statistics
+[handles.QuickStats,success,errmsg,warnings] = computeQuickStats(handles.ExperimentDirectory,...
+  handles.ComputeQuickStatsParams{:});
+if ~success,
+  addToStatus(handles,sprintf('Error computing quick statistics: %s',errmsg));
+end
+if ~isempty(warnings),
+  addToStatus(handles,[{'Warnings computing quick statistics:'},warnings]);
+end
+
+waitbar(.9);
 
 % enable Done button
 set(handles.pushbutton_Done,'Enable','on','BackgroundColor',handles.Done_bkgdcolor,'String','Done');

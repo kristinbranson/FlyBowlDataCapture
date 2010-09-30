@@ -13,8 +13,7 @@ if ~handles.IsTmpFileName,
   return;
 end
 
-filestr = sprintf('movie.%s',handles.params.FileType);
-newfilename = fullfile(handles.ExperimentDirectory,filestr);
+newfilename = fullfile(handles.ExperimentDirectory,handles.params.MovieFileStr);
 
 % check if renaming already done
 if exist(newfilename,'file') && ~exist(oldfilename,'file'),
@@ -79,7 +78,7 @@ newfilename = fullfile(handles.ExperimentDirectory,handles.params.UFMFStatFileNa
 [success,msg] = renamefile(oldfilename,newfilename);
 if success,
   %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
-  handles.params.UFMFStatFileName = newfilename;
+  handles.UFMFStatFileName = newfilename;
   %fprintf('Renamed successfully\n');
 else
   s = {sprintf('UFMF diagnostics temporarily stored to %s. ',oldfilename),...
