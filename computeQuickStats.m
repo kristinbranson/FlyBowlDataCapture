@@ -9,19 +9,26 @@ UFMFDiagnosticsFileStr = 'ufmf_diagnostics.txt';
 % name of video
 MovieFileStr = 'movie.ufmf';
 % streams to plot
-UFMFStreamFns = {'bytes','nForegroundPx','nPxWritten','nFramesBuffered','nFramesDropped',...
+UFMFStreamFns = {'bytes','nForegroundPx','nPxWritten','nFramesBuffered','nFramesDropped','FPS',...
   'meanPixelError','maxPixelError','maxFilterError'};
 % number of subplot columns
-UFMFStream_nc = 4;
+UFMFStream_nc = 3;
 % for auto-setting axis limits
 UFMFStreamXLimExtra = .01;
 UFMFStreamYLimExtra = .05;
 % average, std of statistics
 UFMFStreamMu = struct;
 UFMFStreamSig = struct;
+IntensityHistMu = [];
+IntensityHistSig = [];
+ScanLineMu = [];
+ScanLineSig = [];
 SigColor = [.75,.75,.75];
 MuColor = [.25,.25,.25];
 DataColor = [.7,0,0];
+
+% name of file to export figure to 
+SaveFileStr = '';
 
 % summaries to show
 UFMFSummaryFns = {'nFrames','nFramesDroppedTotal','nFramesUncompressed','nUpdateBackgroundCalls','nWriteKeyFrameCalls','ImageWidth','ImageHeight'};
@@ -36,6 +43,7 @@ BackSubNFramesSample = 10;
 BackSubThreshLow = 10;
 BackSubThreshHigh = 20;
 BackSubMinCCArea = 5;
+BackSubCloseRadius = 2;
 
 [GUIi,fig,FigPos,...
   UFMFDiagnosticsFileStr,MovieFileStr,...
@@ -43,8 +51,10 @@ BackSubMinCCArea = 5;
   UFMFStream_nc,UFMFStreamYLim,UFMFStreamXLim,...
   parent,SigColor,MuColor,DataColor,...
   UFMFSummaryFns,UFMFSummaryStatFns,...
-  NBkgdScanLines,NBkgdBins,...
-  BackSubNFramesSample,BackSubThreshLow,BackSubThreshHigh,BackSubMinCCArea] = ...
+  NBkgdScanLines,ScanLineMu,ScanLineSig,...
+  NBkgdBins,IntensityHistMu,IntensityHistSig,...
+  BackSubNFramesSample,BackSubThreshLow,BackSubThreshHigh,BackSubMinCCArea,...
+  SaveFileStr] = ...
   myparse(varargin,...
   'GUIInstance',1,...
   'FigHandle',nan,...
@@ -55,7 +65,7 @@ BackSubMinCCArea = 5;
   'UFMFStreamMu',UFMFStreamMu,...
   'UFMFStreamSig',UFMFStreamSig,...
   'UFMFStream_nc',UFMFStream_nc,...
-  'UFMFStreamYLim',struct,...
+  'UFMFStreamYLim',struct('FPS',[0,50]),...
   'UFMFStreamXLim',[],...
   'parent',nan,...
   'SigColor',SigColor,...
@@ -64,11 +74,16 @@ BackSubMinCCArea = 5;
   'UFMFSummaryFns',UFMFSummaryFns,...
   'UFMFSummaryStatFns',UFMFSummaryStatFns,...
   'NBkgdScanLines',NBkgdScanLines,...
+  'ScanLineMu',ScanLineMu,...
+  'ScanLineSig',ScanLineSig,...
   'NBkgdBins',NBkgdBins,...
+  'IntensityHistMu',IntensityHistMu,...
+  'IntensityHistSig',IntensityHistSig,...
   'BackSubNFramesSample',BackSubNFramesSample,...
   'BackSubThreshLow',BackSubThreshLow,...
   'BackSubThreshHigh',BackSubThreshHigh,...
-  'BackSubMinCCArea',BackSubMinCCArea);
+  'BackSubMinCCArea',BackSubMinCCArea,...
+  'SaveFileStr',SaveFileStr);
 
 %% Figure positions
 
@@ -97,17 +112,19 @@ XLabelSpace = 20;
 XTickSpace = 20;
 
 % amount of space to skip between everything
-BorderX = 5;
-BorderY = 5;
+BorderX = 10;
+BorderY = 10;
 
-% width of the table
-TableWidth = 550;
-% height of a row of the table
+% for computing width, height of table
+MinTableColumnWidth = 75;
+TableRowLabelWidth = 250;
 TableRowHeight = 19;
 
 % fraction of figure the table can take
-MaxTableHeightFrac = .6;
-MaxTableWidthFrac = .5;
+MaxTableHeightFrac = .3;
+
+% fraction of height the stream axes should take in total
+StreamHeightFrac = .37;
 
 % fraction of width the background axes should take
 BkgdAxesWidthFrac = .225;
@@ -173,27 +190,29 @@ end
 
 framessample = unique(round(linspace(1,nframes,BackSubNFramesSample)));
 BackSubNFramesSample = length(framessample);
+BackSubCloseStrel = strel('disk',BackSubCloseRadius);
 areas = [];
 nccs = zeros(1,BackSubNFramesSample);
 for i = 1:BackSubNFramesSample,
   im = double(readframe(framessample(i)));
   diffim = abs(im-bkgdim);
   isForeLow = diffim >= BackSubThreshLow;
+  isForeLow = imclose(isForeLow,BackSubCloseStrel);
   cc = bwconncomp(isForeLow);
   for j = 1:cc.NumObjects,
-    areacurr = length(cc.PixelIdxList(j));
+    areacurr = length(cc.PixelIdxList{j});
     if areacurr > BackSubMinCCArea && ...
-        max(diffim(cc.PixelIdxList)) >= BackSubThreshHigh,
+        max(diffim(cc.PixelIdxList{j})) >= BackSubThreshHigh,
       nccs(i) = nccs(i)+1;
       areas(end+1) = areacurr; %#ok<AGROW>
     end
   end
 end
 
-BackSubStats.meanNConnectedComponents = mean(nccs);
-BackSubStats.minNConnectedComponents = min(nccs);
-BackSubStats.maxNConnectedComponents = max(nccs);
-BackSubStats.stdNConnectedComponents = std(nccs,1);
+BackSubStats.meanNConnComps = mean(nccs);
+BackSubStats.minNConnComps = min(nccs);
+BackSubStats.maxNConnComps = max(nccs);
+BackSubStats.stdNConnComps = std(nccs,1);
 BackSubStats.meanBlobArea = median(areas);
 BackSubStats.minBlobArea = min(areas);
 BackSubStats.maxBlobArea = max(areas);
@@ -201,7 +220,7 @@ BackSubStats.stdBlobArea = median(abs(areas-BackSubStats.meanBlobArea));
 
 out.BackSubStats = BackSubStats;
 
-BackSubStatFns = {'NConnectedComponents','BlobArea'};
+BackSubStatFns = {'NConnComps','BlobArea'};
 
 %% done with the movie file
 
@@ -239,34 +258,38 @@ if any(badidx),
 end
 BackSubStatFns(badidx) = [];
 
-nTableFns = length(UFMFSummaryFns) + length(UFMFSummaryStatFns) + length(BackSubStatFns);
+nTableFns1 = length(UFMFSummaryFns);
+nTableFns2 = length(UFMFSummaryStatFns) + length(BackSubStatFns);
 
-data = cell(nTableFns,3);
-rowheaders = cat(1,UFMFSummaryFns(:),UFMFSummaryStatFns(:),BackSubStatFns(:));
-colheaders = {'Mean','Std','Min','Max'};
+data1 = cell(nTableFns1,1);
+data2 = cell(nTableFns2,4);
+rowheaders1 = UFMFSummaryFns;
+rowheaders2 = cat(1,UFMFSummaryStatFns(:),BackSubStatFns(:));
+colheaders1 = {'Value'};
+colheaders2 = {'Mean','Std','Min','Max'};
 for i = 1:length(UFMFSummaryFns),
   fn = UFMFSummaryFns{i};
-  data{i,1} = UFMFStats.summary.(fn);
+  data1{i,1} = UFMFStats.summary.(fn);
 end
-off = length(UFMFSummaryFns);
+off = 0;
 for i = 1:length(UFMFSummaryStatFns),
   j = off + i;
   fn = UFMFSummaryStatFns{i};
   meanfn = ['mean',fn];
   if isfield(UFMFStats.summary,meanfn),
-    data{j,1} = UFMFStats.summary.(meanfn);
+    data2{j,1} = UFMFStats.summary.(meanfn);
   end
   stdfn = ['std',fn];
   if isfield(UFMFStats.summary,stdfn),
-    data{j,2} = UFMFStats.summary.(stdfn);
+    data2{j,2} = UFMFStats.summary.(stdfn);
   end
   minfn = ['min',fn];
   if isfield(UFMFStats.summary,minfn),
-    data{j,3} = UFMFStats.summary.(minfn);
+    data2{j,3} = UFMFStats.summary.(minfn);
   end
   maxfn = ['max',fn];
   if isfield(UFMFStats.summary,maxfn),
-    data{j,4} = UFMFStats.summary.(maxfn);
+    data2{j,4} = UFMFStats.summary.(maxfn);
   end
 
 end
@@ -276,19 +299,19 @@ for i = 1:length(BackSubStatFns),
   fn = BackSubStatFns{i};
   meanfn = ['mean',fn];
   if isfield(BackSubStats,meanfn),
-    data{j,1} = BackSubStats.(meanfn);
+    data2{j,1} = BackSubStats.(meanfn);
   end
   stdfn = ['std',fn];
   if isfield(BackSubStats,stdfn),
-    data{j,2} = BackSubStats.(stdfn);
+    data2{j,2} = BackSubStats.(stdfn);
   end
   minfn = ['min',fn];
   if isfield(BackSubStats,minfn),
-    data{j,3} = BackSubStats.(minfn);
+    data2{j,3} = BackSubStats.(minfn);
   end
   maxfn = ['max',fn];
   if isfield(BackSubStats,maxfn),
-    data{j,4} = BackSubStats.(maxfn);
+    data2{j,4} = BackSubStats.(maxfn);
   end
 
 end
@@ -320,27 +343,38 @@ else
 end
 FigWidthFree = FigWidth - FigBorderLeft - FigBorderRight;
 FigHeightFree = FigHeight - FigBorderTop - FigBorderBottom;
-set(fig,'Units','Pixels','Position',FigPos,'Name',sprintf('Summary Stats %d',GUIi),'ToolBar','figure');
+set(fig,'Units','Pixels','Position',FigPos,'Name',sprintf('Summary Stats %d',GUIi),'ToolBar','figure','NumberTitle','off');
 
-% table for statistics
-TableHeight = min(TableRowHeight*(nTableFns+1),FigHeightFree*MaxTableHeightFrac);
-TableWidth = min(TableWidth,FigWidthFree*MaxTableWidthFrac);
-TableLeft = FigBorderLeft;
-TableRight = TableLeft + TableWidth;
+% tables for statistics
+TableColumnWidth = max((FigWidthFree - 2*TableRowLabelWidth - YLabelSpace - BorderX) / (length(colheaders1)+length(colheaders2)),MinTableColumnWidth);
+TableHeight1 = min(TableRowHeight*(nTableFns1+1),FigHeightFree*MaxTableHeightFrac-XLabelSpace);
+TableHeight2 = min(TableRowHeight*(nTableFns2+1),FigHeightFree*MaxTableHeightFrac-XLabelSpace);
+TableHeight = max([TableHeight1,TableHeight2]);
+TableWidth1 = TableRowLabelWidth + length(colheaders1)*TableColumnWidth;
+TableWidth2 = TableRowLabelWidth + length(colheaders2)*TableColumnWidth;
+TableLeft1 = FigBorderLeft;
 TableTop = FigHeight-FigBorderTop;
 TableBottom = TableTop - TableHeight;
-TablePos = [TableLeft,TableBottom,TableWidth,TableHeight];
+TablePos1 = [TableLeft1,TableBottom,TableWidth1,TableHeight];
+TableRight2 = FigWidth-FigBorderRight;
+TableLeft2 = TableRight2 - TableWidth2;
+TablePos2 = [TableLeft2,TableBottom,TableWidth2,TableHeight];
 
 % axes for UFMF stream data
 nUFMFStreamFns = length(UFMFStreamFns);
 UFMFStream_nr = ceil(nUFMFStreamFns/UFMFStream_nc);
-StreamAxHeight = (TableHeight-XLabelSpace-XTickSpace-BorderY*(UFMFStream_nr-1))/UFMFStream_nr;
-StreamAxWidth = (FigWidthFree - TableWidth) / UFMFStream_nc - (BorderX+YLabelSpace+YTickSpace);
+%StreamAxHeight = (TableHeight-XLabelSpace-XTickSpace-BorderY*(UFMFStream_nr-1))/UFMFStream_nr;
+StreamAxHeightTotal = FigHeightFree*StreamHeightFrac;
+StreamAxHeight = (StreamAxHeightTotal-BorderY*(UFMFStream_nr-1) - (XLabelSpace+XTickSpace))/UFMFStream_nr;
+%StreamAxWidth = (FigWidthFree - TableWidth) / UFMFStream_nc - (BorderX+YLabelSpace+YTickSpace);
+StreamAxWidth = (FigWidthFree-BorderX*(UFMFStream_nc-1)) / UFMFStream_nc  - (YLabelSpace+YTickSpace);
+StreamAxTopTotal = TableBottom - BorderY - XLabelSpace;
+StreamAxBottomTotal = StreamAxTopTotal - StreamAxHeightTotal;
 
-l = TableRight + BorderX + YLabelSpace + YTickSpace;
+l = FigBorderLeft + YLabelSpace + YTickSpace;
 StreamAx = nan(UFMFStream_nr,UFMFStream_nc);
 for c = 1:UFMFStream_nc,
-  t = TableTop;
+  t = StreamAxTopTotal;
   for r = 1:UFMFStream_nr,
     StreamAx(r,c) = axes('Parent',fig,'Units','Pixels','Position',[l,t-StreamAxHeight,StreamAxWidth,StreamAxHeight]);
     t = t - (StreamAxHeight + BorderY);
@@ -354,10 +388,11 @@ if UFMFStream_nc*UFMFStream_nr > nUFMFStreamFns,
 end
   
 % axes for background model
-BkgdAxesHeight = FigHeightFree - TableHeight - BorderY - XLabelSpace;
+BkgdAxesTop = StreamAxBottomTotal - BorderY;
+BkgdAxesBottom = FigBorderBottom + XLabelSpace;
+BkgdAxesHeight = BkgdAxesTop - BkgdAxesBottom;
 BkgdAxesWidth = FigWidthFree * BkgdAxesWidthFrac - BorderX/2;
 BkgdAxesLeft = FigBorderLeft;
-BkgdAxesBottom = FigBorderBottom + XLabelSpace;
 BkgdAx = nan(1,2);
 BkgdAx(1) = axes('Parent',fig,'Units','Pixels','Position',[BkgdAxesLeft,BkgdAxesBottom,BkgdAxesWidth,BkgdAxesHeight]);
 BkgdAxesLeft = BkgdAxesLeft + BkgdAxesWidth + BorderX;
@@ -374,8 +409,9 @@ HistAx = axes('Parent',fig,'Units','Pixels','Position',[HistLeft,HistBottom,Hist
 
 % axes for scan line intensities
 ScanHeight = (HistHeight - ((NBkgdScanLines-1)*BorderY))/NBkgdScanLines;
-ScanWidth = FigWidthFree - HistRight - BorderX - YLabelSpace;
 ScanLeft = HistRight + BorderX + YLabelSpace;
+ScanRight = FigWidth - FigBorderRight;
+ScanWidth = ScanRight - ScanLeft;
 ScanBottom = HistBottom;
 
 ScanAx = nan(1,NBkgdScanLines);
@@ -384,11 +420,18 @@ for i = 1:NBkgdScanLines,
   ScanBottom = ScanBottom + ScanHeight + BorderY;
 end
 
-%% plot the table
+%% plot the tables
 
-uitable(fig,'Units','Pixels','Position',TablePos,...
-  'Data',data,'ColumnName',colheaders,'RowName',rowheaders,...
-  'FontUnits','Pixels','FontSize',10.6667);
+uitable(fig,'Units','Pixels','Position',TablePos1,...
+  'Data',data1,'ColumnName',colheaders1,'RowName',rowheaders1,...
+  'FontUnits','Pixels','FontSize',10.6667,...
+  'ColumnFormat',repmat({'numeric'},[1,length(colheaders1)]),...
+  'ColumnWidth',repmat({TableColumnWidth},[1,length(colheaders1)]));
+uitable(fig,'Units','Pixels','Position',TablePos2,...
+  'Data',data2,'ColumnName',colheaders2,'RowName',rowheaders2,...
+  'FontUnits','Pixels','FontSize',10.6667,...
+  'ColumnFormat',repmat({'numeric'},[1,length(colheaders2)]),...
+  'ColumnWidth',repmat({TableColumnWidth},[1,length(colheaders2)]));
 
 
 %% UFMF Diagnostics Stream plots
@@ -436,7 +479,7 @@ for i = 1:nUFMFStreamFns,
 end
 linkaxes(StreamAx,'x');
 
-%% Show background model
+%% Show background image
 
 % grayscale bkgd
 image(repmat(bkgdim/255,[1,1,3]),'parent',BkgdAx(1));
@@ -451,16 +494,29 @@ xlabel(BkgdAx(2),'Background, jet');
 colormap(BkgdAx(2),'jet');
 set(BkgdAx(2),'xtick',[],'ytick',[]);
 
-% intensity histogram
+%% background intensity histogram
 edges = linspace(0,255,NBkgdBins+1);
 ctrs = (edges(1:end-1)+edges(2:end))/2;
 counts = hist(bkgdim(:),ctrs);
 frac = counts / numel(bkgdim);
+% standard deviation
+if length(IntensityHistSig) == NBkgdBins && length(IntensityHistMu) == NBkgdBins,
+  y = IntensityHistMu;
+  dy = IntensityHistSig;
+  patch(HistAx,[ctrs,fliplr(ctrs)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none');
+  hold(HistAx,'on');
+end
+% mean
+if length(IntensityHistMu) == NBkgdBins,
+  plot(HistAx,ctrs,IntensityHistMu,'-','Color',MuColor);
+  hold(HistAx,'on');
+end
 plot(HistAx,ctrs,frac,'.-','Color',DataColor);
 axis(HistAx,[edges(1),edges(end),0,1]);
 xlabel(HistAx,'Pixel intensity histogram');
+ylabel(HistAx,'Fraction of pixels');
 
-% plot some scan lines through the center of the image at different
+%% plot some scan lines through the center of the image at different
 % orientations
 x0 = (headerinfo.nc+1)/2;
 y0 = (headerinfo.nc+1)/2;
@@ -471,16 +527,46 @@ off = -r+1:r-1;
 hold(BkgdAx(1),'on');
 for i = 1:NBkgdScanLines,
   s = sprintf('%d',round(theta(i)*180/pi));
+  % draw a line on the background
   plot(BkgdAx(1),x0+cos(theta(i))*[-r,r],y0+sin(theta(i))*[-r,r],'-','Color',DataColor);
   text(x0+cos(theta(i))*r,y0+sin(theta(i))*r,s,'parent',BkgdAx(1),'Color',DataColor);
+  
+  % sample
   x = round(x0 + cos(theta(i))*off);
   y = round(y0 + sin(theta(i))*off);  
   z = bkgdim(sub2ind([headerinfo.nr,headerinfo.nc],y,x));
+  
+  % standard deviation
+  if size(ScanLineSig,1) >= i && size(ScanLineMu,1) >= i,
+    y = ScanLineMu(i,:);
+    dy = ScanLineSig(i,:);
+    patch(ScanAx(i),[off,fliplr(off)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none');
+    hold(ScanAx(i),'on');
+  end
+  % mean
+  if size(ScanLineMu,1) >= i,
+    plot(ScanAx(i),off,ScanLineMu(i,:),'-','Color',MuColor);
+    hold(ScanAx(i),'on');
+  end
+  
+  % plot actual data
   plot(ScanAx(i),off,z,'-','Color',DataColor);
   axis(ScanAx(i),[-r,r,-5,260]);
+  
   set(ScanAx(i),'xticklabel',{},'yticklabel',{},'ytick',[0,122.5,255],'ticklength',[.005,.005]);
   ylabel(ScanAx(i),s);
 end
-xlabel(ScanAx(1),'Bkgd scan lines');
+xlabel(ScanAx(1),'Bkgd scan line intensities');
 
 linkaxes(ScanAx);
+
+%% save figure
+
+if ~isempty(SaveFileStr),
+  SaveFileName = fullfile(expdir,SaveFileStr);
+  export_fig(SaveFileName,fig);
+end
+
+%% showufmf
+
+out.showufmf_handle = showufmf('UFMFName',MovieFile,'BackSubThresh',BackSubThreshLow);
