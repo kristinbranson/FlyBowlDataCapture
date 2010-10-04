@@ -95,6 +95,22 @@ end
 
 if isfield(handles.previous_values,'FigurePosition'),
   handles.FigurePosition = handles.previous_values.FigurePosition;
+
+  % make sure that this fits on the screen
+  ScreenSize = get(0,'ScreenSize');
+  handles.FigurePosition(1) = max(1,handles.FigurePosition(1));
+  handles.FigurePosition(2) = max(1,handles.FigurePosition(2));
+  top = handles.FigurePosition(2)+handles.FigurePosition(4);
+  if top > ScreenSize(4)-50,
+    top = ScreenSize(4)-50;
+    handles.FigurePosition(2) = top-handles.FigurePosition(4);
+  end
+  right = handles.FigurePosition(1)+handles.FigurePosition(3);
+  if right > ScreenSize(3),
+    right = ScreenSize(3);
+    handles.FigurePosition(1) = max(1,right-handles.FigurePosition(3));
+  end
+  
   set(handles.figure_main,'Units','Pixels','Position',handles.FigurePosition);
 end
 
