@@ -23,7 +23,8 @@ handles.changed_bkgdcolor = 0.314 + zeros(1,3);
 handles.grayed_bkgdcolor = 0.314 + zeros(1,3);
 
 % colors for status box text
-handles.status_colors = [0,1,0;0,0,1];
+handles.status_colors = [0,1,0;0,0,1;1,0,0;1,0,0;1,0,0];
+handles.status_color_names = {'GREEN','BLUE','RED','RED','RED'};
 
 % list of fly lines read frame Sage
 handles.linename_file = 'SageLineNames.txt';
@@ -188,6 +189,7 @@ set(handles.edit_Status,'String',{});
 j = mod(handles.GUIi-1,size(handles.status_colors,1))+1;
 handles.status_color = handles.status_colors(j,:);
 set(handles.edit_Status,'ForegroundColor',handles.status_color);
+fprintf('***GUI Instance %d = %s***\n',handles.GUIi,handles.status_color_names{j});
 s = {
   sprintf('FlyBowlDataCapture v. %s',handles.version)
   '--------------------------------------'};
