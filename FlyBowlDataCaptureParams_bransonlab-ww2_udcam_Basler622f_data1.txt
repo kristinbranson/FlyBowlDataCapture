@@ -57,7 +57,7 @@ PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
 gdcamPreviewFrameInterval,2
 # Directory to store video to
-OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1,D:\data2
+OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1,D:\data1
 # Names of hard drives, corresponding to the ordered OutputDirectory list
 HardDriveName,Internal_C,HD3
 # Prefix of movie file
@@ -95,7 +95,8 @@ TempProbeReject60Hz,0
 DoRecordTemp,1
 # number of temperature and humidity samples to read from the Precon probe
 # set to 0 if no Precon sensor
-NPreconSamples,5
+
+NPreconSamples,0
 # which serial port to connect to -- I have no idea how to figure this out 
 # automatically
 PreconSensorSerialPort,COM3

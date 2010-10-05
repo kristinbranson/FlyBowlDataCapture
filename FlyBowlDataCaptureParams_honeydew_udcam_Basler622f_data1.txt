@@ -51,7 +51,7 @@ Imaq_Brightness,25
 #FileType,fmf
 FileType,ufmf
 # Number of seconds to record
-RecordTime,120
+RecordTime,20
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
@@ -132,4 +132,4 @@ UFMFBGKeyFramePeriodInit,1,10,25,50,75
 # whether to display the video preview with the jet colormap
 ColormapPreview,1
 # whether to rotate the preview image
-DoRotatePreviewImage,1,0
+DoRotatePreviewImage,0,0

@@ -68,4 +68,13 @@ if handles.IsTmpLogFile && exist(oldfilename,'file'),
   renamefile(oldfilename,handles.LogFileName);
   handles.IsTmpLogFile = false;
 end
-  
+
+% copy parameters file into the experiment directory if this is the first
+% time an experiment directory is created
+if isempty(OldExperimentDirectory) && exist(handles.ExperimentDirectory,'file'),
+  [success1,msg] = copyfile(handles.params_file,handles.ExperimentDirectory);
+  if ~success1,
+    addToStatus(handles,{sprintf('Error copying params file %s into directory %s:',...
+      handles.params_file,handles.ExperimentDirectory),msg});
+  end
+end

@@ -70,7 +70,7 @@ end
 
 % function called when video recording stops
 %if ~strcmpi(handles.params.Imaq_Adaptor,'gdcam'),
-%  handles.vid.stopfcn = {@wrapUpVideo,handles.figure_main,handles.params.Imaq_Adaptor};
+%  handles.vid.stopfcn = {@wrapUpVideo,handles.figure_main,handles.params.Imaq_Adaptor,false};
 %end
 
 % for computing fps
