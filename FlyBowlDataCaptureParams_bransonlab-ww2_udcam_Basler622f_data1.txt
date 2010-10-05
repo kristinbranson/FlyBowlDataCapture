@@ -57,7 +57,7 @@ PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
 gdcamPreviewFrameInterval,2
 # Directory to store video to
-OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1,D:\data2
+OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1,D:\data1
 # Names of hard drives, corresponding to the ordered OutputDirectory list
 HardDriveName,Internal_C,HD3
 # Prefix of movie file
