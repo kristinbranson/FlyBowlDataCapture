@@ -37,6 +37,7 @@ end
 
 % Display image data.
 set(himage, 'CData', event.Data);
+
 if params.ColormapPreview,
   colormap(params.axes_PreviewVideo,jet(256));
 end

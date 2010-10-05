@@ -621,7 +621,6 @@ end
 
 %% showufmf
 
-ShowUFMFPos = [FigPos(1)+ShowUFMFBorderLeft,FigPos(2)+ShowUFMFBorderBottom,...
-  FigPos(3)-ShowUFMFBorderLeft-ShowUFMFBorderRight,...
-  FigPos(4)-ShowUFMFBorderTop-ShowUFMFBorderBottom];
+ShowUFMFPos = [FigPos(1)+ShowUFMFBorderLeft,FigPos(2)+ShowUFMFBorderBottom,nan,nan];
+%out.showufmf_handle = showufmf('UFMFName',MovieFile,'BackSubThresh',BackSubThreshLow);
 out.showufmf_handle = showufmf('UFMFName',MovieFile,'BackSubThresh',BackSubThreshLow,'FigPos',ShowUFMFPos);

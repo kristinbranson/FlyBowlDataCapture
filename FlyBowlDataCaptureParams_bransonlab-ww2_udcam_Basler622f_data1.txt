@@ -51,7 +51,7 @@ Imaq_Brightness,25
 #FileType,fmf
 FileType,ufmf
 # Number of seconds to record
-RecordTime,15
+RecordTime,120
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
@@ -70,10 +70,9 @@ MetaDataFileName,Metadata.xml
 LogFileName,Log.txt
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
-MetaData_RearingProtocols,RearingProtocol0001_Morning,RearingProtocol0002_Afternoon
-MetaData_SortingHandlingProtocols,SortingProtocol0001
-MetaData_StarvationHandlingProtocols,StarvationProtocol0001
-MetaData_ExpProtocols,ExperimentProtocol0001
+MetaData_RearingProtocols,RP0001_Incubator1.xml,RP0002_Incubator2.xml
+MetaData_HandlingProtocols,HP0001.xml
+MetaData_ExpProtocols,EP0001.xml
 MetaData_Effector,TrpA
 MetaData_Gender,b
 MetaData_RoomTemperatureSetPoint,29
@@ -96,6 +95,7 @@ TempProbeReject60Hz,0
 DoRecordTemp,1
 # number of temperature and humidity samples to read from the Precon probe
 # set to 0 if no Precon sensor
+
 NPreconSamples,0
 # which serial port to connect to -- I have no idea how to figure this out 
 # automatically
@@ -132,3 +132,5 @@ UFMFNFramesInit,100
 UFMFBGKeyFramePeriodInit,1,10,25,50,75
 # whether to display the video preview with the jet colormap
 ColormapPreview,1
+# whether to rotate the preview image
+DoRotatePreviewImage,1,0

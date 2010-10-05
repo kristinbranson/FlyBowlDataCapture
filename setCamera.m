@@ -163,6 +163,11 @@ if handles.nBands == 1,
   colormap(handles.axes_PreviewVideo,gray(256));
 end
 axis(handles.axes_PreviewVideo,'image');
+if handles.params.DoRotatePreviewImage,
+  set(handles.axes_PreviewVideo,'XDir','reverse','YDir','normal');
+else
+  set(handles.axes_PreviewVideo,'XDir','normal','YDir','reverse');
+end
 
 % Error function
 set(handles.vid,'ErrorFcn',@vidError);
@@ -183,6 +188,7 @@ PreviewParams.text_Status_FramesWritten = handles.text_Status_FramesWritten;
 PreviewParams.hLine_Status_FrameRate = handles.hLine_Status_FrameRate;
 PreviewParams.axes_PreviewVideo = handles.axes_PreviewVideo;
 PreviewParams.ColormapPreview = handles.params.ColormapPreview;
+PreviewParams.DoRotatePreviewImage = handles.params.DoRotatePreviewImage;
 
 setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
 

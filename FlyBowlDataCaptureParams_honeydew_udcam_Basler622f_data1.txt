@@ -2,23 +2,11 @@
 Assay_Experimenters,hirokawaj,robiea,bransonk
 # Expected number of flies
 NFlies,20
-# List of possible Activity Peak values
-Rearing_ActivityPeaks,10:00,16:00
-# These should correspond to activity peaks
-Rearing_LightsOns,08:00,14:00
-# These should correspond to activity peaks
-Rearing_LightsOffs,16:00,22:00
 # List of possible Incubator ID values
 Rearing_IncubatorIDs,1,2
 # Range of Cross Dates to show -- minimum and maximum number of days 
 # before today
-PreAssayHandling_CrossDate_Range,4,10
-# Range of DOB Starts to show -- minimum and maximum number of days 
-# before today
-PreAssayHandling_DOBStart_Range,1,7
-# Range of DOB Ends to show -- minimum and maximum number of days 
-# before today
-PreAssayHandling_DOBEnd_Range,1,7
+PreAssayHandling_CrossDate_Range,22,29
 # Range of Sorting Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_SortingDate_Range,0,3
@@ -26,7 +14,7 @@ PreAssayHandling_SortingDate_Range,0,3
 PreAssayHandling_SortingHandlers,hirokawaj,robiea,bransonk
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
-PreAssayHandling_StarvationDate_Range,0,2
+PreAssayHandling_StarvationDate_Range,0,1
 # List of possible Starvation Handler values
 PreAssayHandling_StarvationHandlers,hirokawaj,robiea,bransonk
 # List of possible Rig values
@@ -50,39 +38,44 @@ Imaq_VideoFormat,Format 7, Mode 0
 # Video ROI Position
 Imaq_ROIPosition,0,0,1024,1024
 # Frame rate we expect
-Imaq_FrameRate,30
+Imaq_FrameRate,30.4
 # Maximum frame rate we will get
 Imaq_MaxFrameRate,31
 # Shutter period
 Imaq_Shutter,100
 # Gain
 Imaq_Gain,200
+# Brightness
+Imaq_Brightness,25
 # Video file type
+#FileType,fmf
 FileType,ufmf
 # Number of seconds to record
-RecordTime,20
+RecordTime,120
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
 gdcamPreviewFrameInterval,2
 # Directory to store video to
-OutputDirectory,E:\Data\FlyBowl\Test1,E:\Data\FlyBowl\Test2
+OutputDirectory,E:\Data\FlyBowl\Test1
+# Names of hard drives, corresponding to the ordered OutputDirectory list
+HardDriveName,Internal_C,HD3
 # Prefix of movie file
 MovieFilePrefix,movie
 # Directory to temporarily store video to
-TmpOutputDirectory,E:\Data\FlyBowl\Test1,E:\Data\FlyBowl\Test2
+TmpOutputDirectory,E:\Data\FlyBowl\Test1
 # Name of file to store metadata to
 MetaDataFileName,Metadata.xml
 # Name of file to store log to
 LogFileName,Log.txt
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
-MetaData_RearingProtocols,RearingProtocol0001_Morning,RearingProtocol0002_Afternoon
-MetaData_SortingHandlingProtocols,SortingProtocol0001
-MetaData_StarvationHandlingProtocols,StarvationProtocol0001
-MetaData_ExpProtocols,ExperimentProtocol0001
+MetaData_RearingProtocols,RP0001_Incubator1.xml,RP0002_Incubator2.xml
+MetaData_HandlingProtocols,HP0001.xml
+MetaData_ExpProtocols,EP0001.xml
 MetaData_Effector,TrpA
-MetaData_RoomTemperatureSetPoint,25
+MetaData_Gender,b
+MetaData_RoomTemperatureSetPoint,29
 MetaData_RoomHumiditySetPoint,60
 # limits of y-axis for frame rate plot
 FrameRatePlotYLim,0,35
@@ -95,23 +88,29 @@ TempProbePeriod,1
 # Which channels have temperature probes
 TempProbeChannels,1,2
 # Thermocouple types
-TempProbeTypes,K,K
+TempProbeTypes,T,T
 # if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
 TempProbeReject60Hz,0
 # whether to read temperature or not
 DoRecordTemp,0
+# number of temperature and humidity samples to read from the Precon probe
+# set to 0 if no Precon sensor
+NPreconSamples,5
+# which serial port to connect to -- I have no idea how to figure this out 
+# automatically
+PreconSensorSerialPort,COM5
 # Line Names to add to the list in Sage
 ExtraLineNames,DL-wildtype
 # Log file for writing ufmf
-UFMFLogFileName,debugoutput_udcam_data1.txt
+UFMFLogFileName,ufmf_log.txt
 # Name of file to write UFMF diagnostic stats
-UFMFStatFileName,ufmfdiagnostics_data1.txt
+UFMFStatFileName,ufmf_diagnostics.txt
 # Whether to compute UFMF diagnostics
 UFMFPrintStats,1
 # number of frames between outputting per-frame compression statistics: 0 means don't print, 1 means every frame
-UFMFStatStreamPrintFreq,1
+UFMFStatStreamPrintFreq,30
 # number of frames between computing statistics of compression error. 0 means don't compute, 1 means every frame
-UFMFStatComputeFrameErrorFreq,10
+UFMFStatComputeFrameErrorFreq,30
 # whether to print information about the time each part of the computation takes
 UFMFStatPrintTimings,1
 # maximum fraction of pixels that can be foreground to try compressing frame
@@ -123,8 +122,14 @@ UFMFBGUpdatePeriod,1
 # number of seconds between spitting out a new background model
 UFMFBGKeyFramePeriod,100
 # max length of box stored during compression
-UFMFMaxBoxLength,30
+UFMFMaxBoxLength,5
 # threshold for background subtraction
-UFMFBackSubThresh,10
-# first nFramesInit will be output raw
+UFMFBackSubThresh,15
+# first nFramesInit we always update the background model
 UFMFNFramesInit,100
+# while ramping up the background model, use the following keyframe periods
+UFMFBGKeyFramePeriodInit,1,10,25,50,75
+# whether to display the video preview with the jet colormap
+ColormapPreview,1
+# whether to rotate the preview image
+DoRotatePreviewImage,1,0

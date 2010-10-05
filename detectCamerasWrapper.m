@@ -8,7 +8,6 @@ if ~isfield(handles,'DeviceIDs') || isempty(handles.DeviceIDs),
   handles.DeviceID = [];
   set(handles.popupmenu_DeviceID,'Enable','off','String','No devices found','Value',1,...
     'BackgroundColor',handles.shouldchange_bkgdcolor);
-
 else
   
   % if invalid DeviceID, choose the first DeviceID

@@ -23,7 +23,8 @@ handles.changed_bkgdcolor = 0.314 + zeros(1,3);
 handles.grayed_bkgdcolor = 0.314 + zeros(1,3);
 
 % colors for status box text
-handles.status_colors = [0,1,0;0,0,1];
+handles.status_colors = [0,1,0;0,0,1;1,0,0;1,0,0;1,0,0];
+handles.status_color_names = {'GREEN','BLUE','RED','RED','RED'};
 
 % list of fly lines read frame Sage
 handles.linename_file = 'SageLineNames.txt';
@@ -60,7 +61,7 @@ filehandlingdir = fullfile(handles.JCtraxCodeDir,'filehandling');
 if ~exist(filehandlingdir,'file')
   error('Directory %s required',filehandlingdir);
 end
-addpath(miscdir);
+addpath(filehandlingdir);
 
 
 %% delete existing imaqs and timers
@@ -127,7 +128,8 @@ try
     'UFMFStatComputeFrameErrorFreq','UFMFStatPrintTimings',...
     'UFMFMaxFracFgCompress','UFMFMaxBGNFrames','UFMFBGUpdatePeriod',...
     'UFMFBGKeyFramePeriod','UFMFMaxBoxLength','UFMFBackSubThresh',...
-    'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview'};
+    'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
+    'DoRotatePreviewImage'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -155,11 +157,15 @@ try
   end
   
   % parameters that are selected by GUI instance
-  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory','HardDriveName'};
+  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory','HardDriveName','DoRotatePreviewImage'};
   for i = 1:length(GUIInstance_params),
     fn = GUIInstance_params{i};
     j = mod(handles.GUIi-1,length(handles.params.(fn)))+1;
-    handles.params.(fn) = handles.params.(fn){j};
+    if iscell(handles.params.(fn)),
+      handles.params.(fn) = handles.params.(fn){j};
+    else
+      handles.params.(fn) = handles.params.(fn)(j);
+    end
   end
 
 catch ME
@@ -188,6 +194,7 @@ set(handles.edit_Status,'String',{});
 j = mod(handles.GUIi-1,size(handles.status_colors,1))+1;
 handles.status_color = handles.status_colors(j,:);
 set(handles.edit_Status,'ForegroundColor',handles.status_color);
+fprintf('***GUI Instance %d = %s***\n',handles.GUIi,handles.status_color_names{j});
 s = {
   sprintf('FlyBowlDataCapture v. %s',handles.version)
   '--------------------------------------'};
