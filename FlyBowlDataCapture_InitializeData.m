@@ -61,7 +61,7 @@ filehandlingdir = fullfile(handles.JCtraxCodeDir,'filehandling');
 if ~exist(filehandlingdir,'file')
   error('Directory %s required',filehandlingdir);
 end
-addpath(miscdir);
+addpath(filehandlingdir);
 
 
 %% delete existing imaqs and timers
@@ -128,7 +128,8 @@ try
     'UFMFStatComputeFrameErrorFreq','UFMFStatPrintTimings',...
     'UFMFMaxFracFgCompress','UFMFMaxBGNFrames','UFMFBGUpdatePeriod',...
     'UFMFBGKeyFramePeriod','UFMFMaxBoxLength','UFMFBackSubThresh',...
-    'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview'};
+    'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
+    'DoRotatePreviewImage'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -156,11 +157,15 @@ try
   end
   
   % parameters that are selected by GUI instance
-  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory','HardDriveName'};
+  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory','HardDriveName','DoRotatePreviewImage'};
   for i = 1:length(GUIInstance_params),
     fn = GUIInstance_params{i};
     j = mod(handles.GUIi-1,length(handles.params.(fn)))+1;
-    handles.params.(fn) = handles.params.(fn){j};
+    if iscell(handles.params.(fn)),
+      handles.params.(fn) = handles.params.(fn){j};
+    else
+      handles.params.(fn) = handles.params.(fn)(j);
+    end
   end
 
 catch ME

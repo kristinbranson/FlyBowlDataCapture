@@ -23,31 +23,43 @@ didabort = ~handles.FinishedRecording;
 
 % write the main metadata file
 fprintf(fid,'<?xml version="1.0"?>\n');
+% name of assay
 fprintf(fid,'<experiment assay="%s" ',handles.params.MetaData_AssayName);
+% start datetime
+fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,'yyyy-mm-ddTHH:MM:SS'));
+% name of experimenter
+fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 % always same experiment protocol
 fprintf(fid,'protocol="%s" ',handles.params.MetaData_ExpProtocols{1});
-fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,'yyyy-mm-ddTHH:MM:SS'));
-fprintf(fid,'aborted="%d" ',didabort);
-fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
-fprintf(fid,'shiftflytemp_time="%f" ',shift_time);
-fprintf(fid,'fliesloaded_time="%f" ',load_time);
 fprintf(fid,'>\n');
 
-fprintf(fid,'  <apparatus rig_id="%s" plate_id="%s" bowl_id="%s">\n',handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Bowl);
-fprintf(fid,'    <camera adaptor="%s" device_name="%s" format="%s" device_id="%d" unique_id="%s" />\n',...
-  handles.params.Imaq_Adaptor,...
-  handles.params.Imaq_DeviceName,...
-  handles.params.Imaq_VideoFormat,...
-  handles.DeviceID,...
-  handles.CameraUniqueID);
-fprintf(fid,'    <computer id="%s" harddrive_id="%s" output_directory="%s"/>\n',handles.ComputerName,handles.params.HardDriveName,handles.params.OutputDirectory);
+% session container
+fprintf(fid,'  <session id="1">\n');
+
+% unique id for this apparatus, composed of all the parts
+apparatusUniqueName = sprintf('Rig%s__Plate%s__Bowl%s__Camera%s__Computer%s__HardDrive%s',handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Bowl,...
+  handles.CameraUniqueID,handles.ComputerName,handles.params.HardDriveName);
+% apparatus full id and parts
+fprintf(fid,'    <apparatus id="%s" rig="%s" plate="%s" bowl="%s" camera="%s" computer="%s" harddrive="%s"/>\n',...
+  apparatusUniqueName,...
+  handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Bowl,...
+  handles.CameraUniqueID,...
+  handles.ComputerName,...
+  handles.params.HardDriveName);
+% line name
 fprintf(fid,'    <flies line="%s" ',handles.Fly_LineName);
+% effector
 fprintf(fid,'effector="%s" ',handles.params.MetaData_Effector);
+% gender
 fprintf(fid,'gender="%s" ',handles.params.MetaData_Gender); 
+% cross date
 fprintf(fid,'cross_date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyy-mm-dd'));
+% hours starved
 fprintf(fid,'hours_starved="%f" ',starvation_time);
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'count="0">\n');
+% TODO: genotype
+fprintf(fid,'      <genotype>%s &amp; w+;;%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
 
 % choose rearing protocol based on incubator ID
 i = find(strcmp(handles.Rearing_IncubatorID,handles.Rearing_IncubatorIDs),1);
@@ -55,33 +67,37 @@ fprintf(fid,'      <rearing protocol="%s" ',handles.params.MetaData_RearingProto
 fprintf(fid,'incubator="%s" ',handles.Rearing_IncubatorID);
 fprintf(fid,'/>\n');
 
-% always same sorting protocol
-fprintf(fid,'      <handling type="sorting" protocol="%s" ',handles.params.MetaData_SortingHandlingProtocols{1});
-fprintf(fid,'handler="%s" ',handles.PreAssayHandling_SortingHandler);
-fprintf(fid,'time="%f" ',sorting_time);
-fprintf(fid,'datetime="%s" ',datestr(handles.PreAssayHandling_SortingTime_datenum,'yyyy-mm-ddTHH:MM:SS'));
+% always same handling protocol
+fprintf(fid,'      <handling protocol="%s" ',handles.params.MetaData_HandlingProtocols{1});
+% person who sorted flies
+fprintf(fid,'handler_sorting="%s" ',handles.PreAssayHandling_SortingHandler);
+% time since sorting, in hours
+fprintf(fid,'hours_sorted="%f" ',sorting_time);
+% absolute datetime the flies were sorted at
+fprintf(fid,'datetime_sorting="%s" ',datestr(handles.PreAssayHandling_SortingTime_datenum,'yyyy-mm-ddTHH:MM:SS'));
+% person who moved flies to starvation material
+fprintf(fid,'handler_starvation="%s" ',handles.PreAssayHandling_StarvationHandler);
+% absolute datetime the flies were moved to starvation material
+fprintf(fid,'datetime_starvation="%s" ',datestr(handles.PreAssayHandling_StarvationTime_datenum,'yyyy-mm-ddTHH:MM:SS'));
+% seconds between bringing vials into hot temperature environment and
+% experiment start
+fprintf(fid,'seconds_shiftflytemp="%f" ',shift_time);
+% seconds between loading flies into arena and experiment start
+fprintf(fid,'seconds_fliesloaded="%f" ',load_time);
 fprintf(fid,'/>\n');
-
-% always same starvation protocol
-fprintf(fid,'      <handling type="starvation" protocol="%s" ',handles.params.MetaData_StarvationHandlingProtocols{1});
-fprintf(fid,'handler="%s" ',handles.PreAssayHandling_StarvationHandler);
-fprintf(fid,'datetime="%s" ',datestr(handles.PreAssayHandling_StarvationTime_datenum,'yyyy-mm-ddTHH:MM:SS'));
-fprintf(fid,'/>\n');
-
 fprintf(fid,'    </flies>\n');
-fprintf(fid,'    <environment temperature="%f" ',handles.MetaData_RoomTemperature);
+fprintf(fid,'  </session>\n');
+% temperature and humidity measured from precon sensor
+fprintf(fid,'  <environment temperature="%f" ',handles.MetaData_RoomTemperature);
 fprintf(fid,'humidity="%f" />\n',handles.MetaData_RoomHumidity);
-fprintf(fid,'    <note type="behavioral">%s</note>\n',handles.BehaviorNotes);
-fprintf(fid,'    <note type="technical">%s</note>\n',handles.TechnicalNotes);
-% no other note right now
-%fprintf(fid,'        <note type="other"> </note>\n');
-if ~strcmpi(handles.ReviewFlag,'None'),
-  fprintf(fid,'    <flag type="review" reason="%s"/>\n',upper(handles.ReviewFlag));
-end
-if ~strcmpi(handles.RedoFlag,'None'),
-  fprintf(fid,'    <flag type="redo" reason="%s"/>\n',upper(handles.RedoFlag));
-end
-fprintf(fid,'  </apparatus>\n');
+% notes entered
+fprintf(fid,'  <note type="behavioral">%s</note>\n',handles.BehaviorNotes);
+fprintf(fid,'  <note type="technical">%s</note>\n',handles.TechnicalNotes);
+% flags entered
+fprintf(fid,'  <flag_review>"%s"</flag_review>\n',upper(handles.ReviewFlag));
+fprintf(fid,'  <flag_redo>%s"</flag_redo>\n',upper(handles.RedoFlag));
+fprintf(fid,'  <flag_aborted>%d</flag_aborted>\n',didabort);
+
 fprintf(fid,'</experiment>\n');
 
 fclose(fid);
