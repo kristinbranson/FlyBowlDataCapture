@@ -9,7 +9,7 @@ Rearing_IncubatorIDs,1,2
 PreAssayHandling_CrossDate_Range,22,29
 # Range of Sorting Dates to show -- minimum and maximum number of days 
 # before today
-PreAssayHandling_SortingDate_Range,0,3
+PreAssayHandling_SortingDate_Range,4,7
 # List of possible Sorting Handler values
 PreAssayHandling_SortingHandlers,hirokawaj,robiea,bransonk
 # Range of Starvation Dates to show -- minimum and maximum number of days 
@@ -22,7 +22,7 @@ Assay_Rigs,1,2
 # List of possible Plate values
 Assay_Plates,01,02
 # List of possible Bowl values
-Assay_Bowls,1,2,3,4
+Assay_Bowls,A,B,C,D
 # List of possible Redo flags
 RedoFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes
 # List of possible Review flags
@@ -51,19 +51,19 @@ Imaq_Brightness,25
 #FileType,fmf
 FileType,ufmf
 # Number of seconds to record
-RecordTime,120
+RecordTime,1000
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
 gdcamPreviewFrameInterval,2
 # Directory to store video to
-OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1,D:\data2
+OutputDirectory,D:\data1,J:\data1
 # Names of hard drives, corresponding to the ordered OutputDirectory list
-HardDriveName,Internal_C,HD3
+HardDriveName,Internal_D,HD2
 # Prefix of movie file
 MovieFilePrefix,movie
 # Directory to temporarily store video to
-TmpOutputDirectory,C:\Users\labadmin\Documents\FlyBowl\tmpdata1,D:\tmpdata2
+TmpOutputDirectory,D:\tmpdata1,J:\tmpdata1
 # Name of file to store metadata to
 MetaDataFileName,Metadata.xml
 # Name of file to store log to
@@ -130,6 +130,6 @@ UFMFNFramesInit,100
 # while ramping up the background model, use the following keyframe periods
 UFMFBGKeyFramePeriodInit,1,10,25,50,75
 # whether to display the video preview with the jet colormap
-ColormapPreview,1
+ColormapPreview,0
 # whether to rotate the preview image
-DoRotatePreviewImage,1,0
+DoRotatePreviewImage,1,1
