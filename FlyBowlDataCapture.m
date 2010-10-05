@@ -54,7 +54,7 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 
 % Choose default command line output for FlyBowlDataCapture
 
-handles.DEBUG = true;
+handles.DEBUG = false;
 handles.IsProcessingError = false;
 guidata(hObject,handles);
 
@@ -123,6 +123,8 @@ end
 
 % make the line name edit box autocomplete -- must be visible
 set(handles.figure_main,'Visible','on');
+hwait = waitbar(0,'Please wait. Initializing GUI...');
+
 if ~handles.isAutoComplete_edit_Fly_LineName,
   handles.AutoCompleteEdit_Fly_LineName = ...
     AutoCompleteEdit(handles.edit_Fly_LineName,handles.Fly_LineNames,...
@@ -136,6 +138,11 @@ handles.jhedit_Status = findjobj(handles.edit_Status);
 handles.jedit_Status = handles.jhedit_Status.getComponent(0).getComponent(0);
 
 guidata(hObject,handles);
+
+hwait = waitbar(1);
+if ishandle(hwait),
+  delete(hwait);
+end
 
 % UIWAIT makes FlyBowlDataCapture wait for user response (see UIRESUME)
 uiwait(handles.figure_main);
@@ -156,6 +163,11 @@ catch ME,
     handles.IsProcessingError = true;
     guidata(hObject,handles);
   end
+  
+  if exist('hwait','var') && ishandle(hwait),
+    delete(hwait);
+  end
+  
 end
 
 function handles = LoadPreviousValues(handles)
