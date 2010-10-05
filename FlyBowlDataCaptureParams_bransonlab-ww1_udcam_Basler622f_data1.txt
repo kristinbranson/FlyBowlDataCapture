@@ -3,7 +3,7 @@ Assay_Experimenters,hirokawaj,robiea,bransonk
 # Expected number of flies
 NFlies,20
 # List of possible Incubator ID values
-Rearing_IncubatorIDs,1,2
+Rearing_IncubatorIDs,AM,PM
 # Range of Cross Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_CrossDate_Range,22,29
@@ -98,7 +98,7 @@ DoRecordTemp,1
 NPreconSamples,5
 # which serial port to connect to -- I have no idea how to figure this out 
 # automatically
-PreconSensorSerialPort,COM5
+PreconSensorSerialPort,COM1
 # Line Names to add to the list in Sage
 ExtraLineNames,DL-wildtype
 # Log file for writing ufmf
