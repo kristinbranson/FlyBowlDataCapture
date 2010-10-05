@@ -1,3 +1,4 @@
 function Stop_RecordTimer(obj, event, vid, hObject, AdaptorName) %#ok<INUSL>
 
-wrapUpVideo(vid,event,hObject,AdaptorName);
+% last parameter: we did not abort
+wrapUpVideo(vid,event,hObject,AdaptorName,false);

@@ -51,7 +51,7 @@ Imaq_Brightness,25
 #FileType,fmf
 FileType,ufmf
 # Number of seconds to record
-RecordTime,120
+RecordTime,20
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates

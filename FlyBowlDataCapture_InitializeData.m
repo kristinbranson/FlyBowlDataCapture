@@ -83,6 +83,10 @@ end
 handles.ExperimentName = '';
 handles.ExperimentDirectory = '';
 
+%% reset abort flag
+
+handles.didabort = true;
+
 %% parse parameter file
 
 % open the parameter file

@@ -1,4 +1,4 @@
-function wrapUpVideo(obj,event,hObject,AdaptorName) %#ok<INUSL>
+function wrapUpVideo(obj,event,hObject,AdaptorName,didabort) %#ok<INUSL>
 
 hwait = waitbar(0,'Closing video file. Please Wait.');
 
@@ -108,6 +108,15 @@ if ~isempty(warnings),
 end
 
 waitbar(.9);
+
+% if we did not abort, store this
+if ~didabort,
+  handles.didabort = false;
+  handles = ChangedMetaData(handles);
+end
+
+% save metadata
+handles = SaveMetaData(handles);
 
 % enable Done button
 set(handles.pushbutton_Done,'Enable','on','BackgroundColor',handles.Done_bkgdcolor,'String','Done');

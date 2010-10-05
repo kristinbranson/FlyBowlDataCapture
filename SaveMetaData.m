@@ -18,9 +18,6 @@ starvation_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandlin
 shift_time = (handles.StartRecording_Time_datenum - handles.ShiftFlyTemp_Time_datenum)*24*60*60;
 load_time = (handles.StartRecording_Time_datenum - handles.FliesLoaded_Time_datenum)*24*60*60;
 
-% was the experiment aborted
-didabort = ~handles.FinishedRecording;
-
 % write the main metadata file
 fprintf(fid,'<?xml version="1.0"?>\n');
 % name of assay
@@ -96,7 +93,7 @@ fprintf(fid,'  <note type="technical">%s</note>\n',handles.TechnicalNotes);
 % flags entered
 fprintf(fid,'  <flag_review>"%s"</flag_review>\n',upper(handles.ReviewFlag));
 fprintf(fid,'  <flag_redo>%s"</flag_redo>\n',upper(handles.RedoFlag));
-fprintf(fid,'  <flag_aborted>%d</flag_aborted>\n',didabort);
+fprintf(fid,'  <flag_aborted>%d</flag_aborted>\n',handles.didabort);
 
 fprintf(fid,'</experiment>\n');
 

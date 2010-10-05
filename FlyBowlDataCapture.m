@@ -1343,7 +1343,8 @@ end
 % stop logging
 if handles.IsRecording && isfield(handles,'vid') && isvalid(handles.vid),
   guidata(hObject,handles);
-  wrapUpVideo(handles.vid,'',hObject,handles.params.Imaq_Adaptor);
+  % last parameter: we did abort
+  wrapUpVideo(handles.vid,'',hObject,handles.params.Imaq_Adaptor,true);
   %stop(handles.vid);
   handles = guidata(hObject);
 end
