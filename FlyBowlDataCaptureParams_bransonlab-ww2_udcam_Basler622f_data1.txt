@@ -57,7 +57,7 @@ Imaq_MaxFrameRate,31
 # Shutter period
 Imaq_Shutter,100
 # Gain
-Imaq_Gain,200
+Imaq_Gain,150
 # Brightness
 Imaq_Brightness,25
 # Minimum time in between preview window updates
