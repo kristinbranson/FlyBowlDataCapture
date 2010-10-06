@@ -91,8 +91,8 @@ fprintf(fid,'humidity="%f" />\n',handles.MetaData_RoomHumidity);
 fprintf(fid,'  <note_behavioral>%s</note>\n',handles.BehaviorNotes);
 fprintf(fid,'  <note_technical>%s</note>\n',handles.TechnicalNotes);
 % flags entered
-fprintf(fid,'  <flag_review>"%s"</flag_review>\n',upper(handles.ReviewFlag));
-fprintf(fid,'  <flag_redo>%s"</flag_redo>\n',upper(handles.RedoFlag));
+fprintf(fid,'  <flag_review>%s</flag_review>\n',upper(handles.ReviewFlag));
+fprintf(fid,'  <flag_redo>%s</flag_redo>\n',upper(handles.RedoFlag));
 fprintf(fid,'  <flag_aborted>%d</flag_aborted>\n',handles.didabort);
 
 fprintf(fid,'</experiment>\n');
