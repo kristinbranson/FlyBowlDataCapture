@@ -88,8 +88,8 @@ fprintf(fid,'  </session>\n');
 fprintf(fid,'  <environment temperature="%f" ',handles.MetaData_RoomTemperature);
 fprintf(fid,'humidity="%f" />\n',handles.MetaData_RoomHumidity);
 % notes entered
-fprintf(fid,'  <note type="behavioral">%s</note>\n',handles.BehaviorNotes);
-fprintf(fid,'  <note type="technical">%s</note>\n',handles.TechnicalNotes);
+fprintf(fid,'  <note_behavioral>%s</note>\n',handles.BehaviorNotes);
+fprintf(fid,'  <note_technical>%s</note>\n',handles.TechnicalNotes);
 % flags entered
 fprintf(fid,'  <flag_review>"%s"</flag_review>\n',upper(handles.ReviewFlag));
 fprintf(fid,'  <flag_redo>%s"</flag_redo>\n',upper(handles.RedoFlag));
