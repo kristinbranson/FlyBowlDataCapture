@@ -1,0 +1,256 @@
+classdef StringValidator < BaseValidator
+    % Used for validating input strings. The list of allowed strings is set
+    % using the rangeString which can be a comma separated list of names or
+    % a speccial symbol such ass %LDAP, %LINENAME, $EFFECTOR. 
+    
+    properties
+        allowedStrings = '';
+    end
+    
+    properties (Hidden)
+        offline = true;
+        lineNames;       % Temporary
+        effectorNames;   % Temporary
+    end
+    
+    methods
+        
+        function self = StringValidator(rangeString)
+            % Class constructor.
+            if nargin > 0
+                self.setRange(rangeString);
+            end
+        end
+        
+        function setRange(self,rangeString)
+            % Parse range string to get cell array of allowed strings.
+            if isempty(rangeString)
+                % Range String is empty - this means allow anything.
+                self.allowedStrings = '';     
+            else
+                % Based on first character of range string determine is this is
+                % a list of stings or a special case
+                rangeString = strtrim(rangeString);
+                firstChar = rangeString(1);
+                switch firstChar
+                    case '$'
+                        self.setRangeSpecialCase(rangeString);
+                    otherwise
+                        self.setRangeSelectList(rangeString);
+                end
+            end
+        end
+        
+        function setRangeSelectList(self,rangeString)
+            % Parse range string for assuming it is a list of strings 
+            % speparated by commas.
+            if isempty(rangeString)
+                self.allowedStrings = '';
+            end
+            
+            % Parse range string
+            commaPos = findstr(rangeString,',');
+            stringPos = [0, commaPos, length(rangeString)+1];
+            self.allowedStrings = {};
+            for i = 1:(length(stringPos)-1)
+                n1 = stringPos(i) + 1;
+                n2 = stringPos(i+1) - 1;
+                if (n1 > n2) 
+                    if (i==length(stringPos)-1)
+                        % Allow trailing comma in list.
+                        continue
+                    else
+                        error('unable to parse range string');
+                    end
+                end
+                word = rangeString(n1:n2);
+                word = strtrim(word);
+                self.allowedStrings{i} = word;
+            end
+        end
+        
+        function setRangeSpecialCase(self,rangeString)
+            % Parse range srting for special cases.
+            switch upper(rangeString)
+                case '$LDAP'
+                    % DUMMY FUNCTION -------------------------
+                    self.allowedStrings = dummyGetLDAP();
+                    
+                case '$LINENAME'
+                    if isempty(self.lineNames)
+                        self.setLineNames();
+                    end
+                    if isempty(self.lineNames)
+                        % DUMMY FUNCTION -------------------------
+                        self.allowedStrings = dummyGetLineNames();
+                    else
+                        self.allowedStrings = self.lineNames;
+                    end
+                    
+                case '$EFFECTOR'
+                    if isempty(self.effectorNames)
+                        self.setEffectorNames();
+                    end
+                    if isempty(self.effectorNames)
+                        % DUMMY FUNCTION -------------------------
+                        self.allowedStrings = dummyGetEffectors();
+                    else
+                        self.allowedStrings = self.effectorNames;
+                    end
+                    
+                otherwise
+                    error('unknown special case range string');
+            end         
+        end
+        
+        function [value, flag, msg] = validationFunc(self,value)
+            % Apply validation function to given value.
+            
+            if isempty(value)
+                % Value is empty - return true. Only apply validatation if
+                % the user actually sets a value.
+                flag = true;
+                msg = '';
+                return;
+            end
+            
+            if isempty(self.allowedStrings)
+                % Empty allowed strings means we allow anything.
+                flag = true;
+                msg = '';
+                return;
+            end
+            
+            % Check that value is in allow strings.
+            flag = false;
+            msg = 'validation error: sting not found';
+            for i = 1:length(self.allowedStrings)
+                if strcmp(value,self.allowedStrings{i})
+                    flag = true;
+                end
+            end
+        end
+        
+        function value = getValidValue(self)
+            % Return a valid value. If allowedStrings is empty any string
+            % is allowed so we just return the empty string. Otherwise the
+            % first string in the list of allowed values is returned.
+            if isempty(self.allowedStrings)
+                value = '';
+            else
+                value = self.allowedStrings{1};
+            end
+        end
+        
+        function numValues = getNumValues(self)
+            % Return number of possible values
+           if self.isFiniteRange() == true
+               numValues = length(self.allowedStrings);
+           else
+               numValues = Inf;
+           end
+        end
+        
+        function valueArray = getValues(self)
+            % Returns valid values or empty array 
+            if self.isFiniteRange() == true
+                valueArray = self.allowedStrings;
+            else
+                valueArray = {};
+            end
+        end
+        
+        function test = isFiniteRange(self)
+            % Returns true if there is finite list of allowed strings.
+            if isempty(self.allowedStrings)
+                test = false;
+            else
+                test = true;
+            end
+        end
+        
+        function setLineNames(self)
+            % Test function for pre-loading line names from SAGE.
+            if self.offline == true;
+                self.lineNames = {};
+                return;
+            end
+            try
+                lines = SAGE.Lab('rubin').lines();
+                self.lineNames = {lines.name};
+            catch ME
+                warning( ...
+                    'StringValidator:getLineNames', ...
+                    'error loading line names form SAGE, %s', ...
+                    ME.message ...
+                    );
+                self.lineNames = {};
+            end
+        end
+        
+        function setEffectorNames(self)
+            % Test function for preloading effector names from SAGE.
+           if self.offline == true
+               self.effectorNames = {};
+               return;
+           end
+           try
+               terms = SAGE.CV('effector').terms();
+               self.effectorNames = {terms.name};
+           catch ME
+               warning('StringValidator:getEffectorNames', ...
+                   'error loading effector names from SAGE, %s', ...
+                   ME.message ...
+                   );
+               self.effectorNames = {};
+           end
+            
+        end
+    end
+end
+
+% Dummy functions for development -----------------------------------------
+function names = dummyGetLDAP()
+% Dummy function for getting LDAP names.
+names = {'andersond'
+  'bransonk'
+  'cardg'
+  'chenn'
+  'groverd'
+  'hirokawaj'
+  'hoopfere'
+  'kimmelb'
+  'korffw'
+  'lows'
+  'robertss'
+  'rowellw'
+  'robiea'
+  'reiserm'
+  'simpsonj'
+  'straussr'
+  'triphant'
+  'guest'};
+end
+
+% -------------------------------------------------------------------------
+function names = dummyGetLineNames()
+% Dummy function for getting line names
+names = {};
+N = 1000;
+for i = 1:N
+    names{i} = sprintf('line_%d', i);
+end
+names{N+1} = 'dummyline';
+
+end
+
+% -------------------------------------------------------------------------
+function names = dummyGetEffectors()
+% Dummy function for getting line names
+names = {};
+N = 100;
+for i = 1:N
+    names{i} = sprintf('effector_%d', i);
+end
+names{N+1} = 'dummyeffector';
+end
