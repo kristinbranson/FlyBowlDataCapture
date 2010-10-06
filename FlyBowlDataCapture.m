@@ -972,6 +972,9 @@ handles = unsetCamera(handles);
 
 CloseQuickStatsFigures(handles);
 
+% record configuration
+handles = RecordConfiguration(handles);
+
 guidata(hObject,handles);
 
 function CloseQuickStatsFigures(handles)
@@ -1315,6 +1318,8 @@ if didcancel,
 end
 handles = DisableGUI(handles);
 CloseQuickStatsFigures(handles);
+% record configuration
+handles = RecordConfiguration(handles);
 
 guidata(hObject,handles);
 
