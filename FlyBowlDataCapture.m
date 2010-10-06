@@ -981,10 +981,10 @@ function CloseQuickStatsFigures(handles)
 
 % delete quick stats figure
 if isfield(handles,'QuickStats'),
-  if ishandle(handles.QuickStats.fig),
+  if isfield(handles.QuickStats,'fig') && ishandle(handles.QuickStats.fig),
     delete(handles.QuickStats.fig);
   end
-  if ishandle(handles.QuickStats.showufmf_handle),
+  if isfield(handles.QuickStats,'showufmf_handle') && ishandle(handles.QuickStats.showufmf_handle),
     delete(handles.QuickStats.showufmf_handle);
   end
 end
