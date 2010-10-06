@@ -1,5 +1,7 @@
 function success = TempProbe_GrabTemp(obj,event,hObject) %#ok<INUSL>
 
+try
+
 success = false;
 handles = guidata(hObject);
 if handles.params.DoRecordTemp == 0,
@@ -11,6 +13,11 @@ try
     addToStatus(handles,sprintf('Error opening file %s to read temperature data',handles.TempProbe_ChannelFileName));
     guidata(hObject,handles);
     return;
+  end
+  % make sure fid is valid
+  [filename,permission] = fopen(fid);
+  if isempty(filename) || isempty(permission),
+    addToStatus(handles,sprintf('Invalid temperature probe semaphore fid %d for file %s',fid,handles.TempProbe_ChannelFileName));
   end
   [data,count] = fscanf(fid,'%f',3);
   fclose(fid);
@@ -31,6 +38,9 @@ overflow = data(3);
 if overflow,
   temp = nan;
 end
+if(handles.Status_Temp_History(1,end-5) == timestamp)
+  addToStatus(handles,'No change in temperature over past 5 samples');
+end
 handles.Status_Temp_History(:,1) = [];
 handles.Status_Temp_History(:,end+1) = [timestamp;temp];
 %fprintf('Read: timestamp = %s, temp = %f\n',datestr(timestamp,13),temp);
@@ -43,8 +53,19 @@ if handles.IsRecording,
   end
   if ~isfield(handles,'TempFid'),
     addToStatus(handles,{'TempFid not yet set. Skipping.'});
+  elseif handles.TempFid <= 0,
+    addToStatus(handles,sprintf('Temperature Fid = %d is invalid',handles.TempFid));
   else
-    fprintf(handles.TempFid,'%f,%f\n',timestamp,temp);
+    [filename,permission] = fopen(handles.TempFid);
+    if isempty(filename) || isempty(permission),
+      addToStatus(handles,sprintf('Temperature Fid = %d is invalid',handles.TempFid));
+    else
+      try
+        fprintf(handles.TempFid,'%f,%f\n',timestamp,temp);
+      catch ME,
+        addToStatus(handles,{'Error writing temperature to file',getReport(ME,'extended','hyperlinks','off')});
+      end
+    end
   end
 end
 guidata(handles.figure_main,handles);
@@ -53,3 +74,11 @@ set(handles.hLine_Status_Temp,'XData',handles.Status_Temp_History(1,:)-handles.S
 drawnow;
 
 success = true;
+
+catch ME
+  
+  getReport(ME)
+  addToStatus(handles,{'Error grabbing temperature',getReport(ME,'extended','hyperlinks','off')});
+  rethrow(ME);
+  
+end

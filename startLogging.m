@@ -30,13 +30,17 @@ handles.TempFid = -1;
 if handles.params.DoRecordTemp ~= 0,
   try
     handles.TempFid = fopen(handles.TempFileName,'w');
-  catch
+  catch ME,
+    addToStatus(handles,{sprintf('Error opening temperature file %s',handles.TempFileName),...
+      getReport(ME,'basic','hyperlinks','off')});
   end
   if handles.TempFid <= 0,
     s = sprintf('Could not open temperature file %s',handles.TempFileName);
+    addToStatus(handles,s);
     uiwait(errordlg(s,'Error opening temperature file'));
     error(s);
   end
+  addToStatus(handles,sprintf('Opened temperature file %s for writing',handles.TempFileName));
 end
 
 % number of frames written
