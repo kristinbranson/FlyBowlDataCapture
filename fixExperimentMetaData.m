@@ -46,7 +46,7 @@ DefaultsTree = loadXMLDefaultsTree(DefaultsFileName);
 
 DataTree.walk(@TrySet);
 
-basicMetaDataDlg(DefaultsTree);
+basicMetaDataDlg(DefaultsTree,'basic',MetaDataFileName);
 
 success = true;
 
