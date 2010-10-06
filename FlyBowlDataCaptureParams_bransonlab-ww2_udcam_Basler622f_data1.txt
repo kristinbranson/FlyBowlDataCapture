@@ -1,3 +1,22 @@
+# Camera adaptor
+Imaq_Adaptor,dcam
+#Imaq_Adaptor,udcam
+# Video format
+Imaq_VideoFormat,F7_Y8_1280x1024
+#Imaq_VideoFormat,Format 7, Mode 0
+# Video file type
+FileType,fmf
+#FileType,ufmf
+# Number of seconds to record
+RecordTime,500
+# Directory to store video to
+OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1,D:\data1
+# Names of hard drives, corresponding to the ordered OutputDirectory list
+HardDriveName,Internal_C,HD1
+# Prefix of movie file
+MovieFilePrefix,movie
+# Directory to temporarily store video to
+TmpOutputDirectory,C:\Users\labadmin\Documents\FlyBowl\tmpdata1,D:\tmpdata1
 # List of possible Experimenter values
 Assay_Experimenters,hirokawaj,robiea,bransonk
 # Expected number of flies
@@ -27,14 +46,8 @@ Assay_Bowls,A,B,C,D
 RedoFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes
 # List of possible Review flags
 ReviewFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes
-# Camera adaptor
-#Imaq_Adaptor,dcam
-Imaq_Adaptor,udcam
 # Device name
 Imaq_DeviceName,A622f
-# Video format
-#Imaq_VideoFormat,F7_Y8_1280x1024
-Imaq_VideoFormat,Format 7, Mode 0
 # Video ROI Position
 Imaq_ROIPosition,0,0,1024,1024
 # Frame rate we expect
@@ -47,23 +60,10 @@ Imaq_Shutter,100
 Imaq_Gain,200
 # Brightness
 Imaq_Brightness,25
-# Video file type
-#FileType,fmf
-FileType,ufmf
-# Number of seconds to record
-RecordTime,1000
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
 gdcamPreviewFrameInterval,2
-# Directory to store video to
-OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1,D:\data1
-# Names of hard drives, corresponding to the ordered OutputDirectory list
-HardDriveName,Internal_C,HD1
-# Prefix of movie file
-MovieFilePrefix,movie
-# Directory to temporarily store video to
-TmpOutputDirectory,C:\Users\labadmin\Documents\FlyBowl\tmpdata1,D:\tmpdata1
 # Name of file to store metadata to
 MetaDataFileName,Metadata.xml
 # Name of file to store log to
