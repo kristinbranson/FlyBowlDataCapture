@@ -41,6 +41,8 @@ handles.TempProbe_timer=timer('ExecutionMode','FixedRate',...
   'StartDelay',1,...
   'Name','FBDC_USBTC08_Timer');
 
+addToStatus(handles,'Initialized temperature probe timer');
+
 handles.TempProbe_IsInitialized = true;
 
 guidata(handles.figure_main,handles);
