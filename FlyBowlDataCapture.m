@@ -1289,6 +1289,7 @@ function menu_File_New_Callback(hObject, eventdata, handles)
 if handles.GUIIsInitialized,
   handles = CloseExperiment(handles);
 end
+CloseQuickStatsFigures(handles);
 
 guidata(hObject,handles);
 
