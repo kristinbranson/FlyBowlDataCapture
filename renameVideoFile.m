@@ -57,34 +57,36 @@ if handles.params.DoRecordTemp ~= 0,
   end
 end
 
-oldfilename = handles.TmpUFMFLogFileName;
-newfilename = fullfile(handles.ExperimentDirectory,handles.params.UFMFLogFileName);
-[success,msg] = renamefile(oldfilename,newfilename);
-if success,
-  %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
-  handles.params.UFMFLogFileName = newfilename;
-  %fprintf('Renamed successfully\n');
-else
-  s = {sprintf('UFMF log temporarily stored to %s. ',oldfilename),...
-    sprintf('Could not rename %s to %s. ',oldfilename,newfilename),...
-    msg};
-  uiwait(errordlg(s,'Error renaming UFMF log file'));
-  addToStatus(handles,s);
-  warning(cell2mat(s));
-end
+if strcmpi(handles.params.FileType,'ufmf'),
+  oldfilename = handles.TmpUFMFLogFileName;
+  newfilename = fullfile(handles.ExperimentDirectory,handles.params.UFMFLogFileName);
+  [success,msg] = renamefile(oldfilename,newfilename);
+  if success,
+    %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
+    handles.params.UFMFLogFileName = newfilename;
+    %fprintf('Renamed successfully\n');
+  else
+    s = {sprintf('UFMF log temporarily stored to %s. ',oldfilename),...
+      sprintf('Could not rename %s to %s. ',oldfilename,newfilename),...
+      msg};
+    uiwait(errordlg(s,'Error renaming UFMF log file'));
+    addToStatus(handles,s);
+    warning(cell2mat(s));
+  end
 
-oldfilename = handles.TmpUFMFStatFileName;
-newfilename = fullfile(handles.ExperimentDirectory,handles.params.UFMFStatFileName);
-[success,msg] = renamefile(oldfilename,newfilename);
-if success,
-  %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
-  handles.UFMFStatFileName = newfilename;
-  %fprintf('Renamed successfully\n');
-else
-  s = {sprintf('UFMF diagnostics temporarily stored to %s. ',oldfilename),...
-    sprintf('Could not rename %s to %s. ',oldfilename,newfilename),...
-    msg};
-  uiwait(errordlg(s,'Error renaming UFMF diagnostics file'));
-  addToStatus(handles,s);
-  warning(cell2mat(s));
+  oldfilename = handles.TmpUFMFStatFileName;
+  newfilename = fullfile(handles.ExperimentDirectory,handles.params.UFMFStatFileName);
+  [success,msg] = renamefile(oldfilename,newfilename);
+  if success,
+    %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
+    handles.UFMFStatFileName = newfilename;
+    %fprintf('Renamed successfully\n');
+  else
+    s = {sprintf('UFMF diagnostics temporarily stored to %s. ',oldfilename),...
+      sprintf('Could not rename %s to %s. ',oldfilename,newfilename),...
+      msg};
+    uiwait(errordlg(s,'Error renaming UFMF diagnostics file'));
+    addToStatus(handles,s);
+    warning(cell2mat(s));
+  end
 end

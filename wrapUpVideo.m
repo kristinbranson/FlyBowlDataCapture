@@ -98,13 +98,15 @@ setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
 waitbar(.7);
 
 % show some simple statistics
-[handles.QuickStats,success,errmsg,warnings] = computeQuickStats(handles.ExperimentDirectory,...
-  handles.ComputeQuickStatsParams{:});
-if ~success,
-  addToStatus(handles,sprintf('Error computing quick statistics: %s',errmsg));
-end
-if ~isempty(warnings),
-  addToStatus(handles,[{'Warnings computing quick statistics:'},warnings]);
+if strcmpi(handles.params.FileType,'ufmf'),
+  [handles.QuickStats,success,errmsg,warnings] = computeQuickStats(handles.ExperimentDirectory,...
+    handles.ComputeQuickStatsParams{:});
+  if ~success,
+    addToStatus(handles,sprintf('Error computing quick statistics: %s',errmsg));
+  end
+  if ~isempty(warnings),
+    addToStatus(handles,[{'Warnings computing quick statistics:'},warnings]);
+  end
 end
 
 waitbar(.9);
