@@ -55,7 +55,7 @@ Imaq_MaxFrameRate,31
 # Shutter period
 Imaq_Shutter,100
 # Gain
-Imaq_Gain,200
+Imaq_Gain,150
 # Brightness
 Imaq_Brightness,25
 # Minimum time in between preview window updates
@@ -130,6 +130,6 @@ UFMFNFramesInit,100
 # while ramping up the background model, use the following keyframe periods
 UFMFBGKeyFramePeriodInit,1,10,25,50,75
 # whether to display the video preview with the jet colormap
-ColormapPreview,0
+ColormapPreview,1
 # whether to rotate the preview image
 DoRotatePreviewImage,1,1
