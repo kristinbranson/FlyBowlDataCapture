@@ -57,6 +57,8 @@ success = true;
       try
         node = DefaultsTree.getNodeByPathString(PathString);
         node.setContent(DataNode.content);
+        node.children(1).value = DataNode.content;
+        %node.value = DataNode.content;
       catch ME,
         s = [sprintf('Could not set %s.content to %s: ',PathString,any2string(DataNode.content)),getReport(ME,'basic','hyperlinks','off')]; 
         warning(s);
