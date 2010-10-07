@@ -970,6 +970,15 @@ end
 handles = resetTempProbe(handles);
 handles = unsetCamera(handles);
 
+successfilename = fullfile(handles.ExperimentDirectory,'SUCCESS');
+try
+  fid = fopen(successfilename,'w');
+  fprintf(fid,datestr(now,30));
+  fclose(fid);
+catch ME
+  addToStatus(handles,{'Could not create success file',getReport(ME,'basic','hyperlinks','off')});
+end
+
 CloseQuickStatsFigures(handles);
 
 % record configuration
