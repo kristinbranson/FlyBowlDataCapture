@@ -57,12 +57,6 @@ if isfield(handles.params,'Imaq_Shutter') && handles.params.Imaq_Shutter > 0 && 
   set(handles.vid.source,'Shutter',handles.params.Imaq_Shutter);
 end
 
-% set gain if possible and necessary
-if isfield(handles.params,'Imaq_Gain') && handles.params.Imaq_Gain > 0 && ...
-    any(strcmpi(srcparamnames,'Gain')),
-  set(handles.vid.source,'Gain',handles.params.Imaq_Gain);
-end
-
 % set shutter period if possible and necessary
 if isfield(handles.params,'Imaq_Brightness') && handles.params.Imaq_Brightness > 0 && ...
     any(strcmpi(srcparamnames,'Brightness')),
@@ -193,6 +187,14 @@ PreviewParams.DoRotatePreviewImage = handles.params.DoRotatePreviewImage;
 setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
 
 preview(handles.vid, handles.hImage_Preview); 
+
+% gain needs to be set after preview for some reason?
+% set gain if possible and necessary
+if isfield(handles.params,'Imaq_Gain') && handles.params.Imaq_Gain > 0 && ...
+    any(strcmpi(srcparamnames,'Gain')),
+  set(handles.vid.source,'Gain',handles.params.Imaq_Gain);
+end
+
 handles.IsCameraInitialized = true;
 
 % set up timer to check if preview is not being updated
