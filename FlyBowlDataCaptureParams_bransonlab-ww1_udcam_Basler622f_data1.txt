@@ -1,14 +1,22 @@
 # Camera adaptor
-Imaq_Adaptor,dcam
-#Imaq_Adaptor,udcam
+#Imaq_Adaptor,dcam
+Imaq_Adaptor,udcam
 # Video format
-Imaq_VideoFormat,F7_Y8_1280x1024
-#Imaq_VideoFormat,Format 7, Mode 0
+#Imaq_VideoFormat,F7_Y8_1280x1024
+Imaq_VideoFormat,Format 7, Mode 0
 # Video file type
-FileType,fmf
-#FileType,ufmf
+#FileType,fmf
+FileType,ufmf
 # Number of seconds to record
-RecordTime,500
+RecordTime,1000
+# whether to display the video preview with the jet colormap
+ColormapPreview,0
+# Shutter period
+Imaq_Shutter,100
+# Gain
+Imaq_Gain,170
+# Brightness
+Imaq_Brightness,25
 # Directory to store video to
 OutputDirectory,D:\data1,J:\data1
 # Directory to temporarily store video to
@@ -52,12 +60,6 @@ Imaq_ROIPosition,0,0,1024,1024
 Imaq_FrameRate,30.4
 # Maximum frame rate we will get
 Imaq_MaxFrameRate,31
-# Shutter period
-Imaq_Shutter,100
-# Gain
-Imaq_Gain,150
-# Brightness
-Imaq_Brightness,25
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
@@ -129,7 +131,5 @@ UFMFBackSubThresh,15
 UFMFNFramesInit,100
 # while ramping up the background model, use the following keyframe periods
 UFMFBGKeyFramePeriodInit,1,10,25,50,75
-# whether to display the video preview with the jet colormap
-ColormapPreview,1
 # whether to rotate the preview image
 DoRotatePreviewImage,1,1
