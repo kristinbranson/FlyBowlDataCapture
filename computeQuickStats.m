@@ -8,11 +8,13 @@ warnings = {};
 UFMFDiagnosticsFileStr = 'ufmf_diagnostics.txt';
 % name of video
 MovieFileStr = 'movie.ufmf';
+% name of temperature stream
+TemperatureFileStr = 'temperature.txt';
 % streams to plot
 UFMFStreamFns = {'bytes','nForegroundPx','nPxWritten','nFramesBuffered','nFramesDropped','FPS',...
-  'meanPixelError','maxPixelError','maxFilterError'};
+  'meanPixelError','maxPixelError','maxFilterError','Temperature'};
 % number of subplot columns
-UFMFStream_nc = 3;
+UFMFStream_nc = 5;
 % for auto-setting axis limits
 UFMFStreamXLimExtra = .01;
 UFMFStreamYLimExtra = .05;
@@ -33,7 +35,7 @@ SaveFileStr = '';
 SaveDataStr = '';
 
 % summaries to show
-UFMFSummaryFns = {'nFrames','nFramesDroppedTotal','nFramesUncompressed','nUpdateBackgroundCalls','nWriteKeyFrameCalls','ImageWidth','ImageHeight'};
+UFMFSummaryFns = {'nFrames','nFramesDroppedTotal','nFramesUncompressed','nUpdateBackgroundCalls','nWriteKeyFrameCalls','ImageWidth','ImageHeight','nTemperatureReadings'};
 UFMFSummaryStatFns = {'FPS','CompressionRate','NForegroundPx','NPxWritten','MeanPixelError','MaxPixelError','MaxFilterError'};
 
 % bkgd scan lines to plot
@@ -48,7 +50,7 @@ BackSubMinCCArea = 5;
 BackSubCloseRadius = 2;
 
 [GUIi,fig,FigPos,...
-  UFMFDiagnosticsFileStr,MovieFileStr,...
+  UFMFDiagnosticsFileStr,MovieFileStr,TemperatureFileStr,...
   UFMFStreamFns,UFMFStreamMu,UFMFStreamSig,...
   UFMFStream_nc,UFMFStreamYLim,UFMFStreamXLim,...
   parent,SigColor,MuColor,DataColor,...
@@ -63,6 +65,7 @@ BackSubCloseRadius = 2;
   'FigPos',[],...
   'UFMFDiagnosticsFileStr',UFMFDiagnosticsFileStr,...
   'MovieFileStr',MovieFileStr,...
+  'TmperatureFileStr',TemperatureFileStr,...
   'UFMFStreamFns',UFMFStreamFns,...
   'UFMFStreamMu',UFMFStreamMu,...
   'UFMFStreamSig',UFMFStreamSig,...
@@ -170,8 +173,40 @@ MovieFile = fullfile(expdir,MovieFileStr);
 if nframes ~= UFMFStats.summary.nFrames,
   warnings{end+1} = sprintf('Number of frames read from movie (%d) does not equal number of frames recorded in UFMF Stats (%d)',nframes,UFMFStats.summary.nFrames);
 end
+
+[UFMFStats,success1,errmsg] = readUFMFDiagnostics(UFMFDiagnosticsFileName);
+out.UFMFStats = UFMFStats;
+if ~success1,
+  return;
+end
+
 UFMFStats.summary.ImageHeight = headerinfo.max_height;
 UFMFStats.summary.ImageWidth = headerinfo.max_width;
+
+
+% read temperature stream
+TemperatureFileName = fullfile(expdir,TemperatureFileStr);
+data = [];
+if ~exist(TemperatureFileName,'file'),
+  warnings{end+1} = sprintf('Temperature stream file %s does not exist',TemperatureFileName);
+else
+  try
+    data = importdata(TemperatureFileName,',');
+  catch ME,
+    warnings{end+1} = sprintf('Error importing temperature stream: %s',getReport(ME,'basic','hyperlinks','off'));
+  end
+end
+if isempty(data),
+  tempTimestamp = [];
+  temp = [];
+elseif size(data,2) < 2,
+  warnings{end+1} = 'Temperature data could not be read';
+  tempTimestamp = [];
+  temp = [];
+else
+  tempTimestamp = data(:,1);
+  temp = data(:,2);
+end
 
 %% Compute background model
 
@@ -247,6 +282,33 @@ BackSubStatFns = {'NConnComps','BlobArea'};
 %% done with the movie file
 
 fclose(fid);
+
+%% add temperature to existing structs
+
+UFMFStats.summary.nTemperatureReadings = length(temp);
+if isempty(temp),
+  BackSubStats.meanTemperature = nan;
+  BackSubStats.minTemperature = nan;
+  BackSubStats.maxTemperature = nan;
+  BackSubStats.stdTemperature = nan;
+  BackSubStats.meanTemperaturePeriod = nan;
+  BackSubStats.minTemperaturePeriod = nan;
+  BackSubStats.maxTemperaturePeriod = nan;
+  BackSubStats.stdTemperaturePeriod = nan;
+else
+  BackSubStats.meanTemperature = mean(temp);
+  BackSubStats.minTemperature = min(temp);
+  BackSubStats.maxTemperature = max(temp);
+  BackSubStats.stdTemperature = std(temp,1);
+  dt = diff(tempTimestamp);
+  BackSubStats.meanTemperaturePeriod = mean(dt);
+  BackSubStats.minTemperaturePeriod = min(dt);
+  BackSubStats.maxTemperaturePeriod = max(dt);
+  BackSubStats.stdTemperaturePeriod = std(dt,1);
+end
+
+UFMFStats.stream.Temperature = [temp';tempTimestamp'];
+BackSubStatFns(end+1:end+2) = {'Temperature','TemperaturePeriod'};
 
 %% Statistics table: collect data
 % make a table for now
@@ -460,6 +522,7 @@ htable2 = uitable(fig,'Units','Pixels','Position',TablePos2,...
 
 isbot = false(UFMFStream_nr,UFMFStream_nc);
 isbot(end,:) = true;
+x0 = UFMFStats.stream.timestamp(1);
 x = UFMFStats.stream.timestamp(:)';
 x = x - x(1);
 if isempty(UFMFStreamXLim),
@@ -467,7 +530,7 @@ if isempty(UFMFStreamXLim),
 end
 for i = 1:nUFMFStreamFns,
   fn = UFMFStreamFns{i};
-  
+
   % plot standard deviation
   if isfield(UFMFStreamSig,fn) && isfield(UFMFStreamMu,fn),
     y = UFMFStreamMu.(fn)(:)';
@@ -480,8 +543,14 @@ for i = 1:nUFMFStreamFns,
     hold(StreamAx(i),'on');
   end
   
-  y = UFMFStats.stream.(fn);
-  plot(StreamAx(i),x,y,'.-','Color',DataColor);
+  if size(UFMFStats.stream.(fn),1) == 2,
+    xcurr = UFMFStats.stream.(fn)(2,:) - UFMFStats.stream.(fn)(2,1);
+  else
+    xcurr = x;
+  end
+  
+  y = UFMFStats.stream.(fn)(1,:);
+  plot(StreamAx(i),xcurr,y,'.-','Color',DataColor);
   if ~isfield(UFMFStreamYLim,fn),
     miny = min(y);
     maxy = max(y);
@@ -627,3 +696,4 @@ out.showufmf_handle = showufmf('UFMFName',MovieFile,'BackSubThresh',BackSubThres
 
 %% succeeded
 success = true;
+out.UFMFStats = UFMFStats;
