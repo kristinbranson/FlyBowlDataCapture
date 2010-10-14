@@ -1,22 +1,32 @@
-# Camera adaptor
-Imaq_Adaptor,dcam
-#Imaq_Adaptor,udcam
-# Video format
-Imaq_VideoFormat,F7_Y8_1280x1024
-#Imaq_VideoFormat,Format 7, Mode 0
-# Video file type
-FileType,fmf
-#FileType,ufmf
-# Number of seconds to record
-RecordTime,500
 # Directory to store video to
-OutputDirectory,C:\Users\labadmin\Documents\FlyBowl\data1,D:\data1
+OutputDirectory,D:\data,J:\data
+#OutputDirectory,D:\debug_data,J:\debug_data
+#OutputDirectory,D:\special_data,J:\special_data
+# Directory to temporarily store video to
+TmpOutputDirectory,D:\tmpdata,J:\tmpdata
 # Names of hard drives, corresponding to the ordered OutputDirectory list
-HardDriveName,Internal_C,HD1
+HardDriveName,Internal_D,HD1
+# Camera adaptor
+#Imaq_Adaptor,dcam
+Imaq_Adaptor,udcam
+# Video format
+#Imaq_VideoFormat,F7_Y8_1280x1024
+Imaq_VideoFormat,Format 7, Mode 0
+# Video file type
+#FileType,fmf
+FileType,ufmf
+# Number of seconds to record
+RecordTime,1000
+# whether to display the video preview with the jet colormap
+ColormapPreview,0
+# Shutter period
+Imaq_Shutter,100
+# Gain
+Imaq_Gain,170
+# Brightness
+Imaq_Brightness,25
 # Prefix of movie file
 MovieFilePrefix,movie
-# Directory to temporarily store video to
-TmpOutputDirectory,C:\Users\labadmin\Documents\FlyBowl\tmpdata1,D:\tmpdata1
 # List of possible Experimenter values
 Assay_Experimenters,hirokawaj,robiea,bransonk
 # Expected number of flies
@@ -30,7 +40,7 @@ PreAssayHandling_CrossDate_Range,22,29
 # before today
 PreAssayHandling_SortingDate_Range,3,7
 # List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,hirokawaj,robiea,bransonk
+PreAssayHandling_SortingHandlers,hirokawaj,robiea,bransonk,chenn
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
@@ -43,9 +53,9 @@ Assay_Plates,01,02
 # List of possible Bowl values
 Assay_Bowls,A,B,C,D
 # List of possible Redo flags
-RedoFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes
+RedoFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes,See both notes
 # List of possible Review flags
-ReviewFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes
+ReviewFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes,See both notes
 # Device name
 Imaq_DeviceName,A622f
 # Video ROI Position
@@ -54,12 +64,6 @@ Imaq_ROIPosition,0,0,1024,1024
 Imaq_FrameRate,30.4
 # Maximum frame rate we will get
 Imaq_MaxFrameRate,31
-# Shutter period
-Imaq_Shutter,100
-# Gain
-Imaq_Gain,150
-# Brightness
-Imaq_Brightness,25
 # Minimum time in between preview window updates
 PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
@@ -129,7 +133,5 @@ UFMFBackSubThresh,15
 UFMFNFramesInit,100
 # while ramping up the background model, use the following keyframe periods
 UFMFBGKeyFramePeriodInit,1,10,25,50,75
-# whether to display the video preview with the jet colormap
-ColormapPreview,0
 # whether to rotate the preview image
 DoRotatePreviewImage,0,0
