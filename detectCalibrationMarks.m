@@ -5,8 +5,12 @@ function [registerfn,offX,offY,offTheta,scale,calibrationPoints,bowlMarkerPoints
   nTopCalibrationPoints,nBottomCalibrationPoints] = ...
   detectCalibrationMarks(varargin)
 
-[bkgdImage,movieName,bkgdNSampleFrames,diskFilterRadius,...
-  minFeatureStrengthLow,minFeatureStrengthHigh,...
+%% parse inputs
+
+[bkgdImage,movieName,annName,bkgdNSampleFrames,...
+  method,...
+  crossFilterRadius,nRotations,minCrossFeatureStrength,...
+  diskFilterRadius,minFeatureStrengthLow,minFeatureStrengthHigh,...
   minDistCenterFrac,maxDistCenterFrac,...
   maxDistCornerFrac_BowlLabel,...
   nCalibrationPoints,featureRadius,...
@@ -15,17 +19,24 @@ function [registerfn,offX,offY,offTheta,scale,calibrationPoints,bowlMarkerPoints
   bowlMarkerPairTheta_true,...
   maxDThetaBowlMarkerPair,...
   markerPairAngle_true,...
-  DEBUG] = ...
+  DEBUG,...
+  calibrationData,...
+  nr,nc] = ...
   myparse(varargin,...
   'bkgdImage',[],...
   'movieName','',...
+  'annName','',...
   'bkgdNSampleFrames',10,...
+  'method','normcorr',...
+  'crossFilterRadius',9,...
+  'nRotations',20,...
+  'minCrossFeatureStrength',.92,...
   'diskFilterRadius',11,...
   'minFeatureStrengthLow',20,...
   'minFeatureStrengthHigh',30,...
   'minDistCenterFrac',.5,...
   'maxDistCenterFrac',.57,...
-  'maxDistCornerFrac_BowlLabel',.14,...
+  'maxDistCornerFrac_BowlLabel',.17,...
   'nCalibrationPoints',8,...
   'featureRadius',25,...
   'maxDThetaMate',10*pi/180,...
@@ -33,14 +44,95 @@ function [registerfn,offX,offY,offTheta,scale,calibrationPoints,bowlMarkerPoints
   'bowlMarkerPairTheta_true',-3*pi/4,...
   'maxDThetaBowlMarkerPair',pi/12,...
   'markerPairAngle_true',pi/6,...
-  'debug',false);
+  'debug',false,...
+  'calibrationData',[],...
+  'nr',[],'nc',[]);
 
-if isempty(bkgdImage),
+%% return register function
+
+if ~isempty(calibrationData),
+  offX = calibrationData.offX;
+  offY = calibrationData.offY;
+  offTheta = calibrationData.offTheta;
+  scale = calibrationData.scale;
+  registerfn = @(x,y) register(x,y,offX,offY,offTheta,scale);
+  if isfield(calibrationData,'calibrationPoints'),
+    calibrationPoints = calibrationData.calibrationPoints;
+  end
+  if isfield(calibrationData,'bowlMarkerPoints'),
+    bowlMarkerPoints = calibrationData.bowlerMarkerPoints;
+  end
+  if isfield(calibrationData,'featureStrengths'),
+    featureStrengths = calibrationData.featureStrengths;
+  end
+  if isfield(calibrationData,'bowlMarkerTheta'),
+    bowlMarkerTheta = calibrationData.bowlMarkerTheta;
+  end
+  if isfield(calibrationData,'dtheta'),
+    dtheta = calibrationData.dtheta;
+  end
+  if isfield(calibrationData,'bkgdImage'),
+    bkgdImage = calibrationData.bkgdImage;
+  end
+  if isfield(calibrationData,'nPairs'),
+    nPairs = calibrationData.nPairs;
+  end
+  if isfield(calibrationData,'nLeftCalibrationPoints'),
+    nLeftCalibrationPoints = calibrationData.nLeftCalibrationPoints;
+  end
+  if isfield(calibrationData,'nRightCalibrationPoints'),
+    nRightCalibrationPoints = calibrationData.nRightCalibrationPoints;
+  end
+  if isfield(calibrationData,'nTopCalibrationPoints'),
+    nTopCalibrationPoints = calibrationData.nTopCalibrationPoints;
+  end
+  if isfield(calibrationData,'nBottomCalibrationPoints'),
+    nBottomCalibrationPoints = calibrationData.nBottomCalibrationPoints;
+  end
+  return;
+end
+
+%% get background image
+
+isBkgdImage = ~isempty(bkgdImage);
+
+if ~isBkgdImage && ~isempty(annName),
+  if ~exist(annName,'file'),
+    error('Ann file %s does not exist',annName);
+  end
+  % try reading 
+  [bkgdImage,bkgdMed,bkgdMean,bg_algorithm,movie_height,movie_width] = ...
+    read_ann(annName,'background_center',...
+    'background_median','background_mean','bg_algorithm',...
+    'movie_height','movie_width');
+  if isempty(bkgdImage),
+    if strcmpi(bg_algorithm,'median'),
+      bkgdImage = bkgdMed;
+    else
+      bkgdImage = bkgdMean;
+    end
+  end
+  if isempty(bkgdImage),
+    error('Could not read background center from ann file');
+  end
+  if ~isempty(movie_height),
+    nr = movie_height;
+  end
+  if ~isempty(movie_width),
+    nc = movie_width;
+  end
+  if isempty(nr) || isempty(nc),
+    error('Shape of movie could not be read from ann file');
+  end
+  bkgdImage = reshape(bkgdImage,[nr,nc]);
+  isBkgdImage = true;
+end
+if ~isBkgdImage,
   if isempty(movieName),
-    error('If bkgdImage not input, then movieName must be input.');
+    error('Either bkgdImage, annName, or movieName must be input. Ann file must contain background center parameter');
   end
   if ~exist(movieName,'file'),
-    error('Movie file %s does nhot exist',movieName);
+    error('Movie file %s does not exist',movieName);
   end
   % open the movie
   [readframe,nframes,fid,headerinfo] = get_readframe_fcn(movieName);
@@ -63,29 +155,87 @@ end
 [nr,nc,ncolors] = size(bkgdImage);
 r = min(nr,nc);
 
+%% feature detection filtering
+
 % compute gradient magnitude image
 gradI = [diff(bkgdImage,1,1).^2;zeros(1,nc)] + [diff(bkgdImage,1,2).^2,zeros(nr,1)];
 % filter with uniform filter of input radius
 fil = fspecial('disk',diskFilterRadius);
-filI1 = imfilter(gradI,fil,0,'same');
+gradfilI = imfilter(gradI,fil,0,'same');
+
+if strcmpi(method,'normcorr'),
+  
+  % make a cross filter
+  fil0 = zeros(crossFilterRadius*2+1);
+  fil0(crossFilterRadius+1,:) = 1;
+  fil0(:,crossFilterRadius+1) = 1;
+  
+  % steer
+  fils = cell(1,nRotations);
+  thetas = linspace(0,90,nRotations+1);
+  thetas = thetas(1:end-1);
+  for i = 1:nRotations,
+    fils{i} = 1-2*imrotate(fil0,thetas(i),'bilinear','loose');
+  end
+
+  % compute normalized maximum correlation
+  filI1 = -inf(nr,nc);
+  for i = 1:nRotations,
+    filI1 = max(filI1,imfilter(bkgdImage,fils{i},'replicate') ./ ...
+                      imfilter(bkgdImage,ones(size(fils{i})),'replicate'));
+  end
+  
+else
+  
+  filI1 = gradfilI;
+  
+end
+
+
+%% find bowl label
+
+% compute distance to corners
+[xGrid,yGrid] = meshgrid(1:nc,1:nr);
+[dxGrid,dyGrid] = meshgrid(-featureRadius:featureRadius,-featureRadius:featureRadius);
+distCorner = inf(nr,nc);
+corners = [1,1,nc,nc;1,nr,nr,1];
+for i = 1:size(corners,2),
+  distCorner = min(distCorner, sqrt( (xGrid-corners(1,i)).^2 + (yGrid-corners(2,i)).^2 ));
+end
+
+% threshold max distance to some corner
+filI4 = gradfilI;
+maxDistCorner_BowlLabel = maxDistCornerFrac_BowlLabel * r;
+filI4(distCorner > maxDistCorner_BowlLabel) = 0;
+
+% find maximum 
+[success,x,y] = getNextFeaturePoint(filI4,'grad2');
+if success,
+  bowlMarkerPoints = [x;y];
+else
+  error('Could not detect bowl marker');
+end
+
+%% find calibration points
 
 % compute distance from center of image
 minDistCenter = minDistCenterFrac * r;
 maxDistCenter = maxDistCenterFrac * r;
-[xGrid,yGrid] = meshgrid(1:nc,1:nr);
 distCenter = sqrt((xGrid-nc/2).^2 + (yGrid-nr/2).^2);
 
 % threshold distance from center
 filI2 = filI1;
 filI2(distCenter < minDistCenter | distCenter > maxDistCenter) = 0;
 
+% zero out bowl marker
+filI2 = zeroOutDetection(bowlMarkerPoints(1),bowlMarkerPoints(2),filI2);
+
 calibrationPoints = [];
 featureStrengths = [];
-[dxGrid,dyGrid] = meshgrid(-featureRadius:featureRadius,-featureRadius:featureRadius);
 filI3 = filI2;
 for i = 1:nCalibrationPoints,
   
-  [success,x,y,featureStrength,filI3] = getNextFeaturePoint(filI3);
+  [success,x,y,featureStrength,filI3] = getNextFeaturePoint(filI3,method);
   if ~success,
     break;
   end
@@ -94,39 +244,11 @@ for i = 1:nCalibrationPoints,
   
 end
 
-% find bowl label
-% compute distance to corners
-distCorner = inf(nr,nc);
-corners = [1,1,nc,nc;1,nr,nr,1];
-for i = 1:size(corners,2),
-  distCorner = min(distCorner, sqrt( (xGrid-corners(1,i)).^2 + (yGrid-corners(2,i)).^2 ));
+if isempty(calibrationPoints),
+  error('No calibration points detected');
 end
 
-% threshold max distance to some corner
-filI4 = filI1;
-maxDistCorner_BowlLabel = maxDistCornerFrac_BowlLabel * r;
-filI4(distCorner > maxDistCorner_BowlLabel) = 0;
-
-% zero out all calibration points
-for i = 1:size(calibrationPoints,2),
-  x = calibrationPoints(1,i);
-  y = calibrationPoints(2,i);
-  i1 = max(1,round(x)-featureRadius);
-  i2 = min(nc,round(x)+featureRadius);
-  j1 = max(1,round(y)-featureRadius);
-  j2 = min(nr,round(y)+featureRadius);
-  filI4(j1:j2,i1:i2) = 0;  
-end
-
-% find maximum 
-[success,x,y] = getNextFeaturePoint(filI4);
-if success,
-  bowlMarkerPoints = [x;y];
-else
-  bowlMarkerPoints = nan(2,1);
-end
-
-% origin is the average of all the calibration points
+%% origin is the average of all the calibration points
 isleft = calibrationPoints(1,:) <= nc/2;
 nLeftCalibrationPoints = nnz(isleft);
 nRightCalibrationPoints = nnz(~isleft);
@@ -142,7 +264,7 @@ originY = (sum(calibrationPoints(2,istop))/nTopCalibrationPoints + ...
 offX = -originX;
 offY = -originY;
 
-% sort calibration points counterclockwise from bowl label
+%% sort calibration points counterclockwise from bowl label
 if success,
   bowlMarkerTheta = atan2(bowlMarkerPoints(2)-originY,bowlMarkerPoints(1)-originX);
 else
@@ -155,6 +277,7 @@ dtheta = mod((theta - bowlMarkerTheta),2*pi);
 calibrationPoints = calibrationPoints(:,order);
 featureStrengths = featureStrengths(order);
 
+%% find the rotation
 
 % take the average of the pair of points around the bowl marker
 d1 = mod(dtheta(1)+pi,2*pi)-pi;
@@ -170,6 +293,8 @@ else
 end
 
 offTheta = mod(bowlMarkerPairTheta_true-bowlMarkerPairTheta+pi,2*pi)-pi;
+
+%% find scale
 
 nPairs = 0;
 d = 0;
@@ -198,8 +323,10 @@ if DEBUG,
   imagesc(bkgdImage);
   hold on;
   l = pairDist_mm/4 / scale;
-  quiver(originX,originY,cos(-offTheta)*l,sin(-offTheta)*l,0,'k-');
+  quiver(originX,originY,cos(-offTheta)*l,sin(-offTheta)*l,0,'k--');
+  text(originX+cos(-offTheta)*l,sin(-offTheta)*l,'x');
   quiver(originX,originY,cos(-offTheta+pi/2)*l,sin(-offTheta+pi/2)*l,0,'k-');
+  text(originX+cos(-offTheta+pi/2)*l,sin(-offTheta+pi/2)*l,'y');
   plot(calibrationPoints(1,:),calibrationPoints(2,:),'ks');
   plot(bowlMarkerPoints(1),bowlMarkerPoints(2),'mo');
   axis image xy;
@@ -240,7 +367,7 @@ if DEBUG,
   axisalmosttight;
 end
 
-function [success,x,y,featureStrength,filI] = getNextFeaturePoint(filI)
+function [success,x,y,featureStrength,filI] = getNextFeaturePoint(filI,methodcurr)
 
   success = false;
 
@@ -249,30 +376,44 @@ function [success,x,y,featureStrength,filI] = getNextFeaturePoint(filI)
   [y,x] = ind2sub([nr,nc],j);
   
   % make sure it meets threshold
-  if featureStrength < minFeatureStrengthHigh,
-    return;
+  if strcmpi(methodcurr,'grad2'),
+    if featureStrength < minFeatureStrengthHigh,
+      return;
+    end
+  else
+    if featureStrength < minCrossFeatureStrength,
+      return;
+    end
   end
 
-  % subpixel accuracy: take box around point and compute weighted average
-  % of feature strength
-  [box] = padgrab(filI,0,y-featureRadius,y+featureRadius,x-featureRadius,x+featureRadius);
-  box = double(box > minFeatureStrengthLow);
-  Z = sum(box(:));
-  dx = sum(box(:).*dxGrid(:))/Z;
-  dy = sum(box(:).*dyGrid(:))/Z;
-  x = x + dx;
-  y = y + dy;
+  % subpixel accuracy: 
   
-  % zero out region around feature
-  i1 = max(1,round(x)-featureRadius);
-  i2 = min(nc,round(x)+featureRadius);
-  j1 = max(1,round(y)-featureRadius);
-  j2 = min(nr,round(y)+featureRadius);
-  filI(j1:j2,i1:i2) = 0;
+  if strcmpi(methodcurr,'grad2'),
+    % take box around point and compute weighted average of feature strength
+    [box] = padgrab(filI,0,y-featureRadius,y+featureRadius,x-featureRadius,x+featureRadius);
+    box = double(box > minFeatureStrengthLow);
+    Z = sum(box(:));
+    dx = sum(box(:).*dxGrid(:))/Z;
+    dy = sum(box(:).*dyGrid(:))/Z;
+    x = x + dx;
+    y = y + dy;
+  end
   
+  filI = zeroOutDetection(x,y,filI);
   success = true;
 
 end
+
+  function filI = zeroOutDetection(x,y,filI)
+    
+    % zero out region around feature
+    i1 = max(1,round(x)-featureRadius);
+    i2 = min(nc,round(x)+featureRadius);
+    j1 = max(1,round(y)-featureRadius);
+    j2 = min(nr,round(y)+featureRadius);
+    filI(j1:j2,i1:i2) = 0;
+    
+  end
 
   function [x,y] = register(x,y,offX,offY,offTheta,scale)
     sz = size(x);
