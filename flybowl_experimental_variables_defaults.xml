@@ -58,6 +58,6 @@
     <content datatype="string" range_basic="None, Rearing problem, Flies look sick, See behavioral notes, See technical notes" range_advanced="None, Rearing problem, Flies look sick, See behavioral notes, See technical notes" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Flag specifying whether or not experiment should be re-done and why." required="true" default="None" last="false" />
   </flag_review>
   <flag_aborted>
-    <content datatype="string" range_basic="" range_advanced="" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Whether the experiment was aborted" required="true" default="" last="" />
+    <content datatype="integer" range_basic="[0,1]" range_advanced="[0,1]" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Whether the experiment was aborted" required="true" default="" last="" />
   </flag_aborted>
 </experiment>
