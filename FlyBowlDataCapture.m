@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 15-Aug-2010 15:26:15
+% Last Modified by GUIDE v2.5 18-Jan-2011 21:34:23
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -179,6 +179,7 @@ if exist(handles.rcfile,'file'),
   try
     handles.previous_values = load(handles.rcfile);
     handles.GUIInstance_prev = {
+      'Assay_Room'
       'Assay_Rig'
       'Assay_Plate'
       'Assay_Bowl'
@@ -188,7 +189,7 @@ if exist(handles.rcfile,'file'),
       };
     for i = 1:length(handles.GUIInstance_prev),
       fn = handles.GUIInstance_prev{i};
-      if ischar(handles.previous_values.(fn)),
+      if ~isfield(handles.previous_values,fn) || ischar(handles.previous_values.(fn)),
         continue;
       end
       j = mod(handles.GUIi-1,length(handles.previous_values.(fn)))+1;
@@ -1513,4 +1514,40 @@ if success,
   end
 else
   uiwait(warndlg('Unable to initialize temperature probe. Perhaps it is open in another program?','Error Initializing Temp Probe'));
+end
+
+
+% --- Executes on selection change in popupmenu_Assay_Room.
+function popupmenu_Assay_Room_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Assay_Room (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Assay_Room contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_Assay_Room
+
+% grab value
+v = get(handles.popupmenu_Assay_Room,'Value');
+handles.Assay_Room = handles.Assay_Rooms{v};
+
+% no longer default
+handles.isdefault.Assay_Room = false;
+
+% set color
+set(handles.popupmenu_Assay_Room,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_Assay_Room_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Assay_Room (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end
