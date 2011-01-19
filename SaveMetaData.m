@@ -27,7 +27,7 @@ fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,'yy
 % name of experimenter
 fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 % always same experiment protocol
-fprintf(fid,'protocol="%s" ',handles.params.MetaData_ExpProtocols{1});
+fprintf(fid,'experiment_protocol="%s" ',handles.params.MetaData_ExpProtocols{1});
 fprintf(fid,'>\n');
 
 % session container
@@ -37,9 +37,9 @@ fprintf(fid,'  <session id="1">\n');
 apparatusUniqueName = sprintf('Rig%s__Plate%s__Bowl%s__Camera%s__Computer%s__HardDrive%s',handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Bowl,...
   handles.CameraUniqueID,handles.ComputerName,handles.params.HardDriveName);
 % apparatus full id and parts
-fprintf(fid,'    <apparatus id="%s" rig="%s" plate="%s" bowl="%s" camera="%s" computer="%s" harddrive="%s"/>\n',...
+fprintf(fid,'    <apparatus id="%s" room="%s" rig="%s" plate="%s" bowl="%s" camera="%s" computer="%s" harddrive="%s"/>\n',...
   apparatusUniqueName,...
-  handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Bowl,...
+  handles.Assay_Room,handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Bowl,...
   handles.CameraUniqueID,...
   handles.ComputerName,...
   handles.params.HardDriveName);
@@ -83,6 +83,8 @@ fprintf(fid,'datetime_starvation="%s" ',datestr(handles.PreAssayHandling_Starvat
 fprintf(fid,'seconds_shiftflytemp="%f" ',shift_time);
 % seconds between loading flies into arena and experiment start
 fprintf(fid,'seconds_fliesloaded="%f" ',load_time);
+% number of observed dead flies
+fprintf(fid,'num_flies_dead="%d" ',handles.NDeadFlies);
 fprintf(fid,'/>\n');
 fprintf(fid,'    </flies>\n');
 fprintf(fid,'  </session>\n');
