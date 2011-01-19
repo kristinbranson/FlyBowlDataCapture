@@ -94,7 +94,8 @@ end
 % Figure position
 
 if isfield(handles.previous_values,'FigurePosition'),
-  handles.FigurePosition = handles.previous_values.FigurePosition;
+  handles.FigurePosition = get(handles.figure_main,'Position');
+  handles.FigurePosition(1:2) = handles.previous_values.FigurePosition(1:2);
 
   % make sure that this fits on the screen
   ScreenSize = get(0,'ScreenSize');
