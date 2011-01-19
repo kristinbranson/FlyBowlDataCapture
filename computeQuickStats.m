@@ -543,6 +543,10 @@ for i = 1:nUFMFStreamFns,
     hold(StreamAx(i),'on');
   end
   
+  if ~isfield(UFMFStats.stream,fn) || isempty(UFMFStats.stream.(fn)),
+    continue;
+  end
+  
   if size(UFMFStats.stream.(fn),1) == 2,
     xcurr = UFMFStats.stream.(fn)(2,:) - UFMFStats.stream.(fn)(2,1);
   else
