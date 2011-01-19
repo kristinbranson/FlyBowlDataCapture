@@ -1,6 +1,6 @@
 # Directory to store video to
-OutputDirectory,D:\data,J:\data
-#OutputDirectory,D:\debug_data,J:\debug_data
+#OutputDirectory,D:\data,J:\data
+OutputDirectory,D:\debug_data,J:\debug_data
 #OutputDirectory,D:\special_data,J:\special_data
 # Directory to temporarily store video to
 TmpOutputDirectory,D:\tmpdata,J:\tmpdata
@@ -18,7 +18,7 @@ FileType,ufmf
 # Number of seconds to record
 RecordTime,1000
 # whether to display the video preview with the jet colormap
-ColormapPreview,0
+ColormapPreview,1
 # Shutter period
 Imaq_Shutter,100
 # Gain
@@ -33,10 +33,10 @@ NFlies,20
 Rearing_IncubatorIDs,AM,PM
 # Range of Cross Dates to show -- minimum and maximum number of days 
 # before today
-PreAssayHandling_CrossDate_Range,22,29
+PreAssayHandling_CrossDate_Range,14,20
 # Range of Sorting Dates to show -- minimum and maximum number of days 
 # before today
-PreAssayHandling_SortingDate_Range,4,7
+PreAssayHandling_SortingDate_Range,3,7
 # List of possible Sorting Handler values
 PreAssayHandling_SortingHandlers,hirokawaj,robiea,bransonk,chenn
 # Range of Starvation Dates to show -- minimum and maximum number of days 
@@ -57,7 +57,7 @@ ReviewFlags,None,Rearing problem,Flies look sick,See behavioral notes,See techni
 # Device name
 Imaq_DeviceName,A622f
 # Video ROI Position
-Imaq_ROIPosition,0,0,1024,1024
+Imaq_ROIPosition,128,0,1024,1024
 # Frame rate we expect
 Imaq_FrameRate,30.4
 # Maximum frame rate we will get
@@ -84,7 +84,7 @@ MetaData_RoomHumiditySetPoint,60
 # limits of y-axis for frame rate plot
 FrameRatePlotYLim,0,35
 # Limits of y-axis for temperature plot
-TempPlotYLim,30,35
+TempPlotYLim,20,35
 # Whether to try to connect over the network to Sage to query line names
 DoQuerySage,1
 # Time in between temperature readings
@@ -94,12 +94,12 @@ TempProbeChannels,1,2
 # Thermocouple types
 TempProbeTypes,T,T
 # if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
-TempProbeReject60Hz,0
+TempProbeReject60Hz,5
 # whether to read temperature or not
-DoRecordTemp,1
+DoRecordTemp,0
 # number of temperature and humidity samples to read from the Precon probe
 # set to 0 if no Precon sensor
-NPreconSamples,5
+NPreconSamples,0
 # which serial port to connect to -- I have no idea how to figure this out 
 # automatically
 PreconSensorSerialPort,COM1
