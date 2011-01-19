@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 18-Jan-2011 21:34:23
+% Last Modified by GUIDE v2.5 18-Jan-2011 23:34:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1551,3 +1551,41 @@ function popupmenu_Assay_Room_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --------------------------------------------------------------------
+function menu_Clean_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_Clean (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function menu_Clean_Semaphores_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_Clean_Semaphores (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+button = questdlg('Are you sure you want to clean semaphores? This may mess up any open GUIs.','Clean Semaphores?','Yes','Cancel','Cancel');
+if strcmp(button,'Yes'),
+  CleanSemaphores();
+end
+
+% --------------------------------------------------------------------
+function menu_Clean_Local_Sempahores_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_Clean_Local_Sempahores (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+button = questdlg('Are you sure you want to clean local semaphores? This may mess up this GUI.','Clean Local Semaphores?','Yes','Cancel','Cancel');
+if strcmp(button,'Yes'),
+  CleanLocalSemaphores;
+end
+
+% --------------------------------------------------------------------
+function menu_FixRCFile_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_FixRCFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+fixRCFile(2);
