@@ -451,6 +451,29 @@ set(handles.popupmenu_PreAssayHandling_StarvationHandler,'String',handles.PreAss
   'Value',find(strcmp(handles.PreAssayHandling_StarvationHandler,handles.PreAssayHandling_StarvationHandlers),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
+%% Room
+
+% whether this has been changed or not
+handles.isdefault.Assay_Room = true;
+
+% possible values for room
+handles.Assay_Rooms = handles.params.Assay_Rooms;
+
+% if StarvationHandler not stored in rc file, choose first room
+if ~isfield(handles.previous_values,'Assay_Room') || ...
+    ~ismember(handles.previous_values.Assay_Room,handles.Assay_Rooms),
+  handles.previous_values.Assay_Room = handles.Assay_Rooms{1};
+end
+
+% by default, previous room
+handles.Assay_Room = handles.previous_values.Assay_Room;
+
+% set possible values, current value, color to default
+set(handles.popupmenu_Assay_Room,'String',handles.Assay_Rooms,...
+  'Value',find(strcmp(handles.Assay_Room,handles.Assay_Rooms),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
+
+
 %% Rig
 
 % whether this has been changed or not
@@ -738,6 +761,7 @@ set(handles.axes_PreviewVideo,'xtick',[],'ytick',[]);
 handles.ComputeQuickStatsParams = {...
   'UFMFDiagnosticsFileStr',handles.params.UFMFStatFileName,...
   'MovieFileStr',handles.params.MovieFileStr,...
+  'MetaDataFileStr',handles.params.MetaDataFileName,...
   'FigHandle',100,...
   'GUIInstance',handles.GUIi,...
   'parent',handles.figure_main...

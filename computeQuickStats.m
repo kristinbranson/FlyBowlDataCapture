@@ -10,6 +10,8 @@ UFMFDiagnosticsFileStr = 'ufmf_diagnostics.txt';
 MovieFileStr = 'movie.ufmf';
 % name of temperature stream
 TemperatureFileStr = 'temperature.txt';
+% name of metadata file
+MetaDataFileStr = 'Metadata.xml';
 % streams to plot
 UFMFStreamFns = {'bytes','nForegroundPx','nPxWritten','nFramesBuffered','nFramesDropped','FPS',...
   'meanPixelError','maxPixelError','maxFilterError','Temperature'};
@@ -35,7 +37,7 @@ SaveFileStr = '';
 SaveDataStr = '';
 
 % summaries to show
-UFMFSummaryFns = {'nFrames','nFramesDroppedTotal','nFramesUncompressed','nUpdateBackgroundCalls','nWriteKeyFrameCalls','ImageWidth','ImageHeight','nTemperatureReadings'};
+UFMFSummaryFns = {'nFrames','nFramesDroppedTotal','nFramesUncompressed','nUpdateBackgroundCalls','nWriteKeyFrameCalls','ImageWidth','ImageHeight','nTemperatureReadings','RoomTemperature','RoomHumidity'};
 UFMFSummaryStatFns = {'FPS','CompressionRate','NForegroundPx','NPxWritten','MeanPixelError','MaxPixelError','MaxFilterError'};
 
 % bkgd scan lines to plot
@@ -50,7 +52,7 @@ BackSubMinCCArea = 5;
 BackSubCloseRadius = 2;
 
 [GUIi,fig,FigPos,...
-  UFMFDiagnosticsFileStr,MovieFileStr,TemperatureFileStr,...
+  UFMFDiagnosticsFileStr,MovieFileStr,TemperatureFileStr,MetaDataFileStr,...
   UFMFStreamFns,UFMFStreamMu,UFMFStreamSig,...
   UFMFStream_nc,UFMFStreamYLim,UFMFStreamXLim,...
   parent,SigColor,MuColor,DataColor,...
@@ -65,7 +67,8 @@ BackSubCloseRadius = 2;
   'FigPos',[],...
   'UFMFDiagnosticsFileStr',UFMFDiagnosticsFileStr,...
   'MovieFileStr',MovieFileStr,...
-  'TmperatureFileStr',TemperatureFileStr,...
+  'TemperatureFileStr',TemperatureFileStr,...
+  'MetaDataFileStr',MetaDataFileStr,...
   'UFMFStreamFns',UFMFStreamFns,...
   'UFMFStreamMu',UFMFStreamMu,...
   'UFMFStreamSig',UFMFStreamSig,...
@@ -101,9 +104,9 @@ end
 
 % we set the figure to be inset from the parent by the following amounts
 OutBorderTop = 50;
-OutBorderLeft = 50;
+OutBorderLeft = 25;
 OutBorderBottom = 50;
-OutBorderRight = 50;
+OutBorderRight = 25;
 
 % we set axes to be inset from the figure by the following amounts
 FigBorderLeft = 10;
@@ -208,6 +211,25 @@ else
   temp = data(:,2);
 end
 
+% read room temperature, humidity from metadata
+RoomTemperature = nan;
+RoomHumidity = nan;
+MetaDataFileName = fullfile(expdir,MetaDataFileStr);
+if exist(MetaDataFileName,'file'),
+  metafid = fopen(MetaDataFileName,'r');
+  while true,
+    s = fgetl(metafid);
+    if ~ischar(s),
+      break;
+    end
+    tmp = regexpi(s,'.*<\s*environment .*temperature\w*=\w*"(?<temperature>[^"]*)".*','names','once');
+    if ~isempty(tmp), RoomTemperature = tmp.temperature; end
+    tmp = regexpi(s,'.*<\s*environment .*humidity\w*=\w*"(?<humidity>[^"]*)".*','names','once');
+    if ~isempty(tmp), RoomHumidity = tmp.humidity; end
+  end
+  fclose(metafid);
+end
+
 %% Compute background model
 
 % take the median of all background frames
@@ -286,6 +308,9 @@ fclose(fid);
 %% add temperature to existing structs
 
 UFMFStats.summary.nTemperatureReadings = length(temp);
+UFMFStats.summary.RoomTemperature = RoomTemperature;
+UFMFStats.summary.RoomHumidity = RoomHumidity;
+
 if isempty(temp),
   BackSubStats.meanTemperature = nan;
   BackSubStats.minTemperature = nan;
@@ -541,6 +566,10 @@ for i = 1:nUFMFStreamFns,
   if isfield(UFMFStreamMu,fn),
     plot(StreamAx(i),x,UFMFStreamMu.(fn)(:)','-','Color',MuColor);
     hold(StreamAx(i),'on');
+  end
+  
+  if ~isfield(UFMFStats.stream,fn) || isempty(UFMFStats.stream.(fn)),
+    continue;
   end
   
   if size(UFMFStats.stream.(fn),1) == 2,

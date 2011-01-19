@@ -5,7 +5,7 @@ OutputDirectory,D:\debug_data,J:\debug_data
 # Directory to temporarily store video to
 TmpOutputDirectory,D:\tmpdata,J:\tmpdata
 # Names of hard drives, corresponding to the ordered OutputDirectory list
-HardDriveName,Internal_D,HD2
+HardDriveName,Internal_D,HD1
 # Camera adaptor
 #Imaq_Adaptor,dcam
 Imaq_Adaptor,udcam
@@ -18,22 +18,24 @@ FileType,ufmf
 # Number of seconds to record
 RecordTime,1000
 # whether to display the video preview with the jet colormap
-ColormapPreview,1
+ColormapPreview,0
 # Shutter period
 Imaq_Shutter,100
 # Gain
 Imaq_Gain,170
 # Brightness
 Imaq_Brightness,25
+# Prefix of movie file
+MovieFilePrefix,movie
 # List of possible Experimenter values
 Assay_Experimenters,hirokawaj,robiea,bransonk
 # Expected number of flies
 NFlies,20
 # List of possible Incubator ID values
-Rearing_IncubatorIDs,AM,PM
+Rearing_IncubatorIDs,1,2,3,4
 # Range of Cross Dates to show -- minimum and maximum number of days 
 # before today
-PreAssayHandling_CrossDate_Range,14,20
+PreAssayHandling_CrossDate_Range,14,22
 # Range of Sorting Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_SortingDate_Range,3,7
@@ -44,6 +46,8 @@ PreAssayHandling_SortingHandlers,hirokawaj,robiea,bransonk,chenn
 PreAssayHandling_StarvationDate_Range,0,1
 # List of possible Starvation Handler values
 PreAssayHandling_StarvationHandlers,hirokawaj,robiea,bransonk
+# List of room names
+Assay_Rooms,1,2,3
 # List of possible Rig values
 Assay_Rigs,1,2
 # List of possible Plate values
@@ -66,8 +70,6 @@ Imaq_MaxFrameRate,31
 PreviewUpdatePeriod,0
 # for gdcam, number of frames between updates
 gdcamPreviewFrameInterval,2
-# Prefix of movie file
-MovieFilePrefix,movie
 # Name of file to store metadata to
 MetaDataFileName,Metadata.xml
 # Name of file to store log to
@@ -76,7 +78,7 @@ LogFileName,Log.txt
 MetaData_AssayName,FlyBowl
 MetaData_RearingProtocols,RP0001_Incubator1.xml,RP0002_Incubator2.xml
 MetaData_HandlingProtocols,HP0001.xml
-MetaData_ExpProtocols,EP0001.xml
+MetaData_ExpProtocols,EP0002.xml
 MetaData_Effector,TrpA
 MetaData_Gender,b
 MetaData_RoomTemperatureSetPoint,29
@@ -84,7 +86,7 @@ MetaData_RoomHumiditySetPoint,60
 # limits of y-axis for frame rate plot
 FrameRatePlotYLim,0,35
 # Limits of y-axis for temperature plot
-TempPlotYLim,20,35
+TempPlotYLim,30,35
 # Whether to try to connect over the network to Sage to query line names
 DoQuerySage,1
 # Time in between temperature readings
@@ -94,7 +96,7 @@ TempProbeChannels,1,2
 # Thermocouple types
 TempProbeTypes,T,T
 # if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
-TempProbeReject60Hz,5
+TempProbeReject60Hz,0
 # whether to read temperature or not
 DoRecordTemp,0
 # number of temperature and humidity samples to read from the Precon probe
@@ -102,9 +104,9 @@ DoRecordTemp,0
 NPreconSamples,0
 # which serial port to connect to -- I have no idea how to figure this out 
 # automatically
-PreconSensorSerialPort,COM1
+PreconSensorSerialPort,COM7
 # Line Names to add to the list in Sage
-ExtraLineNames,DL-wildtype
+ExtraLineNames,DL-wildtype,pBDPGAL4U
 # Log file for writing ufmf
 UFMFLogFileName,ufmf_log.txt
 # Name of file to write UFMF diagnostic stats
@@ -134,4 +136,4 @@ UFMFNFramesInit,100
 # while ramping up the background model, use the following keyframe periods
 UFMFBGKeyFramePeriodInit,1,10,25,50,75
 # whether to rotate the preview image
-DoRotatePreviewImage,1,1
+DoRotatePreviewImage,0,0
