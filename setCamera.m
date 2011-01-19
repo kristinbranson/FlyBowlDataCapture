@@ -123,7 +123,7 @@ if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
     set(handles.vid.Source,'statComputeFrameErrorFreq',handles.params.UFMFStatComputeFrameErrorFreq);
   end
   if isfield(handles.params,'UFMFStatPrintTimings'),
-    set(handles.vid.Source,'statComputeFrameErrorFreq',handles.params.UFMFStatComputeFrameErrorFreq);
+    set(handles.vid.Source,'statPrintTimings',handles.params.UFMFStatPrintTimings);
   end
   if isfield(handles.params,'UFMFBGKeyFramePeriodInit'),
     v = get(handles.vid.Source,'bgKeyFramePeriodInit');
@@ -143,7 +143,7 @@ else
 end
 
 % maximum number of frames to record
-handles.FramesPerTrigger = handles.params.Imaq_FrameRate * handles.params.RecordTime;
+handles.FramesPerTrigger = handles.params.Imaq_MaxFrameRate * handles.params.RecordTime;
 set(handles.vid,'FramesPerTrigger',handles.FramesPerTrigger,'Name','FBDC_VideoInput');
 if isfield(handles.params,'Imaq_ROIPosition'),
   sz = handles.params.Imaq_ROIPosition([4,3]);
