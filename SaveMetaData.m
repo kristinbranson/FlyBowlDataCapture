@@ -81,6 +81,8 @@ fprintf(fid,'datetime_starvation="%s" ',datestr(handles.PreAssayHandling_Starvat
 fprintf(fid,'seconds_shiftflytemp="%f" ',shift_time);
 % seconds between loading flies into arena and experiment start
 fprintf(fid,'seconds_fliesloaded="%f" ',load_time);
+% number of observed dead flies
+fprintf(fid,'num_flies_dead="%d" ',handles.NDeadFlies);
 fprintf(fid,'/>\n');
 fprintf(fid,'    </flies>\n');
 fprintf(fid,'  </session>\n');

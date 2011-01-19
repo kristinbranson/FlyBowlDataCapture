@@ -28,7 +28,7 @@ Imaq_Brightness,25
 # Prefix of movie file
 MovieFilePrefix,movie
 # List of possible Experimenter values
-Assay_Experimenters,hirokawaj,robiea,bransonk
+Assay_Experimenters,hirokawaj,robiea
 # Expected number of flies
 NFlies,20
 # List of possible Incubator ID values
@@ -40,12 +40,12 @@ PreAssayHandling_CrossDate_Range,14,22
 # before today
 PreAssayHandling_SortingDate_Range,3,7
 # List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,hirokawaj,robiea,bransonk,chenn
+PreAssayHandling_SortingHandlers,hirokawaj,robiea,chenn
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
 # List of possible Starvation Handler values
-PreAssayHandling_StarvationHandlers,hirokawaj,robiea,bransonk
+PreAssayHandling_StarvationHandlers,hirokawaj,robiea
 # List of room names
 Assay_Rooms,1,2,3
 # List of possible Rig values
