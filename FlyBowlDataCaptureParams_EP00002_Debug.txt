@@ -78,7 +78,7 @@ LogFileName,Log.txt
 MetaData_AssayName,FlyBowl
 MetaData_RearingProtocols,RP0001_Incubator1.xml,RP0002_Incubator2.xml
 MetaData_HandlingProtocols,HP0001.xml
-MetaData_ExpProtocols,EP0001.xml
+MetaData_ExpProtocols,EP0002.xml
 MetaData_Effector,TrpA
 MetaData_Gender,b
 MetaData_RoomTemperatureSetPoint,29
