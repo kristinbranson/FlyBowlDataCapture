@@ -518,6 +518,29 @@ set(handles.popupmenu_Assay_Plate,'String',handles.Assay_Plates,...
   'Value',find(strcmp(handles.Assay_Plate,handles.Assay_Plates),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
+%% Lid
+
+% whether this has been changed or not
+handles.isdefault.Assay_Lid = true;
+
+% possible values for StarvationHandler
+handles.Assay_Lids = handles.params.Assay_Lids;
+
+% if StarvationHandler not stored in rc file, choose first StarvationHandler
+if ~isfield(handles.previous_values,'Assay_Lid') || ...
+    ~ismember(handles.previous_values.Assay_Lid,handles.Assay_Lids),
+  handles.previous_values.Assay_Lid = handles.Assay_Lids{1};
+end
+
+% by default, previous StarvationHandler
+handles.Assay_Lid = handles.previous_values.Assay_Lid;
+
+% set possible values, current value, color to default
+set(handles.popupmenu_Assay_Lid,'String',handles.Assay_Lids,...
+  'Value',find(strcmp(handles.Assay_Lid,handles.Assay_Lids),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
+
+
 %% Bowl
 
 % whether this has been changed or not

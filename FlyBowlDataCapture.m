@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 18-Jan-2011 23:34:24
+% Last Modified by GUIDE v2.5 19-Jan-2011 19:23:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -182,6 +182,7 @@ if exist(handles.rcfile,'file'),
       'Assay_Room'
       'Assay_Rig'
       'Assay_Plate'
+      'Assay_Lid'
       'Assay_Bowl'
       'DeviceID'
       'TempProbeID'
@@ -1589,3 +1590,39 @@ function menu_FixRCFile_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 fixRCFile(2);
+
+
+% --- Executes on selection change in popupmenu_Assay_Lid.
+function popupmenu_Assay_Lid_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Assay_Lid (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Assay_Lid contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_Assay_Lid
+
+% grab value
+v = get(handles.popupmenu_Assay_Lid,'Value');
+handles.Assay_Lid = handles.Assay_Lids{v};
+
+% no longer default
+handles.isdefault.Assay_Lid = false;
+
+% set color
+set(handles.popupmenu_Assay_Lid,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_Assay_Lid_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Assay_Lid (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
