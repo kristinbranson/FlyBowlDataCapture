@@ -157,11 +157,8 @@ if handles.nBands == 1,
   colormap(handles.axes_PreviewVideo,gray(256));
 end
 axis(handles.axes_PreviewVideo,'image');
-if handles.params.DoRotatePreviewImage,
-  set(handles.axes_PreviewVideo,'XDir','reverse','YDir','normal');
-else
-  set(handles.axes_PreviewVideo,'XDir','normal','YDir','reverse');
-end
+
+RotatePreviewImage(handles);
 
 % Error function
 set(handles.vid,'ErrorFcn',@vidError);

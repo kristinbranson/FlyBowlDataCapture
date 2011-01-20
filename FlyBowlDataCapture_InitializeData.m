@@ -132,8 +132,7 @@ try
     'UFMFStatComputeFrameErrorFreq','UFMFStatPrintTimings',...
     'UFMFMaxFracFgCompress','UFMFMaxBGNFrames','UFMFBGUpdatePeriod',...
     'UFMFBGKeyFramePeriod','UFMFMaxBoxLength','UFMFBackSubThresh',...
-    'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
-    'DoRotatePreviewImage'};
+    'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -146,7 +145,9 @@ try
   notlist_params = {'Imaq_Adaptor','Imaq_DeviceName','Imaq_VideoFormat',...
     'FileType','MetaData_AssayName',...
     'MetaData_Effector','MetaData_Gender','MetaDataFileName','MovieFilePrefix','LogFileName',...
-    'UFMFLogFileName','UFMFStatFileName','PreconSensorSerialPort'};
+    'UFMFLogFileName','UFMFStatFileName','PreconSensorSerialPort',...
+    'DoRotatePreviewImage',...
+    'QuickStatsStatsFileName'};
   for i = 1:length(notlist_params),
     fn = notlist_params{i};
     if ischar(handles.params.(fn){1}),
@@ -161,7 +162,7 @@ try
   end
   
   % parameters that are selected by GUI instance
-  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory','HardDriveName','DoRotatePreviewImage'};
+  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory','HardDriveName'};
   for i = 1:length(GUIInstance_params),
     fn = GUIInstance_params{i};
     j = mod(handles.GUIi-1,length(handles.params.(fn)))+1;
@@ -177,6 +178,23 @@ catch ME
   rethrow(ME);
 end
   
+%% dorotatepreview needs special parsing
+
+if isfield(handles.params,'DoRotatePreviewImage'),
+  try
+    s = handles.params.DoRotatePreviewImage;
+    tmp = regexp(s,'\s*\(([^,]*),([^,]*),([^,]*)\)','tokens');
+    handles.params.DoRotatePreviewImage = cat(1,tmp{:});
+    handles.params.DoRotatePreviewImage(:,3) = num2cell(cellfun(@str2double,handles.params.DoRotatePreviewImage(:,3)));
+  catch ME,
+    fprintf('Error parsing DoRotatePreviewImage config params\n');
+    getReport(ME)
+    handles.Params.DoRotatePreviewImage = cell(0,3);
+  end
+else
+  handles.Params.DoRotatePreviewImage = cell(0,3);
+end
+
 %% temporary output directory
 if isempty(handles.params.TmpOutputDirectory),
   handles.params.TmpOutputDirectory = tempdir;
@@ -791,6 +809,18 @@ handles.ComputeQuickStatsParams = {...
   'SaveFileStr','QuickStats.png',...
   'SaveDataStr','QuickStats.txt'...
   };
+
+if isfield(handles.params,'QuickStatsStatsFileName'),
+  try
+    quickstats_stats = load(handles.params.QuickStatsStatsFileName);
+    handles.ComputeQuickStatsParams = [handles.ComputeQuickStatsParams,...
+      struct2paramscell(quickstats_stats)];
+  catch ME,
+    warning('Could not load QuickStatsStats file %s\n%s',handles.params.QuickStatsStatsFileName,getReport(ME));
+  end
+end
+
+
 
 %% Initialization complete
 handles.GUIInitialization_Time_datenum = now;

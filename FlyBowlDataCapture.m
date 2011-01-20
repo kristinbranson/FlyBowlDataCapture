@@ -673,6 +673,9 @@ set(handles.popupmenu_Assay_Rig,'BackgroundColor',handles.changed_bkgdcolor);
 
 handles = ChangedMetaData(handles);
 
+% rotate preview image if nec
+RotatePreviewImage(handles);
+
 guidata(hObject,handles);
 
 
@@ -746,6 +749,9 @@ handles.isdefault.Assay_Bowl = false;
 set(handles.popupmenu_Assay_Bowl,'BackgroundColor',handles.changed_bkgdcolor);
 
 handles = ChangedMetaData(handles);
+
+% rotate preview image if nec
+RotatePreviewImage(handles);
 
 guidata(hObject,handles);
 
