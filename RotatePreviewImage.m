@@ -9,7 +9,7 @@ tmpidx = strcmp(handles.params.DoRotatePreviewImage(:,1),handles.Assay_Rig) & ..
 if isempty(tmpidx),
   DoRotate = false;
 else
-  DoRotate = handles.params.DoRotatePreviewImage(tmpidx,3);
+  DoRotate = handles.params.DoRotatePreviewImage{tmpidx,3};
 end
 if DoRotate,
   set(handles.axes_PreviewVideo,'XDir','reverse','YDir','normal');
