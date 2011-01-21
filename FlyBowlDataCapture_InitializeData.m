@@ -52,17 +52,18 @@ handles.SAGECodeDir = '../SAGE/MATLABInterface/Trunk';
 handles.JCtraxCodeDir = '../JCtrax';
 
 % add JCtrax to path
-miscdir = fullfile(handles.JCtraxCodeDir,'misc');
-if ~exist(miscdir,'file')
-  error('Directory %s required',miscdir);
+if ~isdeployed,
+  miscdir = fullfile(handles.JCtraxCodeDir,'misc');
+  if ~exist(miscdir,'file')
+    error('Directory %s required',miscdir);
+  end
+  addpath(miscdir);
+  filehandlingdir = fullfile(handles.JCtraxCodeDir,'filehandling');
+  if ~exist(filehandlingdir,'file')
+    error('Directory %s required',filehandlingdir);
+  end
+  addpath(filehandlingdir);
 end
-addpath(miscdir);
-filehandlingdir = fullfile(handles.JCtraxCodeDir,'filehandling');
-if ~exist(filehandlingdir,'file')
-  error('Directory %s required',filehandlingdir);
-end
-addpath(filehandlingdir);
-
 
 %% delete existing imaqs and timers
 
@@ -252,7 +253,9 @@ handles.isdefault.Fly_LineName = true;
 handles.IsSage = exist(handles.SAGECodeDir,'file');
 if handles.IsSage,
   try
-    addpath(handles.SAGECodeDir);
+    if ~isdeployed,
+      addpath(handles.SAGECodeDir);
+    end
   catch
     handles.IsSage = false;
   end
