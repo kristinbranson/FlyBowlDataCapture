@@ -1,6 +1,6 @@
 function addToStatus(handles,s,datenum)
 
-ColsWrap = 57;
+ColsWrap = 90;
 
 if nargin <=1,
   return;
