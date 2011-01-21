@@ -549,22 +549,34 @@ isbot = false(UFMFStream_nr,UFMFStream_nc);
 isbot(end,:) = true;
 x0 = UFMFStats.stream.timestamp(1);
 x = UFMFStats.stream.timestamp(:)';
-x = x - x(1);
+x = x - x0;
+maxx = x(end);
+if isfield(UFMFStreamMu,'timestamp'),
+  maxx = max(maxx,max(UFMFStreamMu.timestamp));
+end
 if isempty(UFMFStreamXLim),
-  UFMFStreamXLim = [-UFMFStreamXLimExtra*x(end),x(end)*(1+UFMFStreamXLimExtra)];
+  UFMFStreamXLim = [-UFMFStreamXLimExtra*maxx,maxx*(1+UFMFStreamXLimExtra)];
 end
 for i = 1:nUFMFStreamFns,
   fn = UFMFStreamFns{i};
 
   % plot standard deviation
+  maxy = -inf;
+  miny = inf;
   if isfield(UFMFStreamSig,fn) && isfield(UFMFStreamMu,fn),
+    xmu = UFMFStreamMu.timestamp;
     y = UFMFStreamMu.(fn)(:)';
     dy = UFMFStreamSig.(fn)(:)';
-    patch(StreamAx(i),[x,fliplr(x)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none');
+    maxy = max(maxy,max(y+dy));
+    miny = min(miny,min(y+dy));
+    patch([xmu,fliplr(xmu)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none','parent',StreamAx(i));
     hold(StreamAx(i),'on');
   end
   if isfield(UFMFStreamMu,fn),
-    plot(StreamAx(i),x,UFMFStreamMu.(fn)(:)','-','Color',MuColor);
+    maxy = max(maxy,max(UFMFStreamMu.(fn)(:)));
+    miny = min(miny,min(UFMFStreamMu.(fn)(:)));
+    xmu = UFMFStreamMu.timestamp;
+    plot(StreamAx(i),xmu,UFMFStreamMu.(fn)(:)','-','Color',MuColor);
     hold(StreamAx(i),'on');
   end
   
@@ -579,10 +591,10 @@ for i = 1:nUFMFStreamFns,
   end
   
   y = UFMFStats.stream.(fn)(1,:);
+  miny = min(miny,min(y(:)));
+  maxy = max(maxy,max(y(:)));
   plot(StreamAx(i),xcurr,y,'.-','Color',DataColor);
   if ~isfield(UFMFStreamYLim,fn),
-    miny = min(y);
-    maxy = max(y);
     dy = (maxy - miny)*UFMFStreamYLimExtra;
     if dy == 0,
       dy = 1;
@@ -623,7 +635,7 @@ frac = counts / numel(bkgdim);
 if length(IntensityHistSig) == NBkgdBins && length(IntensityHistMu) == NBkgdBins,
   y = IntensityHistMu;
   dy = IntensityHistSig;
-  patch(HistAx,[ctrs,fliplr(ctrs)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none');
+  patch([ctrs,fliplr(ctrs)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none','parent',HistAx);
   hold(HistAx,'on');
 end
 % mean
@@ -667,7 +679,7 @@ for i = 1:NBkgdScanLines,
   if size(ScanLineSig,1) >= i && size(ScanLineMu,1) >= i,
     y = ScanLineMu(i,:);
     dy = ScanLineSig(i,:);
-    patch(ScanAx(i),[off,fliplr(off)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none');
+    patch([off,fliplr(off)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none','parent',ScanAx(i));
     hold(ScanAx(i),'on');
   end
   % mean
