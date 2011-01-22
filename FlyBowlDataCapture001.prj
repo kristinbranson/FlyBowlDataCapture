@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-project>
-  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.exe" build-checksum="145856162" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
+  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.exe" build-checksum="2547259356" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
     <param.project.name>C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj</param.project.name>
     <param.target.type>Windows Standalone Application</param.target.type>
     <param.appname>FlyBowlDataCapture001</param.appname>
@@ -136,7 +136,6 @@
       <file>C:\Users\labadmin\Documents\FlyBowl\Code\JCtrax\misc</file>
     </fileset.resources>
     <fileset.package>
-      <file special-file="file.mcr" reference-mode="direct">${MATLAB_ROOT}\toolbox\compiler\deploy\win32\MCRInstaller.exe</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00001.txt</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002.txt</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002_Debug.txt</file>
@@ -144,6 +143,7 @@
       <file>${PROJECT_ROOT}\usbtc08.dll</file>
       <file>${PROJECT_ROOT}\usbtc08.h</file>
       <file>${PROJECT_ROOT}\usbtc08.lib</file>
+      <file>C:\Users\labadmin\Documents\FlyBowl\Code\udcam\Release</file>
     </fileset.package>
     <build-deliverables>
       <file name="readme.txt" location="${PROJECT_ROOT}\FlyBowlDataCapture001\distrib">C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001\distrib\readme.txt</file>

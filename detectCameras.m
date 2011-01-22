@@ -34,10 +34,29 @@ else
     %imaqhwinfo_kb(handles.DetectCameras_Params,handles.params.Imaq_Adaptor);
     adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
   catch ME
-    getReport(ME)
-    s = sprintf('Adaptor %s not registered, or no %s compatable camera found',handles.params.Imaq_Adaptor,handles.params.Imaq_Adaptor);
-    uiwait(errordlg(s,'Error loading imaq adaptor'));
-    return;
+    didregister = false;
+    if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
+      loc = fullfile(pwd,'Release','udcam.dll');
+      hmsg = msgbox('Trying to register %s\n',loc);
+      if exist(loc,'file'),
+        try
+          imaqregister(loc,'register');
+          adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
+          fprintf('Registered udcam\n');
+          didregister = true;
+        catch ME2,
+          fprintf('Tried to register udcam but failed: %s\n',getReport(ME2));
+        end
+      end
+      delete(hmsg);
+    end
+    if ~didregister,
+      getReport(ME)
+      s = sprintf('Adaptor %s not registered, or no %s compatable camera found',handles.params.Imaq_Adaptor,handles.params.Imaq_Adaptor);
+      uiwait(errordlg(s,'Error loading imaq adaptor'));
+      return;
+    end
+    
   end
 end
 
