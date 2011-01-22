@@ -88,7 +88,7 @@ MetaData_RoomHumiditySetPoint,60
 # limits of y-axis for frame rate plot
 FrameRatePlotYLim,0,35
 # Limits of y-axis for temperature plot
-TempPlotYLim,30,35
+TempPlotYLim,20,35
 # Whether to try to connect over the network to Sage to query line names
 DoQuerySage,1
 # Time in between temperature readings
@@ -100,13 +100,13 @@ TempProbeTypes,T,T
 # if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
 TempProbeReject60Hz,0
 # whether to read temperature or not
-DoRecordTemp,0
+DoRecordTemp,1
 # number of temperature and humidity samples to read from the Precon probe
 # set to 0 if no Precon sensor
-NPreconSamples,0
+NPreconSamples,5
 # which serial port to connect to -- I have no idea how to figure this out 
 # automatically
-PreconSensorSerialPort,COM7
+PreconSensorSerialPort,COM1
 # Line Names to add to the list in Sage
 ExtraLineNames,DL-wildtype,pBDPGAL4U
 # Log file for writing ufmf

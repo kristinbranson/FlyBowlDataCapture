@@ -37,7 +37,7 @@ for i = 1:numel(Channels),
 end
 
 if ~libisloaded('usbtc08'),
-  loadlibrary('usbtc08.dll', 'usbtc08.h');
+  loadlibrary('usbtc08.dll', @usbtc08Header, 'alias', 'usbtc08')
 end
 
 % create directory if necessary
@@ -130,7 +130,7 @@ for i = 1:NChannelsTotal,
     j = min(j,length(ChannelTypes));
     ChannelIsSet(i)=calllib('usbtc08','usb_tc08_set_channel', tc08_handle,int16(i),int8(ChannelTypes{j}(1)));
     if ChannelIsSet(i) == 0,
-      fprintf('Error calling usb_tc08_set_channel(%d): %s\n',i,get_last_error(tc08_handle));
+      hwarn = warndlg(sprintf('Error calling usb_tc08_set_channel(%d): %s\n',i,get_last_error(tc08_handle)),'MasterTempRecord Error');
     end
   else
     ChannelIsSet(i)=calllib('usbtc08','usb_tc08_set_channel', tc08_handle,int16(i),int8(' '));
@@ -160,6 +160,10 @@ info.ChannelTypes = ChannelTypes;
 info.GUI = MasterTempRecordGUI(info);
 
 MasterTempRecordInfo = info;
+
+if exist('hwarn','var') && ishandle(hwarn),
+  delete(hwarn);
+end
 
 function s = get_last_error(tc08_handle)
 

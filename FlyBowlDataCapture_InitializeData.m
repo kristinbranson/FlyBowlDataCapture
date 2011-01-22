@@ -55,12 +55,16 @@ handles.JCtraxCodeDir = '../JCtrax';
 if ~isdeployed,
   miscdir = fullfile(handles.JCtraxCodeDir,'misc');
   if ~exist(miscdir,'file')
-    error('Directory %s required',miscdir);
+    s = sprintf('Directory %s required',miscdir);
+    errordlg(s);
+    error(s);
   end
   addpath(miscdir);
   filehandlingdir = fullfile(handles.JCtraxCodeDir,'filehandling');
   if ~exist(filehandlingdir,'file')
-    error('Directory %s required',filehandlingdir);
+    s = sprintf('Directory %s required',filehandlingdir);
+    errordlg(s);
+    error(s);
   end
   addpath(filehandlingdir);
 end
@@ -139,7 +143,7 @@ try
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
     else
-      fprintf('Parameter %s not set in parameter file.\n',numeric_params{i});
+      addToStatus(handles,sprintf('Parameter %s not set in parameter file.',numeric_params{i}));
     end
   end
   
@@ -189,8 +193,7 @@ if isfield(handles.params,'DoRotatePreviewImage'),
     handles.params.DoRotatePreviewImage = cat(1,tmp{:});
     handles.params.DoRotatePreviewImage(:,3) = num2cell(cellfun(@str2double,handles.params.DoRotatePreviewImage(:,3)));
   catch ME,
-    fprintf('Error parsing DoRotatePreviewImage config params\n');
-    getReport(ME)
+    errordlg(['Error parsing DoRotatePreviewImage config params\n',getReport(ME)]);
     handles.Params.DoRotatePreviewImage = cell(0,3);
   end
 else

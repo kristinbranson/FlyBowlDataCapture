@@ -8,7 +8,9 @@ if ~isfield(handles,'DeviceID'),
 end
 
 if ~isfield(handles,'DeviceID'),
-  error('DeviceID not yet set');
+  s = sprintf('DeviceID not yet set');
+  errordlg(s);
+  error(s);
 end
 
 % check if this device is in use now

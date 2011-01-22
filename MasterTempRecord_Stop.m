@@ -15,15 +15,20 @@ if exist(IsMasterFile,'file'),
   try
     delete(IsMasterFile);
   catch ME,
-    fprintf('Error removing semaphore file %s\n',IsMasterFile);
-    disp(ME);
+    
+    s = [sprintf('Error removing semaphore file %s\n',IsMasterFile),getReport(ME)];
+    if exist('hwarn','var') && ishandle(hwarn), delete(hwarn); end
+    hwarn = warndlg(s,'Error stopping temperature recording');
+
   end
   % close the probe
   ok = calllib('usbtc08','usb_tc08_close_unit',tc08_handle);
   if ok == 0,
     last_error=calllib('usbtc08','usb_tc08_get_last_error',tc08_handle);
     [errname,errstr] = USBTC08_error_table(last_error);
-    fprintf('Stop(%s): Error %s: %s\n',datestr(now,13),errname,errstr);
+    s = sprintf('Stop(%s): Error %s: %s\n',datestr(now,13),errname,errstr);
+    if exist('hwarn','var') && ishandle(hwarn), delete(hwarn); end
+    hwarn = warndlg(s,'Error stopping temperature recording');
   end  
 else
   fprintf('Semaphore file %s already deleted\n',IsMasterFile);
@@ -35,8 +40,9 @@ for i = 1:length(ChannelFileNames),
     try
       delete(ChannelFileNames{i});
     catch ME,
-      fprintf('Error removing temperature channel file %s\n',ChannelFileNames{i});
-      disp(ME);
+      s = [sprintf('Error removing temperature channel file %s\n',ChannelFileNames{i}),getReport(ME)];
+      if exist('hwarn','var') && ishandle(hwarn), delete(hwarn); end
+      hwarn = warndlg(s,'Error stopping temperature recording');
     end
   end
 end

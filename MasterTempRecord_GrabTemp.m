@@ -44,7 +44,7 @@ for i = 1:length(Channels),
   if nreadings < 0,
     last_error=calllib('usbtc08','usb_tc08_get_last_error',tc08_handle);
     [errname,errstr] = error_table(last_error);
-    fprintf('Error %s calling usb_tc08_get_single: %s',errname,errstr);
+    hwarn = warndlg(sprintf('Error %s calling usb_tc08_get_single: %s',errname,errstr),'Error reading temperature');
     continue;
   end
   
@@ -66,7 +66,8 @@ for i = 1:length(Channels),
   % write to file
   fid = fopen(ChannelFileNames{i},'w');
   if fid <= 0,
-    fprintf('Could not open file %s for writing temperature data for channel %d\n',ChannelFileNames{i},Channel);
+    if exist('hwarn','var') && ishandle(hwarn), delete(hwarn); end
+    hwarn = warndlg(sprintf('Could not open file %s for writing temperature data for channel %d\n',ChannelFileNames{i},Channel),'Error reading temperature');
     continue;
   end
   fprintf(fid,'%f %f %d',timestamp,temp_v,overflow_v);
@@ -75,6 +76,10 @@ for i = 1:length(Channels),
   % debug
   %fprintf('Channel %d: timestamp = %s, temp = %f, nreadings = %d, callback at time %s\n',channel,datestr(timestamp,13),temp_v,nreadings,datestr(event.Data.time,13));
   
+end
+
+if exist('hwarn','var') && ishandle(hwarn),
+  delete(hwarn);
 end
 
 % ok = calllib('usbtc08','usb_tc08_get_single',...

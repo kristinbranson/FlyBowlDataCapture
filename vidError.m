@@ -30,8 +30,9 @@ EventDataTime = EventData.AbsTime;
 % Create a display indicating the type of event, the time of the event and
 % the name of the object.
 name = get(obj, 'Name');
-fprintf('%s event occurred at %s for video input object: %s.\n', ...
-    EventType, datestr(EventDataTime,13), name);
+s = sprintf('%s event occurred at %s for video input object: %s.\n', ...
+  EventType, datestr(EventDataTime,13), name);
+errordlg(s,'Video Error');
 
 % Display the error string.
 if strcmpi(EventType, 'error')
