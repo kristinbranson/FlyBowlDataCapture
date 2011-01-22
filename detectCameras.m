@@ -37,7 +37,6 @@ else
     didregister = false;
     if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
       loc = fullfile(pwd,'Release','udcam.dll');
-      hmsg = msgbox('Trying to register %s\n',loc);
       if exist(loc,'file'),
         try
           imaqregister(loc,'register');
@@ -45,10 +44,9 @@ else
           fprintf('Registered udcam\n');
           didregister = true;
         catch ME2,
-          fprintf('Tried to register udcam but failed: %s\n',getReport(ME2));
+          fprintf('Tried to register udcam from %s but failed: %s\n',loc,getReport(ME2));
         end
       end
-      delete(hmsg);
     end
     if ~didregister,
       getReport(ME)
