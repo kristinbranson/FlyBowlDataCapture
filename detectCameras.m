@@ -36,12 +36,18 @@ else
   catch ME
     didregister = false;
     if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
+      
       loc = fullfile(pwd,'Release','udcam.dll');
+      fprintf('Looking for udcam.dll at %s\n',loc);
       if exist(loc,'file'),
         try
-          imaqregister(loc,'register');
+          tmp = imaqregister(loc,'register');
+          disp(tmp{:});
+          fprintf('Successfully called imaqregister for udcam\n');
+          imaqreset;
+          imaqhwinfo
           adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
-          fprintf('Registered udcam\n');
+          fprintf('And imaqhwinfo knows about udcam\n');
           didregister = true;
         catch ME2,
           fprintf('Tried to register udcam from %s but failed: %s\n',loc,getReport(ME2));

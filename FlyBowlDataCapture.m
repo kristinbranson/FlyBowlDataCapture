@@ -177,19 +177,20 @@ function handles = LoadPreviousValues(handles)
 
 % Read previous values
 handles.previous_values = struct;
+handles.GUIInstance_prev = {
+  'Assay_Room'
+  'Assay_Rig'
+  'Assay_Plate'
+  'Assay_Lid'
+  'Assay_Bowl'
+  'DeviceID'
+  'TempProbeID'
+  'FigurePosition'
+  };
 if exist(handles.rcfile,'file'),
   try
     handles.previous_values = load(handles.rcfile);
-    handles.GUIInstance_prev = {
-      'Assay_Room'
-      'Assay_Rig'
-      'Assay_Plate'
-      'Assay_Lid'
-      'Assay_Bowl'
-      'DeviceID'
-      'TempProbeID'
-      'FigurePosition'
-      };
+
     for i = 1:length(handles.GUIInstance_prev),
       fn = handles.GUIInstance_prev{i};
       if ~isfield(handles.previous_values,fn) || ischar(handles.previous_values.(fn)),
