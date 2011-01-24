@@ -33,6 +33,8 @@ else
     %adaptorinfo =
     %imaqhwinfo_kb(handles.DetectCameras_Params,handles.params.Imaq_Adaptor);
     adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
+    fprintf('Grabbed adaptor info:\n');
+    disp(adaptorinfo);
   catch ME
     didregister = false;
     if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
@@ -101,3 +103,5 @@ handles.DeviceIDs = cell2mat(adaptorinfo.DeviceIDs(devidx));
 % end
 
 handles.adaptorinfo = adaptorinfo;
+
+fprintf('Exiting detectCameras\n');

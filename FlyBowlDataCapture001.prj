@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-project>
-  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.zip" build-checksum="554180695" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
+  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.zip" build-checksum="563678504" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
     <param.project.name>C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj</param.project.name>
     <param.target.type>Windows Standalone Application</param.target.type>
     <param.appname>FlyBowlDataCapture001</param.appname>
@@ -77,7 +77,6 @@
       <file>${PROJECT_ROOT}\detectCamerasWrapper.m</file>
       <file>${PROJECT_ROOT}\Docs</file>
       <file>${PROJECT_ROOT}\findjobj</file>
-      <file>${PROJECT_ROOT}\fix_metadata20101123.pl</file>
       <file>${PROJECT_ROOT}\fixExperimentMetaData.m</file>
       <file>${PROJECT_ROOT}\fixRCFile.m</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCapture.fig</file>
@@ -105,7 +104,6 @@
       <file>${PROJECT_ROOT}\openVideoFile.m</file>
       <file>${PROJECT_ROOT}\parseIsCameraRunningFileName.m</file>
       <file>${PROJECT_ROOT}\PreconSensorTest.m</file>
-      <file>${PROJECT_ROOT}\QuickStats_Stats_20110120T175100.mat</file>
       <file>${PROJECT_ROOT}\readLineNames.m</file>
       <file>${PROJECT_ROOT}\readUFMFDiagnostics.m</file>
       <file>${PROJECT_ROOT}\RecordConfiguration.m</file>
@@ -113,8 +111,6 @@
       <file>${PROJECT_ROOT}\renameVideoFile.m</file>
       <file>${PROJECT_ROOT}\resetTempProbe.m</file>
       <file>${PROJECT_ROOT}\RotatePreviewImage.m</file>
-      <file>${PROJECT_ROOT}\SageLineNames.txt</file>
-      <file>${PROJECT_ROOT}\SAGEReadParams.txt</file>
       <file>${PROJECT_ROOT}\SaveMetaData.m</file>
       <file>${PROJECT_ROOT}\setCamera.m</file>
       <file>${PROJECT_ROOT}\setExperimentName.m</file>
@@ -124,8 +120,6 @@
       <file>${PROJECT_ROOT}\tryRecordStartTemp.m</file>
       <file>${PROJECT_ROOT}\unsetCamera.m</file>
       <file>${PROJECT_ROOT}\UpdatePreview.m</file>
-      <file>${PROJECT_ROOT}\usbtc08.dll</file>
-      <file>${PROJECT_ROOT}\usbtc08.lib</file>
       <file>${PROJECT_ROOT}\USBTC08_error_table.m</file>
       <file>${PROJECT_ROOT}\USBTC08_temp_units_code.m</file>
       <file>${PROJECT_ROOT}\usbtc08Header.m</file>
@@ -140,6 +134,9 @@
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002.txt</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002_Debug.txt</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002_Special.txt</file>
+      <file>${PROJECT_ROOT}\QuickStats_Stats_20110120T175100.mat</file>
+      <file>${PROJECT_ROOT}\SageLineNames.txt</file>
+      <file>${PROJECT_ROOT}\SAGEReadParams.txt</file>
       <file>${PROJECT_ROOT}\usbtc08.dll</file>
       <file>${PROJECT_ROOT}\usbtc08.h</file>
       <file>${PROJECT_ROOT}\usbtc08.lib</file>
