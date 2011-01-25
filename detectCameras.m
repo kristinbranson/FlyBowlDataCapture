@@ -21,7 +21,36 @@ if handles.IsCameraRunning,
       handles.IsCameraRunningFiles(end).name);
     addToStatus(handles,...
       sprintf('Another camera is in operation, so reading adaptorinfo from %s. If this seems wrong, exit all FlyBowlDataCapture GUIs and run "CleanSemaphores"',filename));
-
+    % make sure adaptor is registered
+    if strcmp(handles.params.Imaq_Adaptor,'udcam'),
+      adaptors = imaqregister;
+      if ~any(cellfun(@(s) ~isempty(regexp(s,'udcam','once')),adaptors)),
+        didregister = false;
+        if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
+          loc = fullfile(pwd,'Release','udcam.dll');
+          fprintf('Looking for udcam.dll at %s\n',loc);
+          if exist(loc,'file'),
+            try
+              tmp = imaqregister(loc,'register');
+              disp(tmp{:});
+              fprintf('Successfully called imaqregister for udcam\n');
+              imaqreset;
+              imaqhwinfo
+              adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
+              fprintf('And imaqhwinfo knows about udcam\n');
+              didregister = true;
+            catch ME2,
+              fprintf('Tried to register udcam from %s but failed: %s\n',loc,getReport(ME2));
+            end
+          end
+        end
+        if ~didregister,
+          s = sprintf('Adaptor %s not registered, or no %s compatable camera found',handles.params.Imaq_Adaptor,handles.params.Imaq_Adaptor);
+          uiwait(errordlg(s,'Error loading imaq adaptor'));
+          return;
+        end
+      end
+    end
     load(filename,'adaptorinfo');
   catch
     s = sprintf('Could not load adaptor info from %s',filename);
@@ -33,12 +62,11 @@ else
     %adaptorinfo =
     %imaqhwinfo_kb(handles.DetectCameras_Params,handles.params.Imaq_Adaptor);
     adaptorinfo = imaqhwinfo(handles.params.Imaq_Adaptor);
-    fprintf('Grabbed adaptor info:\n');
-    disp(adaptorinfo);
+    %fprintf('Grabbed adaptor info:\n');
+    %disp(adaptorinfo);
   catch ME
     didregister = false;
     if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
-      
       loc = fullfile(pwd,'Release','udcam.dll');
       fprintf('Looking for udcam.dll at %s\n',loc);
       if exist(loc,'file'),

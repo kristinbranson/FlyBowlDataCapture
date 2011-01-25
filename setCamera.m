@@ -21,7 +21,7 @@ end
   
 try
   %handles.vid = videoinput_kb(handles.DetectCameras_Params,handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
-  fprintf('Trying to call videoinput(%s,%d,%s)\n',handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
+  %fprintf('Trying to call videoinput(%s,%d,%s)\n',handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
   handles.vid = videoinput(handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
 catch ME,
   s = sprintf('Could not initialize device id %d with format %s and adaptor %s. Try redetecting cameras.',...
