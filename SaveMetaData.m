@@ -55,8 +55,6 @@ fprintf(fid,'cross_date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenu
 fprintf(fid,'hours_starved="%f" ',starvation_time);
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'count="0">\n');
-% number of dead flies
-fprintf(fid,'num_flies_dead="%d">\n',handles.num_flies_dead);
 % TODO: genotype
 fprintf(fid,'      <genotype>%s &amp; w+;;%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
 
