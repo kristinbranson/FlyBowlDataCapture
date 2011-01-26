@@ -1,4 +1,4 @@
-function calibration = detectCalibrationMarks(varargin)
+function registration = detectRegistrationMarks(varargin)
 
 %% parse inputs
 
@@ -6,19 +6,22 @@ function calibration = detectCalibrationMarks(varargin)
   bkgdImage,movieName,annName,bkgdNSampleFrames,...
   method,...
   circleImageType,circleRLim,circleXLim,circleYLim,...
+  circleImageThresh,circleCannyThresh,circleCannySigma,...
+  circleNXTry,circleNYTry,circleNRTry,...
   crossFilterRadius,nRotations,minCrossFeatureStrength,...
   diskFilterRadius,minFeatureStrengthLow,minFeatureStrengthHigh,...
   minDistCenterFrac,maxDistCenterFrac,...
   maxDistCornerFrac_BowlLabel,...
-  nCalibrationPoints,featureRadius,...
+  nRegistrationPoints,featureRadius,...
   maxDThetaMate,...
   pairDist_mm,...
   circleRadius_mm,...
   bowlMarkerPairTheta_true,...
   maxDThetaBowlMarkerPair,...
   markerPairAngle_true,...
+  isBowlMarker,...
   DEBUG,...
-  calibrationData,...
+  registration,...
   nr,nc] = ...
   myparse(varargin,...
   'saveName','',...
@@ -27,10 +30,16 @@ function calibration = detectCalibrationMarks(varargin)
   'annName','',...
   'bkgdNSampleFrames',10,...
   'method','normcorr',...
-  'circleImageType','raw',...
+  'circleImageType','canny',...
   'circleRLim',[.4,.55],...
   'circleXLim',[.3,.6],...
   'circleYLim',[.3,.6],...
+  'circleImageThresh',1,...
+  'circleCannyThresh',[],...
+  'circleCannySigma',[],...
+  'circleNXTry',50,...
+  'circleNYTry',50,...
+  'circleNRTry',50,...
   'crossFilterRadius',9,...
   'nRotations',20,...
   'minCrossFeatureStrength',.92,...
@@ -40,7 +49,7 @@ function calibration = detectCalibrationMarks(varargin)
   'minDistCenterFrac',.5,...
   'maxDistCenterFrac',.57,...
   'maxDistCornerFrac_BowlLabel',.17,...
-  'nCalibrationPoints',8,...
+  'nRegistrationPoints',8,...
   'featureRadius',25,...
   'maxDThetaMate',10*pi/180,...
   'pairDist_mm',133,...
@@ -48,15 +57,20 @@ function calibration = detectCalibrationMarks(varargin)
   'bowlMarkerPairTheta_true',-3*pi/4,...
   'maxDThetaBowlMarkerPair',pi/12,...
   'markerPairAngle_true',pi/6,...
+  'isBowlMarker',true,...
   'debug',false,...
-  'calibrationData',[],...
+  'registrationData',[],...
   'nr',[],'nc',[]);
+
+iscircle = ismember(method,{'circle','circle_manual'});
 
 %% return register function
 
-if ~isempty(calibrationData),
-  calibrationData.registerfn = @(x,y) register(x,y,calibrationData.offX,...
-    calibrationData.offY,calibrationData.offTheta,calibrationData.scale);
+if ~isempty(registration),
+  registration.registerfn = @(x,y) register(x,y,registration.offX,...
+    registration.offY,registration.offTheta,registration.scale);
+  registration.affine = affineTransform(registration.offX,...
+    registration.offY,registration.offTheta,registration.scale);
   return;
 end
 
@@ -160,18 +174,40 @@ elseif strcmpi(method,'gradient'),
 elseif strcmpi(method,'circle'),
   
   % hough circle transform to detect 
-  if strcmpi(circleImageType,'raw'),
+  if strcmpi(circleImageType,'raw_whiteedge'),
+    circleim = bkgdImage >= circleImageThresh;
+  elseif strcmpi(circleImageType,'raw_blackedge'),
+    circleim = bkgdImage <= circleImageThresh;
+  elseif strcmpi(circleImageType,'grad'),
+    circleim = sqrt(gradI) >= circleImageThresh;
+  elseif strcmpi(circleImageType,'canny'),
     circleim = bkgdImage;
-  elseif strcmpi(circleImageType,'edge'),
-    circleim = gradI;
   else
     error('Unknown circleImageType %s',circleImageType);
   end
-  [circleCenterX,circleCenterY,circleRadius] = hough_circle(circleim,'rlim',circleRLim,'xlim',circleXLim,'ylim',circleYLim);
+  binedgesa = linspace(circleXLim(1),circleXLim(2),circleNXTry+1);
+  bincentersb = linspace(circleYLim(1),circleYLim(2),circleNYTry);
+  bincentersr = linspace(circleRLim(1),circleRLim(2),circleNRTry);
+  [circleRadius,circleCenterX,circleCenterY,featureStrengths,circleDetectParams] = ...
+    detectcircles(circleim,...
+    'cannythresh',circleCannyThresh,'cannysigma',circleCannySigma,...
+    'binedgesa',binedgesa,'bincentersb',bincentersb,'bincentersr',bincentersr,...
+    'maxncircles',1,'doedgedetect',strcmpi(circleImageType,'canny'));
 
+elseif strcmpi(method,'circle_manual'),
+  
+  circleim = bkgdImage;
+  hfig = figure;
+  imagesc(bkgdImage,[0,255]); axis image;
+  [circleCenterX,circleCenterY,circleRadius] = fitcircle_manual(hfig);
+  if ishandle(hfig),
+    delete(hfig);
+  end
+  featureStrengths = nan;
+  
 else
   
-  error('Unknown method for calibration mark detection: %s',method);
+  error('Unknown method for registration mark detection: %s',method);
   
 end
 
@@ -179,30 +215,32 @@ end
 %% find bowl label
 
 % compute distance to corners
-[xGrid,yGrid] = meshgrid(1:nc,1:nr);
-[dxGrid,dyGrid] = meshgrid(-featureRadius:featureRadius,-featureRadius:featureRadius);
-distCorner = inf(nr,nc);
-corners = [1,1,nc,nc;1,nr,nr,1];
-for i = 1:size(corners,2),
-  distCorner = min(distCorner, sqrt( (xGrid-corners(1,i)).^2 + (yGrid-corners(2,i)).^2 ));
+if isBowlMarker,
+  [xGrid,yGrid] = meshgrid(1:nc,1:nr);
+  [dxGrid,dyGrid] = meshgrid(-featureRadius:featureRadius,-featureRadius:featureRadius);
+  distCorner = inf(nr,nc);
+  corners = [1,1,nc,nc;1,nr,nr,1];
+  for i = 1:size(corners,2),
+    distCorner = min(distCorner, sqrt( (xGrid-corners(1,i)).^2 + (yGrid-corners(2,i)).^2 ));
+  end
+  
+  % threshold max distance to some corner
+  filI4 = gradfilI;
+  maxDistCorner_BowlLabel = maxDistCornerFrac_BowlLabel * r;
+  filI4(distCorner > maxDistCorner_BowlLabel) = 0;
+  
+  % find maximum
+  [success,x,y] = getNextFeaturePoint(filI4,'grad2');
+  if success,
+    bowlMarkerPoints = [x;y];
+  else
+    error('Could not detect bowl marker');
+  end
 end
 
-% threshold max distance to some corner
-filI4 = gradfilI;
-maxDistCorner_BowlLabel = maxDistCornerFrac_BowlLabel * r;
-filI4(distCorner > maxDistCorner_BowlLabel) = 0;
+%% find registration points
 
-% find maximum 
-[success,x,y] = getNextFeaturePoint(filI4,'grad2');
-if success,
-  bowlMarkerPoints = [x;y];
-else
-  error('Could not detect bowl marker');
-end
-
-%% find calibration points
-
-if ~strcmpi(method,'circle'),
+if ~iscircle
 
   % compute distance from center of image
   minDistCenter = minDistCenterFrac * r;
@@ -214,96 +252,103 @@ if ~strcmpi(method,'circle'),
   filI2(distCenter < minDistCenter | distCenter > maxDistCenter) = 0;
   
   % zero out bowl marker
-  filI2 = zeroOutDetection(bowlMarkerPoints(1),bowlMarkerPoints(2),filI2);
+  if isBowlMarker,
+    filI2 = zeroOutDetection(bowlMarkerPoints(1),bowlMarkerPoints(2),filI2);
+  end
   
-  calibrationPoints = [];
+  registrationPoints = [];
   featureStrengths = [];
   filI3 = filI2;
-  for i = 1:nCalibrationPoints,
+  for i = 1:nRegistrationPoints,
     
     [success,x,y,featureStrength,filI3] = getNextFeaturePoint(filI3,method);
     if ~success,
       break;
     end
-    calibrationPoints(:,i) = [x;y]; %#ok<AGROW>
+    registrationPoints(:,i) = [x;y]; %#ok<AGROW>
     featureStrengths(i) = featureStrength; %#ok<AGROW>
     
   end
   
-  if isempty(calibrationPoints),
-    error('No calibration points detected');
+  if isempty(registrationPoints),
+    error('No registration points detected');
   end
   
 end
 
-%% origin is the average of all the calibration points
-if strcmpi('method','circle'),
+%% origin is the average of all the registration points
+if iscircle,
   originX = circleCenterX;
   originY = circleCenterY;
 else
-  isleft = calibrationPoints(1,:) <= nc/2;
-  nLeftCalibrationPoints = nnz(isleft);
-  nRightCalibrationPoints = nnz(~isleft);
-  istop = calibrationPoints(2,:) >= nr/2;
-  nTopCalibrationPoints = nnz(istop);
-  nBottomCalibrationPoints = nnz(~istop);
+  isleft = registrationPoints(1,:) <= nc/2;
+  nLeftRegistrationPoints = nnz(isleft);
+  nRightRegistrationPoints = nnz(~isleft);
+  istop = registrationPoints(2,:) >= nr/2;
+  nTopRegistrationPoints = nnz(istop);
+  nBottomRegistrationPoints = nnz(~istop);
   
-  originX = (sum(calibrationPoints(1,isleft))/nLeftCalibrationPoints + ...
-    sum(calibrationPoints(1,~isleft))/nRightCalibrationPoints)/2;
-  originY = (sum(calibrationPoints(2,istop))/nTopCalibrationPoints + ...
-    sum(calibrationPoints(2,~istop))/nBottomCalibrationPoints)/2;
+  originX = (sum(registrationPoints(1,isleft))/nLeftRegistrationPoints + ...
+    sum(registrationPoints(1,~isleft))/nRightRegistrationPoints)/2;
+  originY = (sum(registrationPoints(2,istop))/nTopRegistrationPoints + ...
+    sum(registrationPoints(2,~istop))/nBottomRegistrationPoints)/2;
 end
 
 offX = -originX;
 offY = -originY;
 
-%% sort calibration points counterclockwise from bowl label
-if ~strcmpi(method,'circle'),
+%% sort registration points counterclockwise from bowl label
 
-  if success,
-    bowlMarkerTheta = atan2(bowlMarkerPoints(2)-originY,bowlMarkerPoints(1)-originX);
-  else
-    bowlMarkerTheta = atan2(1-originY,1-originX);
-  end
-  theta = atan2(calibrationPoints(2,:)-originY,calibrationPoints(1,:)-originX);
+if isBowlMarker && success,
+  bowlMarkerTheta = atan2(bowlMarkerPoints(2)-originY,bowlMarkerPoints(1)-originX);
+else
+  bowlMarkerTheta = atan2(1-originY,1-originX);
+end
+if ~iscircle
+  theta = atan2(registrationPoints(2,:)-originY,registrationPoints(1,:)-originX);
   % offset from bowlMarkerTheta
   dtheta = mod((theta - bowlMarkerTheta),2*pi);
   [dtheta,order] = sort(dtheta);
-  calibrationPoints = calibrationPoints(:,order);
+  registrationPoints = registrationPoints(:,order);
   featureStrengths = featureStrengths(order);
 end
 
 %% find the rotation
 
-if strcmpi(method,'circle'),
-  % calibration marker
-  bowlMarkerPairTheta = bowlMarkerTheta;
-else
-  % take the average of the pair of points around the bowl marker
-  d1 = mod(dtheta(1)+pi,2*pi)-pi;
-  d2 = mod(dtheta(end)+pi,2*pi)-pi;
-  inrange = d1 > 0 && (abs(abs(d1) - markerPairAngle_true/2) <= maxDThetaBowlMarkerPair) && ...
-    d2 < 0 && (abs(abs(d2) - markerPairAngle_true/2) <= maxDThetaBowlMarkerPair);
-  if inrange,
-    x = (calibrationPoints(1,1)+calibrationPoints(1,end))/2;
-    y = (calibrationPoints(2,1)+calibrationPoints(2,end))/2;
-    bowlMarkerPairTheta = atan2(y-originY,x-originX);
-  else
-    bowlMarkerPairTheta = bowlMarkerTheta;
-  end
-end
+if isBowlMarker && success,
 
-offTheta = mod(bowlMarkerPairTheta_true-bowlMarkerPairTheta+pi,2*pi)-pi;
+  if iscircle
+    % registration marker
+    bowlMarkerPairTheta = bowlMarkerTheta;
+  else
+    % take the average of the pair of points around the bowl marker
+    d1 = mod(dtheta(1)+pi,2*pi)-pi;
+    d2 = mod(dtheta(end)+pi,2*pi)-pi;
+    inrange = d1 > 0 && d1 <= maxDThetaBowlMarkerPair && ...
+      d2 < 0 && -d2 <= maxDThetaBowlMarkerPair;
+    if inrange,
+      x = (registrationPoints(1,1)+registrationPoints(1,end))/2;
+      y = (registrationPoints(2,1)+registrationPoints(2,end))/2;
+      bowlMarkerPairTheta = atan2(y-originY,x-originX);
+    else
+      bowlMarkerPairTheta = bowlMarkerTheta;
+    end
+  end
+  
+  offTheta = mod(bowlMarkerPairTheta_true-bowlMarkerPairTheta+pi,2*pi)-pi;
+else
+  offTheta = 0;
+end
 
 
 %% find scale
 
-if strcmpi(method,'circle'),
+if iscircle,
   scale = circleRadius_mm / circleRadius;
 else
   nPairs = 0;
   d = 0;
-  for i = 1:size(calibrationPoints,2),
+  for i = 1:size(registrationPoints,2),
     thetaCurr = dtheta(i);
     if thetaCurr > pi,
       break;
@@ -311,7 +356,7 @@ else
     [dThetaMate,j] = min(abs(thetaCurr+pi-dtheta));
     isMate = dThetaMate <= maxDThetaMate;
     if isMate,
-      d = d + sqrt(diff(calibrationPoints(1,[i,j])).^2+diff(calibrationPoints(2,[i,j])).^2);
+      d = d + sqrt(diff(registrationPoints(1,[i,j])).^2+diff(registrationPoints(2,[i,j])).^2);
       nPairs = nPairs + 1;
     end
   end
@@ -321,89 +366,125 @@ end
 
 registerfn = @(x,y) register(x,y,offX,offY,offTheta,scale);
 
-calibration = struct('offX',offX,...
+affine = affineTransform(offX,offY,offTheta,scale);
+
+registration = struct('offX',offX,...
   'offY',offY,...
   'offTheta',offTheta,...
   'scale',scale,...
   'bowlMarkerTheta',bowlMarkerTheta,...
-  'bkgdImage',bkgdImage);
-if strcmpi(method,'circle'),
-  calibration.circleCenterX = circleCenterX;
-  calibration.circleCenterY = circleCenterY;
-  calibration.circleRadius = circleRadius;
+  'bkgdImage',bkgdImage,...
+  'featureStrengths',featureStrengths,...
+  'affine',affine);
+
+if iscircle,
+  registration.circleCenterX = circleCenterX;
+  registration.circleCenterY = circleCenterY;
+  registration.circleRadius = circleRadius;
+  if strcmpi(method,'circle'),
+    registration.circleDetectParams = circleDetectParams;
+  end
 else
-  calibration.calibrationPoints = calibrationPoints;
-  calibration.bowlMarkerPoints = bowlMarkerPoints;
-  calibration.featureStrengths = featureStrengths;
-  calibration.dtheta = dtheta;
-  calibration.nPairs = nPairs;
-  calibration.nLeftCalibrationPoints = nLeftCalibrationPoints;
-  calibration.nRightCalibrationPoints = nRightCalibrationPoints;
-  calibration.nTopCalibrationPoints = nTopCalibrationPoints;
-  calibration.nBottomCalibrationPoints = nBottomCalibrationPoints;
+  registration.registrationPoints = registrationPoints;
+  registration.bowlMarkerPoints = bowlMarkerPoints;
+  registration.dtheta = dtheta;
+  registration.nPairs = nPairs;
+  registration.nLeftRegistrationPoints = nLeftRegistrationPoints;
+  registration.nRightRegistrationPoints = nRightRegistrationPoints;
+  registration.nTopRegistrationPoints = nTopRegistrationPoints;
+  registration.nBottomRegistrationPoints = nBottomRegistrationPoints;
 end
 if ~isempty(saveName),
-  save(saveName,'-struct','calibration');
+  save(saveName,'-struct','registration');
 end
-calibration.registerfn = registerfn;
+registration.registerfn = registerfn;
+
+%%
 
 if DEBUG,
-  figure(1);
+  hfig = figure;
+  set(hfig,'Position',[20,20,1500,600]);
   clf;
-  hax = zeros(1,3);
-  hax(1) = subplot(1,4,1);
+  if iscircle,
+    nsubplots = 3;
+  else
+    nsubplots = 4;
+  end
+  hax = createsubplots(1,nsubplots,.05);
+  %hax(1) = subplot(1,nsubplots,1);
+  axes(hax(1));
   imagesc(bkgdImage);
   hold on;
-  if strcmpi(method,'circle'),
+  if iscircle,
     l = circleRadius_mm/2 / scale;
   else
     l = pairDist_mm/4 / scale;
   end
-  quiver(originX,originY,cos(-offTheta)*l,sin(-offTheta)*l,0,'k--');
-  text(originX+cos(-offTheta)*l,sin(-offTheta)*l,'x');
-  quiver(originX,originY,cos(-offTheta+pi/2)*l,sin(-offTheta+pi/2)*l,0,'k-');
-  text(originX+cos(-offTheta+pi/2)*l,sin(-offTheta+pi/2)*l,'y');
-  if strcmpi(method,'circle'),
+  xangle = 0;
+  yangle = pi/2;
+  quiver(originX,originY,cos(xangle-offTheta)*l,sin(xangle-offTheta)*l,0,'k--');
+  text(originX+cos(xangle-offTheta)*l,originY+sin(xangle-offTheta)*l,'x');
+  quiver(originX,originY,cos(yangle-offTheta)*l,sin(yangle-offTheta)*l,0,'k-');
+  text(originX+cos(yangle-offTheta)*l,originY+sin(yangle-offTheta)*l,'y');
+  if iscircle,
     tmp = linspace(0,2*pi,50);
     plot(circleCenterX + circleRadius*cos(tmp),circleCenterY + circleRadius*sin(tmp),'k-');
   else
-    plot(calibrationPoints(1,:),calibrationPoints(2,:),'ks');
+    plot(registrationPoints(1,:),registrationPoints(2,:),'ks');
   end
-  plot(bowlMarkerPoints(1),bowlMarkerPoints(2),'mo');
+  if isBowlMarker,
+    plot(bowlMarkerPoints(1),bowlMarkerPoints(2),'mo');
+  end
   axis image xy;
-  hax(2) = subplot(1,4,2);
-  image(cat(3,min(1,bkgdImage/255 + double(filI1 >= minFeatureStrengthLow)*.3), repmat(bkgdImage/255,[1,1,2])));
+  axes(hax(2));
+  %hax(2) = subplot(1,nsubplots,2);
+  if iscircle,
+    imagesc(bkgdImage);
+  else
+    image(cat(3,min(1,bkgdImage/255 + double(filI1 >= minFeatureStrengthLow)*.3), repmat(bkgdImage/255,[1,1,2])));
+  end
   hold on;
-  quiver(originX,originY,cos(-offTheta)*l,sin(-offTheta)*l,0,'k-');
-  quiver(originX,originY,cos(-offTheta+pi/2)*l,sin(-offTheta+pi/2)*l,0,'k-');
-  if strcmpi(method,'circle'),
+  quiver(originX,originY,cos(xangle-offTheta)*l,sin(xangle-offTheta)*l,0,'k--');
+  text(originX+cos(xangle-offTheta)*l,originY+sin(xangle-offTheta)*l,'x');
+  quiver(originX,originY,cos(yangle-offTheta)*l,sin(yangle-offTheta)*l,0,'k-');
+  text(originX+cos(yangle-offTheta)*l,originY+sin(yangle-offTheta)*l,'y');
+  if iscircle,
     tmp = linspace(0,2*pi,50);
     plot(circleCenterX + circleRadius*cos(tmp),circleCenterY + circleRadius*sin(tmp),'k-');
   else
-    scatter(calibrationPoints(1,:),calibrationPoints(2,:),50,1:size(calibrationPoints,2),'s');
+    scatter(registrationPoints(1,:),registrationPoints(2,:),50,1:size(registrationPoints,2),'s');
   end
-  plot(bowlMarkerPoints(1),bowlMarkerPoints(2),'mo');
+  if isBowlMarker,
+    plot(bowlMarkerPoints(1),bowlMarkerPoints(2),'mo');
+  end
   axis image xy;
-  hax(3) = subplot(1,4,3);
-  if strcmpi(method,'circle'),
+  axes(hax(3));
+  %hax(3) = subplot(1,nsubplots,3);
+  if iscircle,
     imagesc(circleim);
   else
-    imagesc(filI1);
+    imfilI1 = colormap_image(filI1);
+    image(imfilI1);
   end
   hold on;
-  quiver(originX,originY,cos(-offTheta)*l,sin(-offTheta)*l,0,'w-');
-  quiver(originX,originY,cos(-offTheta+pi/2)*l,sin(-offTheta+pi/2)*l,0,'w-');
-  if strcmpi(method,'circle'),
+  quiver(originX,originY,cos(xangle-offTheta)*l,sin(xangle-offTheta)*l,0,'w--');
+  text(originX+cos(xangle-offTheta)*l,originY+sin(xangle-offTheta)*l,'x','color','w');
+  quiver(originX,originY,cos(yangle-offTheta)*l,sin(yangle-offTheta)*l,0,'w-');
+  text(originX+cos(yangle-offTheta)*l,originY+sin(yangle-offTheta)*l,'y','color','w');
+  if iscircle,
     tmp = linspace(0,2*pi,50);
     plot(circleCenterX + circleRadius*cos(tmp),circleCenterY + circleRadius*sin(tmp),'k-');
   else
-    scatter(calibrationPoints(1,:),calibrationPoints(2,:),50,1:size(calibrationPoints,2),'s');
+    scatter(registrationPoints(1,:),registrationPoints(2,:),50,1:size(registrationPoints,2),'s');
   end
-  plot(bowlMarkerPoints(1),bowlMarkerPoints(2),'mo');
+  if isBowlMarker,
+    plot(bowlMarkerPoints(1),bowlMarkerPoints(2),'mo');
+  end
   axis image xy;
-  linkaxes(hax);
-  if ~strcmpi(method,'circle'),
-    subplot(1,4,4);
+  linkaxes(hax(1:3));
+  if ~iscircle
+    axes(hax(4));
+    %subplot(1,nsubplots,4);
     tmp = linspace(0,2*pi,100);
     plot(cos(tmp)*pairDist_mm/2,sin(tmp)*pairDist_mm/2,'b');
     hold on;
@@ -413,16 +494,22 @@ if DEBUG,
     plot([cos(bowlMarkerPairTheta_true-markerPairAngle_true/2+tmp)*pairDist_mm/2;zeros(size(tmp))],...
       [sin(bowlMarkerPairTheta_true-markerPairAngle_true/2+tmp)*pairDist_mm/2;zeros(size(tmp))],'g-');
     plot([0,cos(bowlMarkerPairTheta_true)*pairDist_mm/2],[0,sin(bowlMarkerPairTheta_true)*pairDist_mm/2],'m-');
-    [x,y] = registerfn(calibrationPoints(1,:),calibrationPoints(2,:));
+    [x,y] = registerfn(registrationPoints(1,:),registrationPoints(2,:));
     plot(x,y,'ks');
     [x,y] = registerfn(bowlMarkerPoints(1),bowlMarkerPoints(2));
     plot(x,y,'mo');
-    quiver(0,0,pairDist_mm/4,0,0,'k');
+    quiver(0,0,cos(xangle)*pairDist_mm/4,sin(xangle)*pairDist_mm/4,0,'k');
+    text(cos(xangle)*pairDist_mm/4,sin(xangle)*pairDist_mm/4,'x');
+    quiver(0,0,cos(yangle)*pairDist_mm/4,sin(yangle)*pairDist_mm/4,0,'k');
+    text(cos(yangle)*pairDist_mm/4,sin(yangle)*pairDist_mm/4,'y');
     quiver(0,0,0,pairDist_mm/4,0,'k');
     axis equal;
     axisalmosttight;
   end
+  
 end
+
+%%
 
 function [success,x,y,featureStrength,filI] = getNextFeaturePoint(filI,methodcurr)
 
@@ -484,4 +571,10 @@ end
     y = reshape(X(2,:),sz);    
   end
 
+  function A = affineTransform(offX,offY,offTheta,scale)
+    costheta = cos(offTheta); sintheta = sin(offTheta);
+    A = [1 0 0; 0 1 0; offX offY 1] * ...
+      [costheta sintheta 0; -sintheta costheta 0; 0 0 1] * ...
+      [scale 0 0; 0 scale 0; 0 0 1];
+  end
 end
