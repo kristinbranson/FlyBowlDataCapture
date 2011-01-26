@@ -52,17 +52,22 @@ handles.SAGECodeDir = '../SAGE/MATLABInterface/Trunk';
 handles.JCtraxCodeDir = '../JCtrax';
 
 % add JCtrax to path
-miscdir = fullfile(handles.JCtraxCodeDir,'misc');
-if ~exist(miscdir,'file')
-  error('Directory %s required',miscdir);
+if ~isdeployed,
+  miscdir = fullfile(handles.JCtraxCodeDir,'misc');
+  if ~exist(miscdir,'file')
+    s = sprintf('Directory %s required',miscdir);
+    errordlg(s);
+    error(s);
+  end
+  addpath(miscdir);
+  filehandlingdir = fullfile(handles.JCtraxCodeDir,'filehandling');
+  if ~exist(filehandlingdir,'file')
+    s = sprintf('Directory %s required',filehandlingdir);
+    errordlg(s);
+    error(s);
+  end
+  addpath(filehandlingdir);
 end
-addpath(miscdir);
-filehandlingdir = fullfile(handles.JCtraxCodeDir,'filehandling');
-if ~exist(filehandlingdir,'file')
-  error('Directory %s required',filehandlingdir);
-end
-addpath(filehandlingdir);
-
 
 %% delete existing imaqs and timers
 
@@ -133,12 +138,12 @@ try
     'UFMFMaxFracFgCompress','UFMFMaxBGNFrames','UFMFBGUpdatePeriod',...
     'UFMFBGKeyFramePeriod','UFMFMaxBoxLength','UFMFBackSubThresh',...
     'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
-    'DoRotatePreviewImage'};
+    'ScanLineYLim'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
     else
-      fprintf('Parameter %s not set in parameter file.\n',numeric_params{i});
+      addToStatus(handles,sprintf('Parameter %s not set in parameter file.',numeric_params{i}));
     end
   end
   
@@ -146,7 +151,9 @@ try
   notlist_params = {'Imaq_Adaptor','Imaq_DeviceName','Imaq_VideoFormat',...
     'FileType','MetaData_AssayName',...
     'MetaData_Effector','MetaData_Gender','MetaDataFileName','MovieFilePrefix','LogFileName',...
-    'UFMFLogFileName','UFMFStatFileName','PreconSensorSerialPort'};
+    'UFMFLogFileName','UFMFStatFileName','PreconSensorSerialPort',...
+    'DoRotatePreviewImage',...
+    'QuickStatsStatsFileName'};
   for i = 1:length(notlist_params),
     fn = notlist_params{i};
     if ischar(handles.params.(fn){1}),
@@ -161,7 +168,7 @@ try
   end
   
   % parameters that are selected by GUI instance
-  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory','HardDriveName','DoRotatePreviewImage'};
+  GUIInstance_params = {'OutputDirectory','TmpOutputDirectory','HardDriveName'};
   for i = 1:length(GUIInstance_params),
     fn = GUIInstance_params{i};
     j = mod(handles.GUIi-1,length(handles.params.(fn)))+1;
@@ -177,6 +184,22 @@ catch ME
   rethrow(ME);
 end
   
+%% dorotatepreview needs special parsing
+
+if isfield(handles.params,'DoRotatePreviewImage'),
+  try
+    s = handles.params.DoRotatePreviewImage;
+    tmp = regexp(s,'\s*\(([^,]*),([^,]*),([^,]*)\)','tokens');
+    handles.params.DoRotatePreviewImage = cat(1,tmp{:});
+    handles.params.DoRotatePreviewImage(:,3) = num2cell(cellfun(@str2double,handles.params.DoRotatePreviewImage(:,3)));
+  catch ME,
+    errordlg(['Error parsing DoRotatePreviewImage config params\n',getReport(ME)]);
+    handles.Params.DoRotatePreviewImage = cell(0,3);
+  end
+else
+  handles.Params.DoRotatePreviewImage = cell(0,3);
+end
+
 %% temporary output directory
 if isempty(handles.params.TmpOutputDirectory),
   handles.params.TmpOutputDirectory = tempdir;
@@ -233,7 +256,9 @@ handles.isdefault.Fly_LineName = true;
 handles.IsSage = exist(handles.SAGECodeDir,'file');
 if handles.IsSage,
   try
-    addpath(handles.SAGECodeDir);
+    if ~isdeployed,
+      addpath(handles.SAGECodeDir);
+    end
   catch
     handles.IsSage = false;
   end
@@ -518,6 +543,29 @@ set(handles.popupmenu_Assay_Plate,'String',handles.Assay_Plates,...
   'Value',find(strcmp(handles.Assay_Plate,handles.Assay_Plates),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
+%% Lid
+
+% whether this has been changed or not
+handles.isdefault.Assay_Lid = true;
+
+% possible values for StarvationHandler
+handles.Assay_Lids = handles.params.Assay_Lids;
+
+% if StarvationHandler not stored in rc file, choose first StarvationHandler
+if ~isfield(handles.previous_values,'Assay_Lid') || ...
+    ~ismember(handles.previous_values.Assay_Lid,handles.Assay_Lids),
+  handles.previous_values.Assay_Lid = handles.Assay_Lids{1};
+end
+
+% by default, previous StarvationHandler
+handles.Assay_Lid = handles.previous_values.Assay_Lid;
+
+% set possible values, current value, color to default
+set(handles.popupmenu_Assay_Lid,'String',handles.Assay_Lids,...
+  'Value',find(strcmp(handles.Assay_Lid,handles.Assay_Lids),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
+
+
 %% Bowl
 
 % whether this has been changed or not
@@ -767,7 +815,20 @@ handles.ComputeQuickStatsParams = {...
   'parent',handles.figure_main...
   'SaveFileStr','QuickStats.png',...
   'SaveDataStr','QuickStats.txt'...
+  'ScanLineYLim',handles.params.ScanLineYLim...
   };
+
+if isfield(handles.params,'QuickStatsStatsFileName'),
+  try
+    quickstats_stats = load(handles.params.QuickStatsStatsFileName);
+    handles.ComputeQuickStatsParams = [handles.ComputeQuickStatsParams,...
+      struct2paramscell(quickstats_stats)];
+  catch ME,
+    warning('Could not load QuickStatsStats file %s\n%s',handles.params.QuickStatsStatsFileName,getReport(ME));
+  end
+end
+
+
 
 %% Initialization complete
 handles.GUIInitialization_Time_datenum = now;

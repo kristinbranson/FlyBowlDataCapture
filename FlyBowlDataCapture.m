@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 18-Jan-2011 23:34:24
+% Last Modified by GUIDE v2.5 19-Jan-2011 19:23:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -88,7 +88,9 @@ if ~ischar(filestr) || isempty(filestr),
 end
 handles.params_file = fullfile(pathstr,filestr);
 if ~exist(handles.params_file,'file'),
-  error('File %s does not exist',handles.params_file);
+  s = sprintf('File %s does not exist',handles.params_file);
+  errordlg(s,'Error loading config parameters');
+  error(s);
 end
 
 % Figure position
@@ -175,18 +177,20 @@ function handles = LoadPreviousValues(handles)
 
 % Read previous values
 handles.previous_values = struct;
+handles.GUIInstance_prev = {
+  'Assay_Room'
+  'Assay_Rig'
+  'Assay_Plate'
+  'Assay_Lid'
+  'Assay_Bowl'
+  'DeviceID'
+  'TempProbeID'
+  'FigurePosition'
+  };
 if exist(handles.rcfile,'file'),
   try
     handles.previous_values = load(handles.rcfile);
-    handles.GUIInstance_prev = {
-      'Assay_Room'
-      'Assay_Rig'
-      'Assay_Plate'
-      'Assay_Bowl'
-      'DeviceID'
-      'TempProbeID'
-      'FigurePosition'
-      };
+
     for i = 1:length(handles.GUIInstance_prev),
       fn = handles.GUIInstance_prev{i};
       if ~isfield(handles.previous_values,fn) || ischar(handles.previous_values.(fn)),
@@ -672,6 +676,9 @@ set(handles.popupmenu_Assay_Rig,'BackgroundColor',handles.changed_bkgdcolor);
 
 handles = ChangedMetaData(handles);
 
+% rotate preview image if nec
+RotatePreviewImage(handles);
+
 guidata(hObject,handles);
 
 
@@ -745,6 +752,9 @@ handles.isdefault.Assay_Bowl = false;
 set(handles.popupmenu_Assay_Bowl,'BackgroundColor',handles.changed_bkgdcolor);
 
 handles = ChangedMetaData(handles);
+
+% rotate preview image if nec
+RotatePreviewImage(handles);
 
 guidata(hObject,handles);
 
@@ -1105,14 +1115,37 @@ function figure_main_CloseRequestFcn(hObject, eventdata, handles)
 
 % Hint: delete(hObject) closes the figure
 [handles,didcancel] = CloseExperiment(handles);
+
+hwaitbar = waitbar(0,'Closing GUI');
+
+s = 'Closed experiment';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.3,hwaitbar,s);
+else
+  hwaitbar = waitbar(.3,s);
+end
 if didcancel,
+  if exist('hwaitbar','var') && ishandle(hwaitbar),
+    delete(hwaitbar);
+  end
   return;
 end
 if isfield(handles,'GUIInstanceFileName') && ...
     exist(handles.GUIInstanceFileName,'file'),
   delete(handles.GUIInstanceFileName);
+  s = 'Deleted GUI semaphore';
+  if exist('hwaitbar','var') && ishandle(hwaitbar),
+    waitbar(.6,hwaitbar,s);
+  else
+    hwaitbar = waitbar(.6,s);
+  end
 end
 guidata(hObject,handles);
+
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  delete(hwaitbar);
+end
+
 uiresume(handles.figure_main);
 
 % --------------------------------------------------------------------
@@ -1249,18 +1282,20 @@ function menu_Quit_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-[handles,didcancel] = CloseExperiment(handles);
-if didcancel,
-  return;
-end
-if isfield(handles,'GUIInstanceFileName') && ...
-    exist(handles.GUIInstanceFileName,'file'),
-  delete(handles.GUIInstanceFileName);
-end
-
-guidata(hObject,handles);
-
-uiresume(handles.figure_main);
+figure_main_CloseRequestFcn(hObject, eventdata, handles)
+% 
+% [handles,didcancel] = CloseExperiment(handles);
+% if didcancel,
+%   return;
+% end
+% if isfield(handles,'GUIInstanceFileName') && ...
+%     exist(handles.GUIInstanceFileName,'file'),
+%   delete(handles.GUIInstanceFileName);
+% end
+% 
+% guidata(hObject,handles);
+% 
+% uiresume(handles.figure_main);
 
 % --- Executes on button press in pushbutton_SaveMetaData.
 function pushbutton_SaveMetaData_Callback(hObject, eventdata, handles)
@@ -1341,6 +1376,7 @@ hObject = handles.figure_main;
 didabort = false;
 didcancel = false;
 
+
 % if not done recording, then make sure user wants to stop prematurely
 if ~handles.FinishedRecording && handles.GUIIsInitialized,
   v = questdlg('Do you really want to close the current experiment?','Really close?','Close','Cancel','Cancel');
@@ -1351,6 +1387,8 @@ if ~handles.FinishedRecording && handles.GUIIsInitialized,
   addToStatus(handles,{'Experiment aborted.'});
   didabort = true;
 end
+
+hwaitbar = waitbar(.1,'Closing experiment');
 
 % recording stopped in the middle
 if handles.IsRecording,
@@ -1366,6 +1404,13 @@ if handles.IsRecording && isfield(handles,'vid') && isvalid(handles.vid),
   handles = guidata(hObject);
 end
 
+s = 'Logging stopped';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.2,hwaitbar,s);
+else
+  hwaitbar = waitbar(.2,s);
+end
+
 % save metadata
 if handles.MetaDataNeedsSave,
   answer = questdlg('Save MetaData before closing?','Save MetaData?','Yes','No','Yes');
@@ -1374,6 +1419,14 @@ if handles.MetaDataNeedsSave,
   end
 end
 handles.MetaDataNeedsSave = false;
+
+s = 'Saved metadata';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.3,hwaitbar,s);
+else
+  hwaitbar = waitbar(.3,s);
+end
+
 
 % create a file if there is an experiment directory
 if isfield(handles,'ExperimentDirectory') && exist(handles.ExperimentDirectory,'file') && didabort,
@@ -1385,6 +1438,13 @@ if isfield(handles,'ExperimentDirectory') && exist(handles.ExperimentDirectory,'
   catch
     addToStatus(handles,'Could not create abort file');
   end
+  s = 'Created ABORT file';
+  if exist('hwaitbar','var') && ishandle(hwaitbar),
+    waitbar(.4,hwaitbar,s);
+  else
+    hwaitbar = waitbar(.4,s);
+  end
+
 end
 
 % stop experiment timer
@@ -1393,10 +1453,25 @@ if isfield(handles,'StopTimer') && isvalid(handles.StopTimer),
   delete(handles.StopTimer);
 end
 
+s = 'Stopped experiment timer';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.5,hwaitbar,s);
+else
+  hwaitbar = waitbar(.5,s);
+end
+
+
 % delete vid object
 handles = clearVideoInput(handles);
 if isfield(handles,'vid') && isvalid(handles.vid),
   delete(handles.vid);
+end
+
+s = 'Destroyed vid object';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.6,hwaitbar,s);
+else
+  hwaitbar = waitbar(.6,s);
 end
 
 % delete preview image
@@ -1404,16 +1479,51 @@ if isfield(handles,'hImage_Preview') && ishandle(handles.hImage_Preview),
   delete(handles.hImage_Preview);
 end
 
+
+s = 'Deleted preview image';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.7,hwaitbar,s);
+else
+  hwaitbar = waitbar(.7,s);
+end
+
 % delete temp recorder timer
 handles = resetTempProbe(handles);
 
-% save figure
+s = 'Reset temperature probe';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.8,hwaitbar,s);
+else
+  hwaitbar = waitbar(.8,s);
+end
+
+% save config
 handles = RecordConfiguration(handles);
+
+
+s = 'Recorded configuration';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.9,hwaitbar,s);
+else
+  hwaitbar = waitbar(.9,s);
+end
 
 % enable disabled menus
 set(handles.menu_File_New,'Enable','on');
 set(handles.menu_File_Close,'Enable','on');
 set(handles.menu_Quit,'Enable','on');
+
+
+s = 'Enabled menus';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.95,hwaitbar,s);
+else
+  hwaitbar = waitbar(.95,s);
+end
+
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  delete(hwaitbar);
+end
 
 guidata(hObject,handles);
 
@@ -1589,3 +1699,39 @@ function menu_FixRCFile_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 fixRCFile(2);
+
+
+% --- Executes on selection change in popupmenu_Assay_Lid.
+function popupmenu_Assay_Lid_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Assay_Lid (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Assay_Lid contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_Assay_Lid
+
+% grab value
+v = get(handles.popupmenu_Assay_Lid,'Value');
+handles.Assay_Lid = handles.Assay_Lids{v};
+
+% no longer default
+handles.isdefault.Assay_Lid = false;
+
+% set color
+set(handles.popupmenu_Assay_Lid,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_Assay_Lid_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Assay_Lid (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

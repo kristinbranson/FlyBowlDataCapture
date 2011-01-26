@@ -9,5 +9,6 @@
 try
 CleanLocalSemaphores;
 catch ME
-  getReport(ME)
+  s =['Error cleaning local semaphores when quitting Matlab:\n',getReport(ME)];
+  errordlg(s,'Error quitting Matlab');
 end

@@ -20,9 +20,14 @@ UFMFStream_nc = 5;
 % for auto-setting axis limits
 UFMFStreamXLimExtra = .01;
 UFMFStreamYLimExtra = .05;
+ScanLineYLim = [-5,260];
 % average, std of statistics
 UFMFStreamMu = struct;
 UFMFStreamSig = struct;
+UFMFSummaryMu = struct;
+UFMFSummarySig = struct;
+UFMFSummaryNStd = 3;
+
 IntensityHistMu = [];
 IntensityHistSig = [];
 ScanLineMu = [];
@@ -30,6 +35,8 @@ ScanLineSig = [];
 SigColor = [.75,.75,.75];
 MuColor = [.25,.25,.25];
 DataColor = [.7,0,0];
+TableBackgroundColor = [1,1,1];
+TableWarningColor = [1,.2,.2];
 
 % name of file to export figure to 
 SaveFileStr = '';
@@ -57,10 +64,12 @@ BackSubCloseRadius = 2;
   UFMFStream_nc,UFMFStreamYLim,UFMFStreamXLim,...
   parent,SigColor,MuColor,DataColor,...
   UFMFSummaryFns,UFMFSummaryStatFns,...
+  UFMFSummaryMu,UFMFSummarySig,UFMFSummary_NStd,...
   NBkgdScanLines,ScanLineMu,ScanLineSig,...
   NBkgdBins,IntensityHistMu,IntensityHistSig,...
   BackSubNFramesSample,BackSubThreshLow,BackSubThreshHigh,BackSubMinCCArea,...
-  SaveFileStr,SaveDataStr] = ...
+  SaveFileStr,SaveDataStr,...
+  ScanLineYLim] = ...
   myparse(varargin,...
   'GUIInstance',1,...
   'FigHandle',nan,...
@@ -81,6 +90,9 @@ BackSubCloseRadius = 2;
   'DataColor',DataColor,...
   'UFMFSummaryFns',UFMFSummaryFns,...
   'UFMFSummaryStatFns',UFMFSummaryStatFns,...
+  'UFMFSummaryMu',UFMFSummaryMu,...
+  'UFMFSummarySig',UFMFSummarySig,...
+  'UFMFSummaryNstd',UFMFSummaryNStd,...
   'NBkgdScanLines',NBkgdScanLines,...
   'ScanLineMu',ScanLineMu,...
   'ScanLineSig',ScanLineSig,...
@@ -92,7 +104,8 @@ BackSubCloseRadius = 2;
   'BackSubThreshHigh',BackSubThreshHigh,...
   'BackSubMinCCArea',BackSubMinCCArea,...
   'SaveFileStr',SaveFileStr,...
-  'SaveDataStr',SaveDataStr);
+  'SaveDataStr',SaveDataStr,...
+  'ScanLineYLim',ScanLineYLim); 
 
 %% Figure positions
 
@@ -127,7 +140,7 @@ BorderY = 10;
 % for computing width, height of table
 MinTableColumnWidth = 75;
 TableRowLabelWidth = 250;
-TableRowHeight = 19;
+TableRowHeight = 20;
 
 % fraction of figure the table can take
 MaxTableHeightFrac = .3;
@@ -378,7 +391,9 @@ colheaders1 = {'Value'};
 colheaders2 = {'Mean','Std','Min','Max'};
 for i = 1:length(UFMFSummaryFns),
   fn = UFMFSummaryFns{i};
-  data1{i,1} = UFMFStats.summary.(fn);
+  if isfield(UFMFStats.summary,fn),
+    data1{i,1} = htmlcolor(UFMFStats.summary.(fn),fn);
+  end
 end
 off = 0;
 for i = 1:length(UFMFSummaryStatFns),
@@ -386,19 +401,19 @@ for i = 1:length(UFMFSummaryStatFns),
   fn = UFMFSummaryStatFns{i};
   meanfn = ['mean',fn];
   if isfield(UFMFStats.summary,meanfn),
-    data2{j,1} = UFMFStats.summary.(meanfn);
+    data2{j,1} = htmlcolor(UFMFStats.summary.(meanfn),meanfn);
   end
   stdfn = ['std',fn];
   if isfield(UFMFStats.summary,stdfn),
-    data2{j,2} = UFMFStats.summary.(stdfn);
+    data2{j,2} = htmlcolor(UFMFStats.summary.(stdfn),stdfn);
   end
   minfn = ['min',fn];
   if isfield(UFMFStats.summary,minfn),
-    data2{j,3} = UFMFStats.summary.(minfn);
+    data2{j,3} = htmlcolor(UFMFStats.summary.(minfn),minfn);
   end
   maxfn = ['max',fn];
   if isfield(UFMFStats.summary,maxfn),
-    data2{j,4} = UFMFStats.summary.(maxfn);
+    data2{j,4} = htmlcolor(UFMFStats.summary.(maxfn),maxfn);
   end
 
 end
@@ -534,12 +549,13 @@ end
 htable1 = uitable(fig,'Units','Pixels','Position',TablePos1,...
   'Data',data1,'ColumnName',colheaders1,'RowName',rowheaders1,...
   'FontUnits','Pixels','FontSize',10.6667,...
-  'ColumnFormat',repmat({'numeric'},[1,length(colheaders1)]),...
-  'ColumnWidth',repmat({TableColumnWidth},[1,length(colheaders1)])); %#ok<NASGU>
+  'ColumnFormat',repmat({'char'},[1,length(colheaders1)]),...
+  'ColumnWidth',repmat({TableColumnWidth},[1,length(colheaders1)]),...
+  'BackgroundColor',[1,1,1]); %#ok<NASGU>
 htable2 = uitable(fig,'Units','Pixels','Position',TablePos2,...
   'Data',data2,'ColumnName',colheaders2,'RowName',rowheaders2,...
   'FontUnits','Pixels','FontSize',10.6667,...
-  'ColumnFormat',repmat({'numeric'},[1,length(colheaders2)]),...
+  'ColumnFormat',repmat({'char'},[1,length(colheaders2)]),...
   'ColumnWidth',repmat({TableColumnWidth},[1,length(colheaders2)])); %#ok<NASGU>
 
 
@@ -549,22 +565,34 @@ isbot = false(UFMFStream_nr,UFMFStream_nc);
 isbot(end,:) = true;
 x0 = UFMFStats.stream.timestamp(1);
 x = UFMFStats.stream.timestamp(:)';
-x = x - x(1);
+x = x - x0;
+maxx = x(end);
+if isfield(UFMFStreamMu,'timestamp'),
+  maxx = max(maxx,max(UFMFStreamMu.timestamp));
+end
 if isempty(UFMFStreamXLim),
-  UFMFStreamXLim = [-UFMFStreamXLimExtra*x(end),x(end)*(1+UFMFStreamXLimExtra)];
+  UFMFStreamXLim = [-UFMFStreamXLimExtra*maxx,maxx*(1+UFMFStreamXLimExtra)];
 end
 for i = 1:nUFMFStreamFns,
   fn = UFMFStreamFns{i};
 
   % plot standard deviation
+  maxy = -inf;
+  miny = inf;
   if isfield(UFMFStreamSig,fn) && isfield(UFMFStreamMu,fn),
+    xmu = UFMFStreamMu.timestamp;
     y = UFMFStreamMu.(fn)(:)';
     dy = UFMFStreamSig.(fn)(:)';
-    patch(StreamAx(i),[x,fliplr(x)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none');
+    maxy = max(maxy,max(y+dy));
+    miny = min(miny,min(y+dy));
+    patch([xmu,fliplr(xmu)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none','parent',StreamAx(i));
     hold(StreamAx(i),'on');
   end
   if isfield(UFMFStreamMu,fn),
-    plot(StreamAx(i),x,UFMFStreamMu.(fn)(:)','-','Color',MuColor);
+    maxy = max(maxy,max(UFMFStreamMu.(fn)(:)));
+    miny = min(miny,min(UFMFStreamMu.(fn)(:)));
+    xmu = UFMFStreamMu.timestamp;
+    plot(StreamAx(i),xmu,UFMFStreamMu.(fn)(:)','-','Color',MuColor);
     hold(StreamAx(i),'on');
   end
   
@@ -579,10 +607,10 @@ for i = 1:nUFMFStreamFns,
   end
   
   y = UFMFStats.stream.(fn)(1,:);
+  miny = min(miny,min(y(:)));
+  maxy = max(maxy,max(y(:)));
   plot(StreamAx(i),xcurr,y,'.-','Color',DataColor);
   if ~isfield(UFMFStreamYLim,fn),
-    miny = min(y);
-    maxy = max(y);
     dy = (maxy - miny)*UFMFStreamYLimExtra;
     if dy == 0,
       dy = 1;
@@ -623,7 +651,7 @@ frac = counts / numel(bkgdim);
 if length(IntensityHistSig) == NBkgdBins && length(IntensityHistMu) == NBkgdBins,
   y = IntensityHistMu;
   dy = IntensityHistSig;
-  patch(HistAx,[ctrs,fliplr(ctrs)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none');
+  patch([ctrs,fliplr(ctrs)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none','parent',HistAx);
   hold(HistAx,'on');
 end
 % mean
@@ -667,7 +695,7 @@ for i = 1:NBkgdScanLines,
   if size(ScanLineSig,1) >= i && size(ScanLineMu,1) >= i,
     y = ScanLineMu(i,:);
     dy = ScanLineSig(i,:);
-    patch(ScanAx(i),[off,fliplr(off)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none');
+    patch([off,fliplr(off)],[y+dy,fliplr(y-dy)],SigColor,'LineStyle','none','parent',ScanAx(i));
     hold(ScanAx(i),'on');
   end
   % mean
@@ -678,7 +706,7 @@ for i = 1:NBkgdScanLines,
   
   % plot actual data
   plot(ScanAx(i),off,z,'-','Color',DataColor);
-  axis(ScanAx(i),[-r,r,-5,260]);
+  axis(ScanAx(i),[-r,r,ScanLineYLim]);
   
   set(ScanAx(i),'xticklabel',{},'yticklabel',{},'ytick',[0,122.5,255],'ticklength',[.005,.005]);
   ylabel(ScanAx(i),s);
@@ -726,3 +754,25 @@ out.showufmf_handle = showufmf('UFMFName',MovieFile,'BackSubThresh',BackSubThres
 %% succeeded
 success = true;
 out.UFMFStats = UFMFStats;
+
+function s = htmlcolor(v,fn)
+  if ischar(v),
+    s = v;
+    v = str2double(v);
+  else
+    s = num2str(v);
+  end
+  if ~isfield(UFMFSummaryMu,fn) || ~isfield(UFMFSummarySig,fn),
+    return;
+  end
+  if isnan(v),
+    w = 1;
+  else
+    nsig = abs(v-UFMFSummaryMu.(fn))./max(.000001,UFMFSummarySig.(fn));
+    w = min(1,nsig / UFMFSummary_NStd);
+  end
+  color = round((TableBackgroundColor*(1-w) + TableWarningColor*w)*255);
+  s = sprintf('<html><font style="background-color: #%02x%02x%02x">%s</font></html>',color(1),color(2),color(3),num2str(UFMFStats.summary.(fn)));
+end
+
+end

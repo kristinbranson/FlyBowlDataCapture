@@ -8,7 +8,9 @@ if ~isfield(handles,'DeviceID'),
 end
 
 if ~isfield(handles,'DeviceID'),
-  error('DeviceID not yet set');
+  s = sprintf('DeviceID not yet set');
+  errordlg(s);
+  error(s);
 end
 
 % check if this device is in use now
@@ -19,12 +21,13 @@ end
   
 try
   %handles.vid = videoinput_kb(handles.DetectCameras_Params,handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
+  %fprintf('Trying to call videoinput(%s,%d,%s)\n',handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
   handles.vid = videoinput(handles.params.Imaq_Adaptor,handles.DeviceID,handles.params.Imaq_VideoFormat);
-catch
+catch ME,
   s = sprintf('Could not initialize device id %d with format %s and adaptor %s. Try redetecting cameras.',...
     handles.DeviceID,handles.params.Imaq_VideoFormat,handles.params.Imaq_Adaptor);
   uiwait(errordlg(s,'Error initializing device'));
-  error(s);
+  error([s,'\n',getReport(ME)]);
 end
 
 handles.vidRes = get(handles.vid, 'VideoResolution'); 
@@ -157,11 +160,8 @@ if handles.nBands == 1,
   colormap(handles.axes_PreviewVideo,gray(256));
 end
 axis(handles.axes_PreviewVideo,'image');
-if handles.params.DoRotatePreviewImage,
-  set(handles.axes_PreviewVideo,'XDir','reverse','YDir','normal');
-else
-  set(handles.axes_PreviewVideo,'XDir','normal','YDir','reverse');
-end
+
+RotatePreviewImage(handles);
 
 % Error function
 set(handles.vid,'ErrorFcn',@vidError);

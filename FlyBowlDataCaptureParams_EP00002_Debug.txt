@@ -28,7 +28,7 @@ Imaq_Brightness,25
 # Prefix of movie file
 MovieFilePrefix,movie
 # List of possible Experimenter values
-Assay_Experimenters,hirokawaj,robiea,bransonk
+Assay_Experimenters,hirokawaj,robiea
 # Expected number of flies
 NFlies,20
 # List of possible Incubator ID values
@@ -40,18 +40,20 @@ PreAssayHandling_CrossDate_Range,14,22
 # before today
 PreAssayHandling_SortingDate_Range,3,7
 # List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,hirokawaj,robiea,bransonk,chenn
+PreAssayHandling_SortingHandlers,hirokawaj,robiea,chenn
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
 # List of possible Starvation Handler values
-PreAssayHandling_StarvationHandlers,hirokawaj,robiea,bransonk
+PreAssayHandling_StarvationHandlers,hirokawaj,robiea
 # List of room names
 Assay_Rooms,1,2,3
 # List of possible Rig values
 Assay_Rigs,1,2
 # List of possible Plate values
 Assay_Plates,01,02
+# List of possible Lid values
+Assay_Lids,01,02
 # List of possible Bowl values
 Assay_Bowls,A,B,C,D
 # List of possible Redo flags
@@ -86,7 +88,7 @@ MetaData_RoomHumiditySetPoint,60
 # limits of y-axis for frame rate plot
 FrameRatePlotYLim,0,35
 # Limits of y-axis for temperature plot
-TempPlotYLim,30,35
+TempPlotYLim,20,35
 # Whether to try to connect over the network to Sage to query line names
 DoQuerySage,1
 # Time in between temperature readings
@@ -98,13 +100,13 @@ TempProbeTypes,T,T
 # if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
 TempProbeReject60Hz,0
 # whether to read temperature or not
-DoRecordTemp,0
+DoRecordTemp,1
 # number of temperature and humidity samples to read from the Precon probe
 # set to 0 if no Precon sensor
-NPreconSamples,0
+NPreconSamples,5
 # which serial port to connect to -- I have no idea how to figure this out 
 # automatically
-PreconSensorSerialPort,COM7
+PreconSensorSerialPort,COM1
 # Line Names to add to the list in Sage
 ExtraLineNames,DL-wildtype,pBDPGAL4U
 # Log file for writing ufmf
@@ -135,5 +137,10 @@ UFMFBackSubThresh,15
 UFMFNFramesInit,100
 # while ramping up the background model, use the following keyframe periods
 UFMFBGKeyFramePeriodInit,1,10,25,50,75
-# whether to rotate the preview image
-DoRotatePreviewImage,0,0
+# lookup table from rig+bowl to whether to rotate the preview image
+DoRotatePreviewImage,(1,A,1),(1,B,1),(1,C,0),(1,D,0),(2,A,1),(2,B,1),(2,C,0),(2,D,0)
+# Name of mat file containing quickstats stats
+QuickStatsStatsFileName,QuickStats_Stats_20110120T175100.mat
+# y-axis limits for scan lines
+ScanLineYLim,60,250
+
