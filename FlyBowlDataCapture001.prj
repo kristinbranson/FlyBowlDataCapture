@@ -132,7 +132,6 @@
       <file>C:\Users\labadmin\Documents\FlyBowl\Code\SAGE\MATLABInterface\Trunk\+SAGE</file>
     </fileset.resources>
     <fileset.package>
-      <file>${PROJECT_ROOT}\.FlyBowlDataCapture_rc.mat</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00001.txt</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002.txt</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002_Debug.txt</file>
