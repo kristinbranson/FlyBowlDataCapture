@@ -50,12 +50,16 @@ for i = 1:length(fns),
     continue;
   end
   if ismember(fn,handles.GUIInstance_prev),
-    if ~isfield(rc,fn),
-      n1 = 1;
+    if numel(rc.(fn)) < GUIi,
+      if ~isfield(rc,fn),
+        n1 = 1;
+      else
+        n1 = numel(rc.(fn))+1;
+      end
+      rc.(fn)(n1:GUIi) = repmat({handles.(fn)},[1,GUIi-n1+1]);
     else
-      n1 = numel(rc.(fn))+1;
+      rc.(fn){GUIi} = handles.(fn);
     end
-    rc.(fn)(n1:GUIi) = repmat({handles.(fn)},[1,GUIi-n1+1]);
   else
     rc.(fn) = handles.(fn);
   end
@@ -71,7 +75,7 @@ if ~isempty(fnsmissing),
 end
 fns = setdiff(fns,fnsmissing);
 
-waitbar(.4,hwaitbar,sprintf('Checked for missing values, trying to save to ',handles.rcfile));
+waitbar(.4,hwaitbar,sprintf('Checked for missing values, trying to save to %s',handles.rcfile));
 
 save(handles.rcfile,'-struct','rc',fns{:});
 
