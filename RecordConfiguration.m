@@ -50,7 +50,7 @@ for i = 1:length(fns),
     continue;
   end
   if ismember(fn,handles.GUIInstance_prev),
-    if numel(rc.(fn)) < GUIi,
+    if ~isfield(rc,fn) || numel(rc.(fn)) < GUIi,
       if ~isfield(rc,fn),
         n1 = 1;
       else
