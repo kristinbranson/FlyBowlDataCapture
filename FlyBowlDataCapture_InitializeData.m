@@ -253,15 +253,15 @@ set(handles.popupmenu_Assay_Experimenter,'String',handles.Assay_Experimenters,..
 
 % whether this has been changed or not
 handles.isdefault.Fly_LineName = true;
-handles.IsSage = exist(handles.SAGECodeDir,'file');
-if handles.IsSage,
+if ~isdeployed,
+  handles.IsSage = exist(handles.SAGECodeDir,'file');
   try
-    if ~isdeployed,
-      addpath(handles.SAGECodeDir);
-    end
+    addpath(handles.SAGECodeDir);
   catch
     handles.IsSage = false;
   end
+else
+  handles.IsSage = exist('SAGE.Line','class');
 end
 if ~handles.IsSage,
   addToStatus(handles,{sprintf('SAGE code directory %s could not be added to the path.',handles.SAGECodeDir)});

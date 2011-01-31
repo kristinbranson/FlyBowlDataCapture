@@ -99,13 +99,21 @@ waitbar(.7);
 
 % show some simple statistics
 if strcmpi(handles.params.FileType,'ufmf'),
-  [handles.QuickStats,success,errmsg,warnings] = computeQuickStats(handles.ExperimentDirectory,...
-    handles.ComputeQuickStatsParams{:});
-  if ~success,
-    addToStatus(handles,sprintf('Error computing quick statistics: %s',errmsg));
-  end
-  if ~isempty(warnings),
-    addToStatus(handles,[{'Warnings computing quick statistics:'},warnings]);
+  
+  try
+
+    [handles.QuickStats,success,errmsg,warnings] = computeQuickStats(handles.ExperimentDirectory,...
+      handles.ComputeQuickStatsParams{:});
+  
+    if ~success,
+      addToStatus(handles,sprintf('Error computing quick statistics: %s',errmsg));
+    end
+    if ~isempty(warnings),
+      addToStatus(handles,[{'Warnings computing quick statistics:'},warnings]);
+    end
+    
+  catch ME,
+    addToStatus(handles,['Error computing quickstats: ',getReport(ME)]);
   end
 end
 
