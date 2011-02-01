@@ -40,7 +40,7 @@ PreAssayHandling_CrossDate_Range,14,22
 # before today
 PreAssayHandling_SortingDate_Range,3,7
 # List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,hirokawaj,robiea,chenn
+PreAssayHandling_SortingHandlers,hirokawaj,robiea,chenn,unknown
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
@@ -51,7 +51,7 @@ Assay_Rooms,1,2,3
 # List of possible Rig values
 Assay_Rigs,1,2
 # List of possible Plate values
-Assay_Plates,01,02
+Assay_Plates,10,14
 # List of possible Lid values
 Assay_Lids,01,02
 # List of possible Bowl values
@@ -78,7 +78,7 @@ MetaDataFileName,Metadata.xml
 LogFileName,Log.txt
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
-MetaData_RearingProtocols,rc2,rc2,rc2,rc2
+MetaData_RearingProtocols,rc2_20110201,rc2_20110201,rc2_20110201,rc2_20110201
 MetaData_HandlingProtocols,HP0001.xml
 MetaData_ExpProtocols,EP0002.xml
 MetaData_Effector,TrpA
