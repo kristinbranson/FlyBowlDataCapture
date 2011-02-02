@@ -8,8 +8,10 @@
     <id datatype="integer" range_basic="" range_advanced="" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Session identifier" required="true" default="1" last="1"></id>
     <apparatus>
       <id datatype="string" range_basic="" range_advanced="" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Apparatus identifier, generated from rig, plate, bowl" required="true" default="" last=""></id>
+      <environmental_chamber datatype="string" range_basic="1,2,3" range_advanced="1,2,3" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Environmental chamber identifier." required="true" default="$LAST" last="" />
       <rig datatype="string" range_basic="1,2" range_advanced="1,2" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Rig identifier." required="true" default="$LAST" last="" />
       <plate datatype="integer" range_basic="[1,40]" range_advanced="[1,40]" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Plate identifier." required="true" default="$LAST" last="" />
+      <top_plate datatype="integer" range_basic="[1,40]" range_advanced="[1,40]" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Lid identifier." required="true" default="$LAST" last="" />
       <bowl datatype="string" range_basic="A,B,C,D" range_advanced="A,B,C,D" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Bowl identifier." required="true" default="$LAST" last=""></bowl>
       <camera datatype="string" range_basic="" range_advanced="" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Camera unique identifier." required="true" default="$LAST" last=""></camera>
       <computer datatype="string" range_basic="" range_advanced="" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Computer identifier." required="true" default="" last="" />
@@ -38,6 +40,7 @@
         <datetime_starvation datatype="datetime" range_basic="[now-2,now]" range_advanced="[now-2,now]" units="" appear_basic="true" appear_advanced="true" entry="acquire" description="Date and time at which the flies were moved to starvation material." required="true" default="" last=""></datetime_starvation>
         <seconds_shiftflytemp datatype="float" range_basic="" range_advanced="" units="seconds" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Time in seconds between bringing the fly vials into the hot room and experiment start." required="true" default="$LAST" last="" />
         <seconds_fliesloaded datatype="float" range_basic="" range_advanced="" units="seconds" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Time in seconds between loading the flies into the arena and experiment start." required="true" default="$LAST" last="" />
+	<num_flies_dead datatype="integer" range_basic="[0,25]" range_advanced="[0,25]" units="flies" appear_basic="true" appear_advanced="true" entry="manual" description="Number of dead flies loaded into the bowl." required="true" default="$LAST" last="" />
       </handling>
     </flies>
   </session>
