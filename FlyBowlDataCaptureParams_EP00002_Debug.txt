@@ -38,9 +38,9 @@ Rearing_IncubatorIDs,1,2,3,4
 PreAssayHandling_CrossDate_Range,14,22
 # Range of Sorting Dates to show -- minimum and maximum number of days 
 # before today
-PreAssayHandling_SortingDate_Range,3,7
+PreAssayHandling_SortingDate_Range,2,8
 # List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,hirokawaj,robiea,chenn,unknown
+PreAssayHandling_SortingHandlers,chenn,hayess,hirokawaj,lows,rowellw,robertss,robiea,shustermand,unknown
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
