@@ -972,6 +972,9 @@ function pushbutton_Done_Callback(hObject, eventdata, handles)
 
 handles = DisableGUI(handles);
 
+CloseQuickStatsFigures(handles);
+pause(1);
+
 % rename video
 oldname = handles.FileName;
 handles = renameVideoFile(handles);
@@ -990,8 +993,6 @@ try
 catch ME
   addToStatus(handles,{'Could not create success file',getReport(ME,'basic','hyperlinks','off')});
 end
-
-CloseQuickStatsFigures(handles);
 
 % record configuration
 handles = RecordConfiguration(handles);

@@ -125,6 +125,9 @@ if ~didabort,
   handles = ChangedMetaData(handles);
 end
 
+% add a wait period before resaving
+pause(5);
+
 % save metadata
 handles = SaveMetaData(handles);
 

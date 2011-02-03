@@ -6,6 +6,9 @@ else
   oldexperimentname = '';
 end
 handles.ExperimentName = getExperimentName(handles);
+if strcmp(handles.ExperimentName,oldexperimentname),
+  return;
+end
 if isempty(oldexperimentname),
   addToStatus(handles,sprintf('Experiment name initialized to %s',handles.ExperimentName));
 elseif ~strcmp(handles.ExperimentName,oldexperimentname),
@@ -27,7 +30,20 @@ if ~isempty(OldExperimentDirectory) && ...
     ~strcmp(OldExperimentDirectory,handles.ExperimentDirectory) && ...
     exist(OldExperimentDirectory,'file'),
   addToStatus(handles,sprintf('Trying to rename experiment directory from %s to %s\n',OldExperimentDirectory,handles.ExperimentDirectory));
-  [success,msg] = renamefile(OldExperimentDirectory,handles.ExperimentDirectory);
+  for renametry = 1:5,
+    [success,msg] = renamefile(OldExperimentDirectory,handles.ExperimentDirectory);
+    if success, break; end
+    addToStatus(handles,sprintf('Rename %s -> %s failed on try %d',...
+      OldExperimentDirectory,handles.ExperimentDirectory,renametry));
+    openfids = fopen('all');
+    s = {sprintf('The following files are open, and will be closed:')};
+    for filei = 1:numel(openfids),
+      s{end+1} = fopen(openfids(filei)); %#ok<AGROW>
+    end
+    addToStatus(handles,s);
+    fclose(openfids);
+    pause(3);
+  end
   if ~success,
     s = sprintf('Could not rename old experiment directory %s to %s: %s',...
       OldExperimentDirectory,handles.ExperimentDirectory,msg);

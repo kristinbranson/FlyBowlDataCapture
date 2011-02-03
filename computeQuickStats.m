@@ -316,6 +316,9 @@ BackSubStatFns = {'NConnComps','BlobArea'};
 
 %% done with the movie file
 
+if ~isdeployed,
+  fprintf('Closing movie file after computing QuickStats\n');
+end
 fclose(fid);
 
 %% add temperature to existing structs
