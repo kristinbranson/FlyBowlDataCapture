@@ -183,7 +183,7 @@ catch ME
   uiwait(errordlg({'Error parsing parameter file:',getReport(ME)},'Error reading parameters'));
   rethrow(ME);
 end
-  
+
 %% dorotatepreview needs special parsing
 
 if isfield(handles.params,'DoRotatePreviewImage'),
@@ -212,6 +212,22 @@ handles.params.MovieFileStr = sprintf('%s.%s',handles.params.MovieFilePrefix,han
 %% computer name
 [~,handles.ComputerName] = system('hostname');
 handles.ComputerName = strtrim(handles.ComputerName);
+
+%% hard drive needs special parsing
+if isfield(handles.params,'HardDriveName'),
+  s = handles.params.HardDriveName;
+  if s(1) == '(' && s(end) == ')',
+    s = s(2:end-1);
+  end
+  parts = regexp(s,';','split');
+  for i = 1:numel(parts),
+    parts1 = regexp(parts{i},':','split');
+    if strcmpi(parts1{1},handles.ComputerName),
+      handles.params.HardDriveName = parts1{2};
+      break;
+    end
+  end
+end
 
 %% Status window
 %handles.Status_MaxNLines = 50;

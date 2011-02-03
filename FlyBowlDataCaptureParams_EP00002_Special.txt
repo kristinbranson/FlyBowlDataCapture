@@ -5,7 +5,7 @@ OutputDirectory,D:\special_data,J:\special_data
 # Directory to temporarily store video to
 TmpOutputDirectory,D:\tmpdata,J:\tmpdata
 # Names of hard drives, corresponding to the ordered OutputDirectory list
-HardDriveName,Internal_D,HD1
+HardDriveName,(bransonlab-ww1:Internal_D;bransonlab-ww2:Internal_D;bransonlab-ww3:Internal_D;bransonlab-ww4:Internal_D),(bransonlab-ww1:HD2;bransonlab-ww2:HD1;bransonlab-ww3:HD4;bransonlab-ww4:HD3)
 # Camera adaptor
 #Imaq_Adaptor,dcam
 Imaq_Adaptor,udcam
