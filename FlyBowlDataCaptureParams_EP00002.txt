@@ -78,7 +78,7 @@ MetaDataFileName,Metadata.xml
 LogFileName,Log.txt
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
-MetaData_RearingProtocols,rc2_20110201,rc2_20110201,rc2_20110201,rc2_20110201
+MetaData_RearingProtocols,rc2,rc2,rc2,rc2
 MetaData_HandlingProtocols,HP0001.xml
 MetaData_ExpProtocols,EP0002.xml
 MetaData_Effector,TrpA
