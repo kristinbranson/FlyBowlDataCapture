@@ -40,7 +40,7 @@ PreAssayHandling_CrossDate_Range,14,22
 # before today
 PreAssayHandling_SortingDate_Range,2,8
 # List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,chenn,hayess,hirokawaj,lows,rowellw,robertss,robiea,shustermand,unknown
+PreAssayHandling_SortingHandlers,chenn,flycore,hayess,hirokawaj,lows,rowellw,robertss,robiea,shustermand,unknown
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
