@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 19-Jan-2011 19:23:37
+% Last Modified by GUIDE v2.5 04-Mar-2011 19:16:46
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1736,3 +1736,29 @@ function popupmenu_Assay_Lid_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --------------------------------------------------------------------
+function menu_Edit_ChangeLineNameFile_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_Edit_ChangeLineNameFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+[filestr,pathstr] = uigetfile('*.txt','Choose Line Name File');
+handles.linename_file = fullfile(pathstr,filestr);
+
+handles = readLineNames(handles,false);
+
+% if current line name not in new list, choose first line name
+if ~ismember(handles.Fly_LineName,handles.Fly_LineNames),
+  handles.Fly_LineName = handles.Fly_LineNames{1};
+end
+
+% set possible values, current value, color to shouldchange
+%set(handles.edit_Fly_LineName,'String',handles.Fly_LineNames,...
+%  'Value',find(strcmp(handles.Fly_LineName,handles.Fly_LineNames),1),...
+%  'BackgroundColor',handles.shouldchange_bkgdcolor);
+AutoCompleteEdit(handles.AutoCompleteEdit_Fly_LineName,handles.Fly_LineNames);
+set(handles.edit_Fly_LineName,'String',handles.Fly_LineName,...
+  'BackgroundColor',handles.shouldchange_bkgdcolor);
+guidata(hObject,handles);

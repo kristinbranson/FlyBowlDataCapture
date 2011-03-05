@@ -27,13 +27,16 @@ handles.status_colors = [0,1,0;0,0,1;1,0,0;1,0,0;1,0,0];
 handles.status_color_names = {'GREEN','BLUE','RED','RED','RED'};
 
 % list of fly lines read frame Sage
-%handles.linename_file = 'SageLineNames.txt';
-[filestr,pathstr] = uigetfile('*.txt','Choose Line Name File');
-
-handles.linename_file = fullfile(pathstr,filestr);
-if ~exist(handles.linename_file,'file'),
-handles.linename_file = 'SageLineNames.txt';
+if ~isfield(handles.previous_values,'linename_file'),
+  handles.linename_file = 'SageLineNames.txt';
+else
+  handles.linename_file = handles.previous_values.linename_file;
 end
+%[filestr,pathstr] = uigetfile('*.txt','Choose Line Name File');
+%handles.linename_file = fullfile(pathstr,filestr);
+%if ~exist(handles.linename_file,'file'),
+%handles.linename_file = 'SageLineNames.txt';
+%end
 
 % name of Sage parameters file
 handles.SageParamsFile = 'SAGEReadParams.txt';
