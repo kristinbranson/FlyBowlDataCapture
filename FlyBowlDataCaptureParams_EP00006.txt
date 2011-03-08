@@ -1,0 +1,145 @@
+# Directory to store video to
+OutputDirectory,D:\data,J:\data
+#OutputDirectory,D:\debug_data,J:\debug_data
+#OutputDirectory,D:\special_data,J:\special_data
+# Directory to temporarily store video to
+TmpOutputDirectory,D:\tmpdata,J:\tmpdata
+# Names of hard drives, corresponding to the ordered OutputDirectory list
+HardDriveName,(bransonlab-ww1:Internal_D;bransonlab-ww2:Internal_D;bransonlab-ww3:Internal_D;bransonlab-ww4:Internal_D),(bransonlab-ww1:HD2;bransonlab-ww2:HD1;bransonlab-ww3:HD4;bransonlab-ww4:HD3)
+# Camera adaptor
+#Imaq_Adaptor,dcam
+Imaq_Adaptor,udcam
+# Video format
+#Imaq_VideoFormat,F7_Y8_1280x1024
+Imaq_VideoFormat,Format 7, Mode 0
+# Video file type
+#FileType,fmf
+FileType,ufmf
+# Number of seconds to record
+RecordTime,1000
+# whether to display the video preview with the jet colormap
+ColormapPreview,0
+# Shutter period
+Imaq_Shutter,100
+# Gain
+Imaq_Gain,170
+# Brightness
+Imaq_Brightness,25
+# Prefix of movie file
+MovieFilePrefix,movie
+# List of possible Experimenter values
+Assay_Experimenters,hirokawaj,robiea,robertss
+# Expected number of flies
+NFlies,20
+# List of possible Incubator ID values
+Rearing_IncubatorIDs,1,2,3,4
+# Range of Cross Dates to show -- minimum and maximum number of days 
+# before today
+PreAssayHandling_CrossDate_Range,14,22
+# Range of Sorting Dates to show -- minimum and maximum number of days 
+# before today
+PreAssayHandling_SortingDate_Range,1,8
+# List of possible Sorting Handler values
+PreAssayHandling_SortingHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,unknown,zhengg
+# Range of Starvation Dates to show -- minimum and maximum number of days 
+# before today
+PreAssayHandling_StarvationDate_Range,0,1
+# List of possible Starvation Handler values
+PreAssayHandling_StarvationHandlers,hirokawaj,robiea
+# List of room names
+Assay_Rooms,1,2,3
+# List of possible Rig values
+Assay_Rigs,1,2
+# List of possible Plate values
+Assay_Plates,10,11,12,13,14
+# List of possible Lid values
+Assay_Lids,01,02
+# List of possible Bowl values
+Assay_Bowls,A,B,C,D
+# List of possible Redo flags
+RedoFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes,See both notes
+# List of possible Review flags
+ReviewFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes,See both notes
+# Device name
+Imaq_DeviceName,A622f
+# Video ROI Position
+Imaq_ROIPosition,128,0,1024,1024
+# Frame rate we expect
+Imaq_FrameRate,30.4
+# Maximum frame rate we will get
+Imaq_MaxFrameRate,31
+# Minimum time in between preview window updates
+PreviewUpdatePeriod,0
+# for gdcam, number of frames between updates
+gdcamPreviewFrameInterval,2
+# Name of file to store metadata to
+MetaDataFileName,Metadata.xml
+# Name of file to store log to
+LogFileName,Log.txt
+# MetaData: Assay name
+MetaData_AssayName,FlyBowl
+MetaData_RearingProtocols,rc8,rc8,rc8,rc8
+MetaData_HandlingProtocols,HP0002.xml
+MetaData_ExpProtocols,EP0005.xml
+MetaData_Effector,TrpA
+MetaData_Gender,b
+MetaData_RoomTemperatureSetPoint,29
+MetaData_RoomHumiditySetPoint,60
+# limits of y-axis for frame rate plot
+FrameRatePlotYLim,0,35
+# Limits of y-axis for temperature plot
+TempPlotYLim,25,35
+# Whether to try to connect over the network to Sage to query line names
+DoQuerySage,1
+# Time in between temperature readings
+TempProbePeriod,1
+# Which channels have temperature probes
+TempProbeChannels,1,2
+# Thermocouple types
+TempProbeTypes,T,T
+# if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
+TempProbeReject60Hz,0
+# whether to read temperature or not
+DoRecordTemp,1
+# number of temperature and humidity samples to read from the Precon probe
+# set to 0 if no Precon sensor
+NPreconSamples,5
+# which serial port to connect to -- I have no idea how to figure this out 
+# automatically
+PreconSensorSerialPort,COM1
+# Line Names to add to the list in Sage
+ExtraLineNames,DL-wildtype,pBDPGAL4U
+# Log file for writing ufmf
+UFMFLogFileName,ufmf_log.txt
+# Name of file to write UFMF diagnostic stats
+UFMFStatFileName,ufmf_diagnostics.txt
+# Whether to compute UFMF diagnostics
+UFMFPrintStats,1
+# number of frames between outputting per-frame compression statistics: 0 means don't print, 1 means every frame
+UFMFStatStreamPrintFreq,30
+# number of frames between computing statistics of compression error. 0 means don't compute, 1 means every frame
+UFMFStatComputeFrameErrorFreq,30
+# whether to print information about the time each part of the computation takes
+UFMFStatPrintTimings,1
+# maximum fraction of pixels that can be foreground to try compressing frame
+UFMFMaxFracFgCompress,.2
+# number of frames the background model should be based on 
+UFMFMaxBGNFrames,100
+# number of seconds between updates to the background model
+UFMFBGUpdatePeriod,1
+# number of seconds between spitting out a new background model
+UFMFBGKeyFramePeriod,100
+# max length of box stored during compression
+UFMFMaxBoxLength,5
+# threshold for background subtraction
+UFMFBackSubThresh,15
+# first nFramesInit we always update the background model
+UFMFNFramesInit,100
+# while ramping up the background model, use the following keyframe periods
+UFMFBGKeyFramePeriodInit,1,10,25,50,75
+# lookup table from rig+bowl to whether to rotate the preview image
+DoRotatePreviewImage,(1,A,1),(1,B,1),(1,C,0),(1,D,0),(2,A,1),(2,B,1),(2,C,0),(2,D,0)
+# Name of mat file containing quickstats stats
+QuickStatsStatsFileName,QuickStats_Stats_20110120T175100.mat
+# y-axis limits for scan lines
+ScanLineYLim,60,250
