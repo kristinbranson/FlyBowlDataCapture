@@ -91,8 +91,22 @@ fprintf(fid,'  </session>\n');
 fprintf(fid,'  <environment temperature="%f" ',handles.MetaData_RoomTemperature);
 fprintf(fid,'humidity="%f" />\n',handles.MetaData_RoomHumidity);
 % notes entered
-fprintf(fid,'  <note_behavioral>%s</note_behavioral>\n',handles.BehaviorNotes);
-fprintf(fid,'  <note_technical>%s</note_technical>\n',handles.TechnicalNotes);
+% deal with multi-line notes
+if iscell(handles.BehaviorNotes),
+  BehaviorNotes = sprintf('%s\\n',handles.BehaviorNotes{:});
+  BehaviorNotes = BehaviorNotes(1:end-1);
+else
+  BehaviorNotes = handles.BehaviorNotes;
+end
+fprintf(fid,'  <note_behavioral>%s</note_behavioral>\n',BehaviorNotes);
+% deal with multi-line notes
+if iscell(handles.TechnicalNotes),
+  TechnicalNotes = sprintf('%s\\n',handles.TechnicalNotes{:});
+  TechnicalNotes = TechnicalNotes(1:end-1);
+else
+  TechnicalNotes = handles.TechnicalNotes;
+end
+fprintf(fid,'  <note_technical>%s</note_technical>\n',TechnicalNotes);
 % flags entered
 fprintf(fid,'  <flag_review>%s</flag_review>\n',handles.ReviewFlag);
 fprintf(fid,'  <flag_redo>%s</flag_redo>\n',handles.RedoFlag);
