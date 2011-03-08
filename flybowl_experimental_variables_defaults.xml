@@ -41,6 +41,7 @@
         <seconds_shiftflytemp datatype="float" range_basic="" range_advanced="" units="seconds" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Time in seconds between bringing the fly vials into the hot room and experiment start." required="true" default="$LAST" last="" />
         <seconds_fliesloaded datatype="float" range_basic="" range_advanced="" units="seconds" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Time in seconds between loading the flies into the arena and experiment start." required="true" default="$LAST" last="" />
 	<num_flies_dead datatype="integer" range_basic="[0,25]" range_advanced="[0,25]" units="flies" appear_basic="true" appear_advanced="true" entry="manual" description="Number of dead flies loaded into the bowl." required="true" default="$LAST" last="" />
+	<num_flies_damaged datatype="integer" range_basic="[0,25]" range_advanced="[0,25]" units="flies" appear_basic="true" appear_advanced="true" entry="manual" description="Number of damaged flies loaded into the bowl." required="true" default="$LAST" last="" />
       </handling>
     </flies>
   </session>
