@@ -8,7 +8,7 @@ fid = fopen(handles.MetaDataFileName,'w');
 if fid < 0,
   s = sprintf('Could not write to experiment metadata file %s',handles.MetaDataFileName);
   uiwait(errordlg(s,'Error saving metadata'));
-  error(s);
+  error(s); %#ok<SPERR>
 end
 
 % in hours
@@ -84,6 +84,8 @@ fprintf(fid,'seconds_shiftflytemp="%f" ',shift_time);
 fprintf(fid,'seconds_fliesloaded="%f" ',load_time);
 % number of observed dead flies
 fprintf(fid,'num_flies_dead="%d" ',handles.NDeadFlies);
+% number of observed damaged flies
+fprintf(fid,'num_flies_damaged="%d" ',handles.NDamagedFlies);
 fprintf(fid,'/>\n');
 fprintf(fid,'    </flies>\n');
 fprintf(fid,'  </session>\n');

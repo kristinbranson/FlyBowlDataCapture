@@ -620,6 +620,14 @@ handles.NDeadFlies = 0;
 set(handles.popupmenu_NDeadFlies,'String',handles.NDeadFlies_str,...
   'Value',handles.NDeadFlies+1);
 
+%% Number of damaged flies
+
+handles.NDamagedFlies_str = cellstr(num2str((0:handles.params.NFlies)'));
+handles.NDamagedFlies = 0;
+set(handles.popupmenu_NDamagedFlies,'String',handles.NDamagedFlies_str,...
+  'Value',handles.NDamagedFlies+1);
+
+
 %% Redo Flag
 
 % whether this has been changed or not

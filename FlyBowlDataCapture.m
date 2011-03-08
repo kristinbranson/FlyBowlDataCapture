@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 04-Mar-2011 19:16:46
+% Last Modified by GUIDE v2.5 08-Mar-2011 16:36:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1771,3 +1771,27 @@ AutoCompleteEdit(handles.AutoCompleteEdit_Fly_LineName,handles.Fly_LineNames);
 set(handles.edit_Fly_LineName,'String',handles.Fly_LineName,...
   'BackgroundColor',handles.shouldchange_bkgdcolor);
 guidata(hObject,handles);
+
+
+% --- Executes on selection change in popupmenu_NDamagedFlies.
+function popupmenu_NDamagedFlies_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_NDamagedFlies (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_NDamagedFlies contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_NDamagedFlies
+handles.NDamagedFlies = get(hObject,'Value')-1;
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_NDamagedFlies_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_NDamagedFlies (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
