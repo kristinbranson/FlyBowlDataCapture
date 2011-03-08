@@ -95,19 +95,21 @@ fprintf(fid,'humidity="%f" />\n',handles.MetaData_RoomHumidity);
 % notes entered
 % deal with multi-line notes
 if iscell(handles.BehaviorNotes),
-  BehaviorNotes = sprintf('%s\\n',handles.BehaviorNotes{:});
-  BehaviorNotes = BehaviorNotes(1:end-1);
-else
   BehaviorNotes = handles.BehaviorNotes;
+else
+  BehaviorNotes = cellstr(handles.BehaviorNotes);
 end
+BehaviorNotes = sprintf('%s\\n',BehaviorNotes{:});
+BehaviorNotes = BehaviorNotes(1:end-2);
 fprintf(fid,'  <note_behavioral>%s</note_behavioral>\n',BehaviorNotes);
 % deal with multi-line notes
 if iscell(handles.TechnicalNotes),
-  TechnicalNotes = sprintf('%s\\n',handles.TechnicalNotes{:});
-  TechnicalNotes = TechnicalNotes(1:end-1);
-else
   TechnicalNotes = handles.TechnicalNotes;
+else
+  TechnicalNotes = cellstr(handles.TechnicalNotes);
 end
+TechnicalNotes = sprintf('%s\\n',TechnicalNotes{:});
+TechnicalNotes = TechnicalNotes(1:end-2);
 fprintf(fid,'  <note_technical>%s</note_technical>\n',TechnicalNotes);
 % flags entered
 fprintf(fid,'  <flag_review>%s</flag_review>\n',handles.ReviewFlag);
