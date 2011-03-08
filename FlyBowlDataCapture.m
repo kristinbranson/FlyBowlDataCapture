@@ -985,6 +985,15 @@ end
 handles = resetTempProbe(handles);
 handles = unsetCamera(handles);
 
+% save metadata
+if handles.MetaDataNeedsSave,
+  answer = questdlg('Save MetaData before closing?','Save MetaData?','Yes','No','Yes');
+  if strcmpi(answer,'Yes'),
+    handles = SaveMetaData(handles);
+  end
+end
+handles.MetaDataNeedsSave = false;
+
 successfilename = fullfile(handles.ExperimentDirectory,'SUCCESS');
 try
   fid = fopen(successfilename,'w');
