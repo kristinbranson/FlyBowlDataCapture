@@ -1,6 +1,6 @@
 # Directory to store video to
-OutputDirectory,D:\data,J:\data
-#OutputDirectory,D:\debug_data,J:\debug_data
+#OutputDirectory,D:\data,J:\data
+OutputDirectory,D:\debug_data,J:\debug_data
 #OutputDirectory,D:\special_data,J:\special_data
 # Directory to temporarily store video to
 TmpOutputDirectory,D:\tmpdata,J:\tmpdata
@@ -16,9 +16,9 @@ Imaq_VideoFormat,Format 7, Mode 0
 #FileType,fmf
 FileType,ufmf
 # Number of seconds to record
-RecordTime,1000
+RecordTime,30
 # whether to display the video preview with the jet colormap
-ColormapPreview,0
+ColormapPreview,1
 # Shutter period
 Imaq_Shutter,100
 # Gain
@@ -28,7 +28,7 @@ Imaq_Brightness,25
 # Prefix of movie file
 MovieFilePrefix,movie
 # List of possible Experimenter values
-Assay_Experimenters,hirokawaj,robiea
+Assay_Experimenters,hirokawaj,robiea,robertss
 # Expected number of flies
 NFlies,20
 # List of possible Incubator ID values
@@ -38,9 +38,9 @@ Rearing_IncubatorIDs,1,2,3,4
 PreAssayHandling_CrossDate_Range,14,22
 # Range of Sorting Dates to show -- minimum and maximum number of days 
 # before today
-PreAssayHandling_SortingDate_Range,2,8
+PreAssayHandling_SortingDate_Range,1,8
 # List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,chenn,hayess,hirokawaj,lows,rowellw,robertss,robiea,shustermand,unknown
+PreAssayHandling_SortingHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,unknown,zhengg
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
@@ -51,7 +51,7 @@ Assay_Rooms,1,2,3
 # List of possible Rig values
 Assay_Rigs,1,2
 # List of possible Plate values
-Assay_Plates,10,14
+Assay_Plates,10,11,12,13,14
 # List of possible Lid values
 Assay_Lids,01,02
 # List of possible Bowl values
@@ -78,9 +78,9 @@ MetaDataFileName,Metadata.xml
 LogFileName,Log.txt
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
-MetaData_RearingProtocols,rc2,rc2,rc2,rc2
-MetaData_HandlingProtocols,HP0001.xml
-MetaData_ExpProtocols,EP0002.xml
+MetaData_RearingProtocols,rc8,rc8,rc8,rc8
+MetaData_HandlingProtocols,HP0002.xml
+MetaData_ExpProtocols,EP0005.xml
 MetaData_Effector,UAS_dTrpA1_2_0002
 MetaData_Gender,b
 MetaData_RoomTemperatureSetPoint,29

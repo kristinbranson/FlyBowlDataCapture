@@ -1,5 +1,7 @@
 function handles = SaveMetaData(handles)
 
+dateformat = 'yyyymmddTHHMMSS';
+
 % construct experiment name, directory
 handles = setExperimentName(handles);
 
@@ -23,7 +25,7 @@ fprintf(fid,'<?xml version="1.0"?>\n');
 % name of assay
 fprintf(fid,'<experiment assay="%s" ',handles.params.MetaData_AssayName);
 % start datetime
-fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,'yyyy-mm-ddTHH:MM:SS'));
+fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,dateformat));
 % name of experimenter
 fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 % always same experiment protocol
