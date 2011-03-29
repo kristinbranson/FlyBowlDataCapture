@@ -81,7 +81,7 @@ MetaData_AssayName,FlyBowl
 MetaData_RearingProtocols,rc8,rc8,rc8,rc8
 MetaData_HandlingProtocols,HP0002.xml
 MetaData_ExpProtocols,EP0005.xml
-MetaData_Effector,TrpA
+MetaData_Effector,UAS_dTrpA1_2_0002
 MetaData_Gender,b
 MetaData_RoomTemperatureSetPoint,29
 MetaData_RoomHumiditySetPoint,60
