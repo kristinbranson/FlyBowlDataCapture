@@ -19,7 +19,7 @@ sorting_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_S
 if isnan(sorting_time),
   sorting_time = -1;
 end
-starvation_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_StarvationTime_datenum)*24;
+starvation_time = max(0,(handles.StartRecording_Time_datenum - handles.PreAssayHandling_StarvationTime_datenum)*24);
 % in seconds
 shift_time = (handles.StartRecording_Time_datenum - handles.ShiftFlyTemp_Time_datenum)*24*60*60;
 load_time = (handles.StartRecording_Time_datenum - handles.FliesLoaded_Time_datenum)*24*60*60;
@@ -64,7 +64,7 @@ fprintf(fid,'hours_starved="%f" ',starvation_time);
 fprintf(fid,'count="0">\n');
 % TODO: genotype
 %fprintf(fid,'      <genotype>%s &amp; w+;;%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
-fprintf(fid,'      <genotype>%s_%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
+fprintf(fid,'      <genotype>%s__%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
 
 % choose rearing protocol based on incubator ID
 i = find(strcmp(handles.Rearing_IncubatorID,handles.Rearing_IncubatorIDs),1);

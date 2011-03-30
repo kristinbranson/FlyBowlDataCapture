@@ -5,7 +5,7 @@ errmsg = '';
 warnings = {};
 DefaultsTree = [];
 
-datetimeFormat = 'yyyy-mm-ddTHH:MM:SS';
+datetimeFormat = 'yyyymmddTHHMMSS';
 
 % parse inputs
 MetaDataFileName = 'Metadata.xml';
@@ -77,8 +77,13 @@ success = true;
       PathString2 = [PathString1,fn];
       try
         node = DefaultsTree.getNodeByPathString(PathString2);
-        if strcmp(node.attribute.datatype,'datetime') && length(Value) ~= length(datetimeFormat),
-          Value = datestr(datenum(Value),datetimeFormat);
+        if strcmp(node.attribute.datatype,'datetime'),
+          % if old datetime format
+          if ~isempty(regexp(Value,'^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d$','once')),
+            Value = datestr(datenum(Value,'yyyy-mm-ddTHH:MM:SS'),datetimeFormat);
+          elseif length(Value) ~= length(datetimeFormat),
+            Value = datestr(datenum(Value),datetimeFormat);
+          end
         end
         DefaultsTree.setValueByPathString(PathString2,Value);
       catch ME,
