@@ -1,6 +1,6 @@
 # Directory to store video to
-OutputDirectory,D:\data,J:\data
-#OutputDirectory,D:\debug_data,J:\debug_data
+#OutputDirectory,D:\data,J:\data
+OutputDirectory,D:\debug_data,J:\debug_data
 #OutputDirectory,D:\special_data,J:\special_data
 # Directory to temporarily store video to
 TmpOutputDirectory,D:\tmpdata,J:\tmpdata

@@ -15,6 +15,10 @@ end
 
 % in hours
 sorting_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_SortingTime_datenum)*24;
+% unknown sorting time
+if isnan(sorting_time),
+  sorting_time = -1;
+end
 starvation_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_StarvationTime_datenum)*24;
 % in seconds
 shift_time = (handles.StartRecording_Time_datenum - handles.ShiftFlyTemp_Time_datenum)*24*60*60;
@@ -59,7 +63,8 @@ fprintf(fid,'hours_starved="%f" ',starvation_time);
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'count="0">\n');
 % TODO: genotype
-fprintf(fid,'      <genotype>%s &amp; w+;;%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
+%fprintf(fid,'      <genotype>%s &amp; w+;;%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
+fprintf(fid,'      <genotype>%s_%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
 
 % choose rearing protocol based on incubator ID
 i = find(strcmp(handles.Rearing_IncubatorID,handles.Rearing_IncubatorIDs),1);
@@ -74,11 +79,17 @@ fprintf(fid,'handler_sorting="%s" ',handles.PreAssayHandling_SortingHandler);
 % time since sorting, in hours
 fprintf(fid,'hours_sorted="%f" ',sorting_time);
 % absolute datetime the flies were sorted at
-fprintf(fid,'datetime_sorting="%s" ',datestr(handles.PreAssayHandling_SortingTime_datenum,'yyyy-mm-ddTHH:MM:SS'));
+% handle missing sorting time
+if isnan(handles.PreAssayHandling_SortingTime_datenum),
+  s = [datestr(handles.PreAssayHandling_SortingDate_datenum,'yyyymmdd'),'T999999'];
+else
+  s = datestr(handles.PreAssayHandling_SortingTime_datenum,'yyyymmddTHHMMSS');
+end
+fprintf(fid,'datetime_sorting="%s" ',s);
 % person who moved flies to starvation material
 fprintf(fid,'handler_starvation="%s" ',handles.PreAssayHandling_StarvationHandler);
 % absolute datetime the flies were moved to starvation material
-fprintf(fid,'datetime_starvation="%s" ',datestr(handles.PreAssayHandling_StarvationTime_datenum,'yyyy-mm-ddTHH:MM:SS'));
+fprintf(fid,'datetime_starvation="%s" ',datestr(handles.PreAssayHandling_StarvationTime_datenum,'yyyymmddTHHMMSS'));
 % seconds between bringing vials into hot temperature environment and
 % experiment start
 fprintf(fid,'seconds_shiftflytemp="%f" ',shift_time);

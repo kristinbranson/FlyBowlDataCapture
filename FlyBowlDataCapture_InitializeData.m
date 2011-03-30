@@ -147,12 +147,12 @@ try
     'UFMFMaxFracFgCompress','UFMFMaxBGNFrames','UFMFBGUpdatePeriod',...
     'UFMFBGKeyFramePeriod','UFMFMaxBoxLength','UFMFBackSubThresh',...
     'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
-    'ScanLineYLim'};
+    'ScanLineYLim','MinFliesLoadedTime','MaxFliesLoadedTime'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
     else
-      addToStatus(handles,sprintf('Parameter %s not set in parameter file.',numeric_params{i}));
+      fprintf('Parameter %s not set in parameter file.\n',numeric_params{i});
     end
   end
   
@@ -861,6 +861,13 @@ if isfield(handles.params,'QuickStatsStatsFileName'),
   end
 end
 
+%% flies loaded time constraints
+if ~isfield(handles.params,'MinFliesLoadedTime'),
+  handles.params.MinFliesLoadedTime = 0;
+end
+if ~isfield(handles.params,'MaxFliesLoadedTime'),
+  handles.params.MaxFliesLoadedTime = inf;
+end
 
 
 %% Initialization complete

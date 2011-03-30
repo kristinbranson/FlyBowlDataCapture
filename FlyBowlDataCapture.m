@@ -494,7 +494,12 @@ if isempty(m),
 end
   
 handles.PreAssayHandling_SortingHour = s;
-handles.PreAssayHandling_SortingHour_datenum = rem(datenum(s),1);
+% unknown sorting hour
+if strcmpi(s,'99:99'),
+  handles.PreAssayHandling_SortingHour_datenum = nan;
+else
+  handles.PreAssayHandling_SortingHour_datenum = rem(datenum(s),1);
+end
 
 handles.PreAssayHandling_SortingTime_datenum = ...
   handles.PreAssayHandling_SortingDate_datenum + ...
@@ -807,9 +812,25 @@ function pushbutton_FliesLoaded_Callback(hObject, eventdata, handles)
 
 % store time flies were loaded
 handles.FliesLoaded_Time_datenum = now;
+
+% start a timer so that we know how long it's been since flies were loaded
+FliesLoaded_Timer_Params = ...
+ struct('FliesLoaded_Time_datenum',handles.FliesLoaded_Time_datenum,...
+ 'pushbutton_FliesLoaded',handles.pushbutton_FliesLoaded,...
+ 'pushbutton_StartRecording',handles.pushbutton_StartRecording,...
+ 'MinFliesLoadedTime',handles.params.MinFliesLoadedTime,...
+ 'MaxFliesLoadedTime',handles.params.MaxFliesLoadedTime);
+
+handles.FliesLoaded_Timer = timer('Period',1,...
+  'ExecutionMode','fixedRate',...
+  'Name','FliesLoaded_Timer','tag','FliesLoaded_Timer',...
+  'TimerFcn',{@FliesLoaded_Timer_Callback,FliesLoaded_Timer_Params},...
+  'StopFcn',{@FliesLoaded_Timer_Stop,FliesLoaded_Timer_Params},...
+  'BusyMode','drop');
+
 % also write to button string
 set(hObject,'BackgroundColor',handles.grayed_bkgdcolor,...
-  'String',sprintf('Load: %s',datestr(handles.FliesLoaded_Time_datenum,13)));
+  'String',sprintf('Load: %ds ago',0));
 
 % enable recording if camera is initialized
 if handles.IsCameraInitialized && (handles.TempProbe_IsInitialized || (handles.params.DoRecordTemp == 0)),
@@ -821,13 +842,54 @@ addToStatus(handles,{'Flies loaded.'},handles.FliesLoaded_Time_datenum);
 
 handles = ChangedMetaData(handles);
 
+start(handles.FliesLoaded_Timer);
+
 guidata(hObject,handles);
+
+function FliesLoaded_Timer_Stop(obj,event,params)
+
+% time since flies loaded, in seconds
+dt = (now - params.FliesLoaded_Time_datenum)*86400;
+set(params.pushbutton_FliesLoaded,'String',sprintf('Load Time: %.2f',dt));
+set(params.pushbutton_StartRecording,'String','Start Recording');
+
+function FliesLoaded_Timer_Callback(obj,event,params)
+
+% time since flies loaded, in seconds
+dt = (now - params.FliesLoaded_Time_datenum)*86400;
+rounddt = round(dt);
+if dt < params.MinFliesLoadedTime,
+  set(params.pushbutton_StartRecording,...
+    'String',sprintf('Record (%ds early)',params.MinFliesLoadedTime-rounddt));
+elseif dt > params.MaxFliesLoadedTime,
+  set(params.pushbutton_StartRecording,...
+    'String',sprintf('Record (%ds late)',rounddt-params.MaxFliesLoadedTime));
+else
+  set(params.pushbutton_StartRecording,...
+    'String','Start Recording');
+end
+set(params.pushbutton_FliesLoaded,'String',sprintf('Load: %ds ago',rounddt));
+
+function handles = RemoveFliesLoadedTimer(handles)
+
+% stop, delete the fliesloaded timer
+if isfield(handles,'FliesLoaded_Timer') && ...
+    isvalid(handles.FliesLoaded_Timer),
+  if strcmpi(get(handles.FliesLoaded_Timer,'Running'),'on'),
+    stop(handles.FliesLoaded_Timer);
+  end
+  delete(handles.FliesLoaded_Timer);
+  handles = rmfield(handles,'FliesLoaded_Timer');
+end
+
 
 % --- Executes on button press in pushbutton_StartRecording.
 function pushbutton_StartRecording_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_StartRecording (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+handles = RemoveFliesLoadedTimer(handles);
 
 % store isrecording flag
 handles.IsRecording = true;
@@ -1399,6 +1461,9 @@ if ~handles.FinishedRecording && handles.GUIIsInitialized,
 end
 
 hwaitbar = waitbar(.1,'Closing experiment');
+
+% remove flies loaded timer
+handles = RemoveFliesLoadedTimer(handles);
 
 % recording stopped in the middle
 if handles.IsRecording,
