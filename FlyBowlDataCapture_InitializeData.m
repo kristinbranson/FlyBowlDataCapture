@@ -7,7 +7,7 @@ handles.version = '0.1';
 comment_char = '#';
 
 % date format
-handles.dateformat = 'yyyymmddTHHMMSS';
+handles.datetimeformat = 'yyyymmddTHHMMSS';
 
 % background color if value has not been changed from defaults
 handles.isdefault_bkgdcolor = [0,.2,.2];

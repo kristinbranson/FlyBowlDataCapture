@@ -38,7 +38,7 @@ fprintf(fid,'<?xml version="1.0"?>\n');
 % name of assay
 fprintf(fid,'<experiment assay="%s" ',handles.params.MetaData_AssayName);
 % start datetime
-fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,handles.dateformat));
+fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,handles.datetimeformat));
 % name of experimenter
 fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 % always same experiment protocol
