@@ -58,7 +58,9 @@ if handles.IsRecording,
   if ~isfield(handles,'TempStreamDisabled'),
     handles.TempStreamDisabled = false;
   end
-  if ~handles.TempStreamDisabled,
+  if handles.TempStreamDisabled,
+    addToStatus(handles,'Temperature stream saving disabled');
+  else
     if ~isfield(handles,'TempFid'),
       addToStatus(handles,{'TempFid not yet set. Skipping.'});
     elseif handles.TempFid <= 0,
@@ -69,6 +71,7 @@ if handles.IsRecording,
         addToStatus(handles,sprintf('Temperature Fid = %d is invalid',handles.TempFid));
       else
         try
+          fprintf(handles.TempFid,'%f,%f\n',timestamp,temp);
           success = true;
         catch ME,
           addToStatus(handles,{'Error writing temperature to file',getReport(ME,'extended','hyperlinks','off')});
