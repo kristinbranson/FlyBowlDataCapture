@@ -1,10 +1,19 @@
 function handles = SaveMetaData(handles)
 
-dateformat = 'yyyymmddTHHMMSS';
-
 % construct experiment name, directory
 handles = setExperimentName(handles);
 
+% back up metadata file if it exists
+if exist(handles.MetaDataFileName,'file'),
+  addToStatus(handles,'Copying metadata file to backup %s',handles.MetaDataFileName);
+  bakfilename = [handles.MetaDataFileName,'.bak'];
+  [success,msg] = copyfile(handles.MetaDataFileName,bakfilename);
+  if ~success,
+    warndlg(msg,'Error backing up metadatafile, aborting SaveMetaData','modal');
+    return;
+  end
+end
+  
 % open meta data file
 fid = fopen(handles.MetaDataFileName,'w');
 if fid < 0,
@@ -29,7 +38,7 @@ fprintf(fid,'<?xml version="1.0"?>\n');
 % name of assay
 fprintf(fid,'<experiment assay="%s" ',handles.params.MetaData_AssayName);
 % start datetime
-fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,dateformat));
+fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,handles.dateformat));
 % name of experimenter
 fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 % always same experiment protocol
@@ -57,7 +66,7 @@ fprintf(fid,'effector="%s" ',handles.params.MetaData_Effector);
 % gender
 fprintf(fid,'gender="%s" ',handles.params.MetaData_Gender); 
 % cross date
-fprintf(fid,'cross_date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyy-mm-dd'));
+fprintf(fid,'cross_date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyymmdd'));
 % hours starved
 fprintf(fid,'hours_starved="%f" ',starvation_time);
 % count is set to 0 -- won't know this til after tracking

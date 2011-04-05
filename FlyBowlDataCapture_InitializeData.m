@@ -3,11 +3,11 @@ function handles = FlyBowlDataCapture_InitializeData(handles)
 % version
 handles.version = '0.1';
 
-% for unique names
-handles.RandomNumber = randi(9999,1);
-
 % comment character in params file
 comment_char = '#';
+
+% date format
+handles.dateformat = 'yyyymmddTHHMMSS';
 
 % background color if value has not been changed from defaults
 handles.isdefault_bkgdcolor = [0,.2,.2];
@@ -59,6 +59,9 @@ handles.maxhour = rem(datenum('23:00'),1);
 
 handles.SAGECodeDir = '../SAGE/MATLABInterface/Trunk';
 handles.JCtraxCodeDir = '../JCtrax';
+
+% max number of times to try to grab temperature and fail
+handles.MaxNTempGrabAttempts = 10;
 
 % add JCtrax to path
 if ~isdeployed,
@@ -241,7 +244,9 @@ end
 %% Status window
 %handles.Status_MaxNLines = 50;
 handles.IsTmpLogFile = true;
-handles.LogFileName = fullfile(handles.params.TmpOutputDirectory,sprintf('TmpLog_%s.txt',datestr(now,30)));
+handles.TmpDateStrFormat = 'yyyymmddTHHMMSSFFF';
+handles.TmpDateStr = datestr(now,handles.TmpDateStrFormat);
+handles.LogFileName = fullfile(handles.params.TmpOutputDirectory,sprintf('TmpLog_%s.txt',handles.TmpDateStr));
 set(handles.edit_Status,'String',{});
 j = mod(handles.GUIi-1,size(handles.status_colors,1))+1;
 handles.status_color = handles.status_colors(j,:);
@@ -251,7 +256,7 @@ s = {
   sprintf('FlyBowlDataCapture v. %s',handles.version)
   '--------------------------------------'};
 addToStatus(handles,s,-1);
-addToStatus(handles,{sprintf('GUI instance %d, writing to %s, random number %d.',handles.GUIi,handles.params.OutputDirectory,handles.RandomNumber)});
+addToStatus(handles,{sprintf('GUI instance %d, writing to %s.',handles.GUIi,handles.params.OutputDirectory)});
 %% Experimenter
 
 % whether this has been changed or not

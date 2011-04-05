@@ -78,15 +78,13 @@ end
 if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
 
   % create a temporary name for the log file
-  filestr = sprintf('FBDC_UFMF_Log_%s_%d.txt',...
-    datestr(handles.SetCamera_Time_datenum,30),...
-    handles.RandomNumber);
+  filestr = sprintf('FBDC_UFMF_Log_%s.txt',...
+    datestr(handles.SetCamera_Time_datenum,handles.TmpDateStrFormat));
   handles.TmpUFMFLogFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
 
   % create a temporary name for the diagnostics file
-  filestr = sprintf('FBDC_UFMF_Diagnostics_%s_%d.txt',...
-    datestr(handles.SetCamera_Time_datenum,30),...
-    handles.RandomNumber);
+  filestr = sprintf('FBDC_UFMF_Diagnostics_%s.txt',...
+    datestr(handles.SetCamera_Time_datenum,handles.TmpDateStrFormat));
   handles.TmpUFMFStatFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
     
   if isfield(handles.params,'UFMFMaxFracFgCompress'),

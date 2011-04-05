@@ -1,6 +1,6 @@
 function wrapUpVideo(obj,event,hObject,AdaptorName,didabort) %#ok<INUSL>
 
-hwait = waitbar(0,'Closing video file. Please Wait.');
+hwait = waitbar(0,'Closing video file: stopping recording');
 
 if strcmpi(AdaptorName,'gdcam')
   set(obj.Source,'LogFlag',0);
@@ -22,12 +22,12 @@ else
   % nothing to do
 end
 
-waitbar(.2);
+waitbar(.2,'Closing video file: pausing for 3 seconds...');
 
 % wait a few seconds
 pause(3);
 
-waitbar(.4);
+waitbar(.4,'Closing video file: waiting for Running == Off');
 
 % wait until actually stopped
 %fprintf('Waiting for Running == Off...\n');
@@ -39,7 +39,7 @@ while true,
 end
 %fprintf('Running = Off.\n');
 
-waitbar(.5);
+waitbar(.5,'Closing video file: cleaning up remaining frames.');
 
 if ~(strcmpi(AdaptorName,'gdcam') || strcmpi(AdaptorName,'udcam')),
 
@@ -69,11 +69,17 @@ end
 
 handles = guidata(hObject);
 
-waitbar(.6);
+waitbar(.6,'Closing video file: closing temperature stream file.');
 
 % close temperature file
-if handles.params.DoRecordTemp ~= 0,
-  fclose(handles.TempFid);
+if handles.params.DoRecordTemp ~= 0 && isfield(handles,'TempFid') && ...
+    handles.tempFid > 0 && ~isempty(fopen(handles.TempFid)),
+  try
+    fclose(handles.TempFid);
+  catch ME,
+    addToStatus(handles,{'Error closing temperature stream file:',getReport(ME)});
+    warndlg(getReport(ME),'Error closing temperature stream file','modal');
+  end
 end
 
 % no longer recording
@@ -82,6 +88,7 @@ handles = guidata(hObject);
 handles.IsRecording = false;
 handles.FinishedRecording = true;
 
+waitbar(.65,'Closing video file: renaming experiment...');
 oldname = handles.FileName;
 %fprintf('Renaming file.\n');
 handles = renameVideoFile(handles);
@@ -95,7 +102,7 @@ PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
 PreviewParams.IsRecording = false;
 setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
 
-waitbar(.7);
+waitbar(.7,'Computing quick stats...');
 
 % show some simple statistics
 if strcmpi(handles.params.FileType,'ufmf'),
@@ -114,10 +121,11 @@ if strcmpi(handles.params.FileType,'ufmf'),
     
   catch ME,
     addToStatus(handles,['Error computing quickstats: ',getReport(ME)]);
+    warndlg(getReport(ME),'Error computing quickstats','modal');
   end
 end
 
-waitbar(.9);
+waitbar(.899,'Closing video file: Enabling Save Metadata button...');
 
 % if we did not abort, store this
 if ~didabort,
@@ -125,11 +133,16 @@ if ~didabort,
   handles = ChangedMetaData(handles);
 end
 
+waitbar(.9,'Closing video file: Waiting 5 seconds before resaving metadata...');
+
 % add a wait period before resaving
 pause(5);
 
 % save metadata
+waitbar(.98,'Closing video file: Saving metadata...');
 handles = SaveMetaData(handles);
+
+waitbar(.99,'Closing video file: Updating GUI...');
 
 % enable Done button
 set(handles.pushbutton_Done,'Enable','on','BackgroundColor',handles.Done_bkgdcolor,'String','Done');
@@ -154,7 +167,7 @@ set(handles.menu_Quit,'Enable','on');
 
 guidata(hObject,handles);
 
-waitbar(1);
+waitbar(1,'Video file closed');
 if ishandle(hwait),
   delete(hwait);
 end

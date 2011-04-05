@@ -1,6 +1,7 @@
 function ExperimentName = getExperimentName(handles)
 
-effector_abbrs = {'UAS_dTrpA1_2_0002','TrpA'};
+effector_abbrs = {'UAS_dTrpA1_2_0002','TrpA'
+  'EXT_CantonS_1101243','CS'};
 i = find(strcmp(handles.params.MetaData_Effector,effector_abbrs(:,1)),1);
 if ~isempty(i),
   effector = effector_abbrs{i,2};

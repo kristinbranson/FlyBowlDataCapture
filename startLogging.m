@@ -14,19 +14,19 @@ handles = SaveMetaData(handles);
 %save('-append',handles.IsCameraRunningFile,'DevicesUsed');
 
 % create a temporary name for the video
-%handles.RandomNumber = randi(9999,1);
-filestr = sprintf('FBDC_movie_%s_%d.%s',...
-  datestr(handles.StartRecording_Time_datenum,30),...
-  handles.RandomNumber,handles.params.FileType);
+filestr = sprintf('FBDC_movie_%s.%s',...
+  datestr(handles.StartRecording_Time_datenum,handles.TmpDateStrFormat),...
+  handles.params.FileType);
 handles.FileName = fullfile(handles.params.TmpOutputDirectory,filestr);
 handles.IsTmpFileName = true;
 
 % create a temporary name for the temperature
-filestr = sprintf('FBDC_temperature_%s_%d.txt',...
-  datestr(handles.StartRecording_Time_datenum,30),...
-  handles.RandomNumber);
+filestr = sprintf('FBDC_temperature_%s.txt',...
+  datestr(handles.StartRecording_Time_datenum,handles.TmpDateStrFormat));
 handles.TempFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
+addToStatus(handles,sprintf('Opening %s to write temperature stream',handles.TempFileName));
 handles.TempFid = -1;
+handles.NTempGrabAttempts = 0;
 if handles.params.DoRecordTemp ~= 0,
   try
     handles.TempFid = fopen(handles.TempFileName,'w');

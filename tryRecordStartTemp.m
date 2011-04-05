@@ -14,6 +14,7 @@ if ~handles.StartTempRecorded,
       handles.MetaData_RoomTemperature = temp;
       handles.MetaData_RoomHumidity = humid;
       handles.StartTempRecorded = true;
+      addToStatus(handles,sprintf('Recorded start temp %f, humid %f',temp,humid));
     end
   end
   

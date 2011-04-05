@@ -51,6 +51,7 @@ if handles.IsRecording,
   if ~isfield(handles,'StartTempRecorded') || ~handles.StartTempRecorded,
     handles = tryRecordStartTemp(handles);
   end
+  success = false;
   if ~isfield(handles,'TempFid'),
     addToStatus(handles,{'TempFid not yet set. Skipping.'});
   elseif handles.TempFid <= 0,
@@ -62,9 +63,19 @@ if handles.IsRecording,
     else
       try
         fprintf(handles.TempFid,'%f,%f\n',timestamp,temp);
+        success = true;
       catch ME,
         addToStatus(handles,{'Error writing temperature to file',getReport(ME,'extended','hyperlinks','off')});
       end
+    end
+  end
+  if success,
+    handles.NTempGrabAttempts = 0;
+  else
+    handles.NTempGrabAttempts = handles.NTempGrabAttempts + 1;
+    if handles.NTempGrabAttempts > handles.MaxNTempGrabAttempts,
+      warndlg(sprintf('Failed to write temperature for > %d consecutive attempts. Disabling temperature recording.',handles.MaxNTempGrabAttempts),'Error recording temperature','modal');
+      handles.params.DoRecordTemp = 0;
     end
   end
 end
