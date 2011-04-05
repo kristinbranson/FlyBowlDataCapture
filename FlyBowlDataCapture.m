@@ -54,7 +54,7 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 
 % Choose default command line output for FlyBowlDataCapture
 
-handles.DEBUG = false;
+handles.DEBUG = true;
 handles.IsProcessingError = false;
 guidata(hObject,handles);
 

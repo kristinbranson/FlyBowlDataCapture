@@ -5,7 +5,7 @@ handles = setExperimentName(handles);
 
 % back up metadata file if it exists
 if exist(handles.MetaDataFileName,'file'),
-  addToStatus(handles,'Copying metadata file to backup %s',handles.MetaDataFileName);
+  addToStatus(handles,sprintf('Copying metadata file to backup %s',handles.MetaDataFileName));
   bakfilename = [handles.MetaDataFileName,'.bak'];
   [success,msg] = copyfile(handles.MetaDataFileName,bakfilename);
   if ~success,

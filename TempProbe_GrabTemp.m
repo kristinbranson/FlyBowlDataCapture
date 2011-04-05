@@ -52,34 +52,43 @@ if handles.IsRecording,
     handles = tryRecordStartTemp(handles);
   end
   success = false;
-  if ~isfield(handles,'TempFid'),
-    addToStatus(handles,{'TempFid not yet set. Skipping.'});
-  elseif handles.TempFid <= 0,
-    addToStatus(handles,sprintf('Temperature Fid = %d is invalid',handles.TempFid));
-  else
-    [filename,permission] = fopen(handles.TempFid);
-    if isempty(filename) || isempty(permission),
+  if ~isfield(handles,'NTempGrabAttempts'),
+    handles.NTempGrabAttempts = 0;
+  end
+  if ~isfield(handles,'TempStreamDisabled'),
+    handles.TempStreamDisabled = false;
+  end
+  if ~handles.TempStreamDisabled,
+    if ~isfield(handles,'TempFid'),
+      addToStatus(handles,{'TempFid not yet set. Skipping.'});
+    elseif handles.TempFid <= 0,
       addToStatus(handles,sprintf('Temperature Fid = %d is invalid',handles.TempFid));
     else
-      try
-        fprintf(handles.TempFid,'%f,%f\n',timestamp,temp);
-        success = true;
-      catch ME,
-        addToStatus(handles,{'Error writing temperature to file',getReport(ME,'extended','hyperlinks','off')});
+      [filename,permission] = fopen(handles.TempFid);
+      if isempty(filename) || isempty(permission),
+        addToStatus(handles,sprintf('Temperature Fid = %d is invalid',handles.TempFid));
+      else
+        try
+          success = true;
+        catch ME,
+          addToStatus(handles,{'Error writing temperature to file',getReport(ME,'extended','hyperlinks','off')});
+        end
+      end
+    end
+    if success,
+      handles.NTempGrabAttempts = 0;
+    else
+      handles.NTempGrabAttempts = handles.NTempGrabAttempts + 1;
+      if handles.NTempGrabAttempts > handles.MaxNTempGrabAttempts,
+        handles.TempStreamDisabled = true;
+        guidata(hObject,handles);
+        warndlg(sprintf('Failed to write temperature for > %d consecutive attempts. Disabling temperature recording.',handles.MaxNTempGrabAttempts),'Error recording temperature','modal');
+        pause(.1);
       end
     end
   end
-  if success,
-    handles.NTempGrabAttempts = 0;
-  else
-    handles.NTempGrabAttempts = handles.NTempGrabAttempts + 1;
-    if handles.NTempGrabAttempts > handles.MaxNTempGrabAttempts,
-      warndlg(sprintf('Failed to write temperature for > %d consecutive attempts. Disabling temperature recording.',handles.MaxNTempGrabAttempts),'Error recording temperature','modal');
-      handles.params.DoRecordTemp = 0;
-    end
-  end
 end
-guidata(handles.figure_main,handles);
+guidata(hObject,handles);
 set(handles.hLine_Status_Temp,'XData',handles.Status_Temp_History(1,:)-handles.Status_Temp_History(1,end),...
   'YData',handles.Status_Temp_History(2,:));
 drawnow;

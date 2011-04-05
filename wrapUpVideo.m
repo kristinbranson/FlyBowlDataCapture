@@ -22,12 +22,12 @@ else
   % nothing to do
 end
 
-waitbar(.2,'Closing video file: pausing for 3 seconds...');
+hwait = mywaitbar(.2,hwait,'Closing video file: pausing for 3 seconds...');
 
 % wait a few seconds
 pause(3);
 
-waitbar(.4,'Closing video file: waiting for Running == Off');
+hwait = mywaitbar(.4,hwait,'Closing video file: waiting for Running == Off');
 
 % wait until actually stopped
 %fprintf('Waiting for Running == Off...\n');
@@ -49,7 +49,7 @@ while true,
 end
 %fprintf('Running = Off.\n');
 
-waitbar(.5,'Closing video file: cleaning up remaining frames.');
+hwait = waitbar(.5,hwait,'Closing video file: cleaning up remaining frames.');
 
 if ~(strcmpi(AdaptorName,'gdcam') || strcmpi(AdaptorName,'udcam')),
 
@@ -79,11 +79,11 @@ end
 
 handles = guidata(hObject);
 
-waitbar(.6,'Closing video file: closing temperature stream file.');
+hwait = mywaitbar(.6,hwait,'Closing video file: closing temperature stream file.');
 
 % close temperature file
 if handles.params.DoRecordTemp ~= 0 && isfield(handles,'TempFid') && ...
-    handles.tempFid > 0 && ~isempty(fopen(handles.TempFid)),
+    handles.TempFid > 0 && ~isempty(fopen(handles.TempFid)),
   try
     fclose(handles.TempFid);
   catch ME,
@@ -98,7 +98,7 @@ handles = guidata(hObject);
 handles.IsRecording = false;
 handles.FinishedRecording = true;
 
-waitbar(.65,'Closing video file: renaming experiment...');
+hwait = mywaitbar(.65,hwait,'Closing video file: renaming experiment...');
 oldname = handles.FileName;
 %fprintf('Renaming file.\n');
 handles = renameVideoFile(handles);
@@ -112,7 +112,7 @@ PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
 PreviewParams.IsRecording = false;
 setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
 
-waitbar(.7,'Computing quick stats...');
+hwait = mywaitbar(.7,hwait,'Computing quick stats...');
 
 % show some simple statistics
 if strcmpi(handles.params.FileType,'ufmf'),
@@ -135,7 +135,7 @@ if strcmpi(handles.params.FileType,'ufmf'),
   end
 end
 
-waitbar(.899,'Closing video file: Enabling Save Metadata button...');
+hwait = mywaitbar(.899,hwait,'Closing video file: Enabling Save Metadata button...');
 
 % if we did not abort, store this
 if ~didabort,
@@ -143,16 +143,16 @@ if ~didabort,
   handles = ChangedMetaData(handles);
 end
 
-waitbar(.9,'Closing video file: Waiting 5 seconds before resaving metadata...');
+hwait = mywaitbar(.9,hwait,'Closing video file: Waiting 5 seconds before resaving metadata...');
 
 % add a wait period before resaving
 pause(5);
 
 % save metadata
-waitbar(.98,'Closing video file: Saving metadata...');
+hwait = mywaitbar(.98,hwait,'Closing video file: Saving metadata...');
 handles = SaveMetaData(handles);
 
-waitbar(.99,'Closing video file: Updating GUI...');
+hwait = mywaitbar(.99,hwait,'Closing video file: Updating GUI...');
 
 % enable Done button
 set(handles.pushbutton_Done,'Enable','on','BackgroundColor',handles.Done_bkgdcolor,'String','Done');
@@ -177,7 +177,7 @@ set(handles.menu_Quit,'Enable','on');
 
 guidata(hObject,handles);
 
-waitbar(1,'Video file closed');
+hwait = mywaitbar(1,hwait,'Video file closed');
 if ishandle(hwait),
   delete(hwait);
 end
