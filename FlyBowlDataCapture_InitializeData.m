@@ -317,6 +317,17 @@ set(handles.edit_Fly_LineName,'String',handles.Fly_LineName,...
 % we have not created the autofill version yet
 handles.isAutoComplete_edit_Fly_LineName = false;
 
+%% barcode
+
+handles.isdefault.barcode = true;
+
+% by default, -1
+handles.barcode = -1;
+
+% set possible values, current value, color to shouldchange
+set(handles.edit_Barcode,'String',num2str(handles.barcode),...
+  'BackgroundColor',handles.shouldchange_bkgdcolor);
+
 %% Incubator ID
 
 % whether this has been changed or not
@@ -364,6 +375,28 @@ handles.PreAssayHandling_CrossDate = datestr(handles.PreAssayHandling_CrossDate_
 % set possible values, current value, color to default
 set(handles.popupmenu_PreAssayHandling_CrossDate,'String',handles.PreAssayHandling_CrossDates,...
   'Value',find(strcmp(handles.PreAssayHandling_CrossDate,handles.PreAssayHandling_CrossDates),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
+
+%% Cross Handler
+
+% whether this has been changed or not
+handles.isdefault.PreAssayHandling_CrossHandler = true;
+
+% possible values for CrossHandler
+handles.PreAssayHandling_CrossHandlers = handles.params.PreAssayHandling_CrossHandlers;
+
+% if CrossHandler not stored in rc file, choose first CrossHandler
+if ~isfield(handles.previous_values,'PreAssayHandling_CrossHandler') || ...
+    ~ismember(handles.previous_values.PreAssayHandling_CrossHandler,handles.PreAssayHandling_CrossHandlers),
+  handles.previous_values.PreAssayHandling_CrossHandler = handles.PreAssayHandling_CrossHandlers{1};
+end
+
+% by default, previous CrossHandler
+handles.PreAssayHandling_CrossHandler = handles.previous_values.PreAssayHandling_CrossHandler;
+
+% set possible values, current value, color to default
+set(handles.popupmenu_PreAssayHandling_CrossHandler,'String',handles.PreAssayHandling_CrossHandlers,...
+  'Value',find(strcmp(handles.PreAssayHandling_CrossHandler,handles.PreAssayHandling_CrossHandlers),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Sorting Date

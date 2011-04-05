@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 08-Mar-2011 16:36:01
+% Last Modified by GUIDE v2.5 05-Apr-2011 16:10:39
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1856,6 +1856,65 @@ function popupmenu_NDamagedFlies_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in popupmenu_PreAssayHandling_CrossHandler.
+function popupmenu_PreAssayHandling_CrossHandler_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_CrossHandler (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_CrossHandler contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_CrossHandler
+
+% grab value
+v = get(handles.popupmenu_PreAssayHandling_CrossHandler,'Value');
+handles.PreAssayHandling_CrossHandler = handles.PreAssayHandling_CrossHandlers{v};
+
+% no longer default
+handles.isdefault.PreAssayHandling_CrossHandler = false;
+
+% set color
+set(handles.popupmenu_PreAssayHandling_CrossHandler,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_PreAssayHandling_CrossHandler_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_CrossHandler (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_Barcode_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_Barcode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_Barcode as text
+%        str2double(get(hObject,'String')) returns contents of edit_Barcode as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit_Barcode_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_Barcode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
