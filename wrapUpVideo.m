@@ -31,11 +31,21 @@ waitbar(.4,'Closing video file: waiting for Running == Off');
 
 % wait until actually stopped
 %fprintf('Waiting for Running == Off...\n');
+tic;
+handles = guidata(hObject);
+MaxTimeWaitStopRunning = 30;
 while true,
   if ~isrunning(obj) && ~islogging(obj)% && ...
     break;
   end
   pause(.5);
+  dt = toc;
+  if dt > MaxTimeWaitStopRunning,
+    s = sprintf('Waited more than %f seconds for recording to stop. Erroring out.',MaxTimeWaitStopRunning);
+    errordlg(s);
+    error(s);
+  end
+  addToStatus(handles,sprintf('Waiting for recording to stop (%f/%f s)',dt,MaxTimeWaitStopRunning));
 end
 %fprintf('Running = Off.\n');
 
