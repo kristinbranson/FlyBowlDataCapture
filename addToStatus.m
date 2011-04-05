@@ -1,5 +1,7 @@
 function addToStatus(handles,s,datenum)
 
+try
+
 ColsWrap = 90;
 
 if nargin <=1,
@@ -32,12 +34,35 @@ Status_String(end+1:end+length(s)) = s;
 set(handles.edit_Status,'String',Status_String);
 
 % write to log file
-fid = fopen(handles.LogFileName,'a');
-fprintf(fid,'%s\n',s{:});
-fclose(fid);
+success = false;
+try
+  fid = fopen(handles.LogFileName,'a');
+  if fid > 0,
+    fprintf(fid,'%s\n',s{:});
+    fclose(fid);
+    success = true;
+  end
+catch ME,
+  getReport(ME)
+end
+if ~success,
+  fprintf('(Could not write to log file)\n');
+  fprintf('%s\n',s{:});
+end
+
 
 % scroll down to bottom
 if isfield(handles,'jedit_Status'),
   drawnow;
   handles.jedit_Status.setCaretPosition(handles.jedit_Status.getDocument.getLength);
+end
+
+catch ME,
+  
+  fprintf('Error writing status message:\n');
+  try
+    fprintf('%s\n',s{:});
+  catch
+  end
+  getReport(ME)
 end
