@@ -131,7 +131,7 @@ else
 end
 BehaviorNotes = sprintf('%s\\n',BehaviorNotes{:});
 BehaviorNotes = BehaviorNotes(1:end-2);
-fprintf(fid,'  <note_behavioral>%s</note_behavioral>\n',BehaviorNotes);
+fprintf(fid,'  <notes_behavioral>%s</notes_behavioral>\n',BehaviorNotes);
 % deal with multi-line notes
 if iscell(handles.TechnicalNotes),
   TechnicalNotes = handles.TechnicalNotes;
@@ -140,7 +140,7 @@ else
 end
 TechnicalNotes = sprintf('%s\\n',TechnicalNotes{:});
 TechnicalNotes = TechnicalNotes(1:end-2);
-fprintf(fid,'  <note_technical>%s</note_technical>\n',TechnicalNotes);
+fprintf(fid,'  <notes_technical>%s</notes_technical>\n',TechnicalNotes);
 % flags entered
 fprintf(fid,'  <flag_review>%d</flag_review>\n',strcmpi(handles.Flag,'Review'));
 fprintf(fid,'  <flag_redo>%d</flag_redo>\n',strcmpi(handles.Flag,'Redo'));
