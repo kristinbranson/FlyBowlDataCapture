@@ -1,9 +1,9 @@
 # Directory to store video to
 #OutputDirectory,D:\data,J:\data
-OutputDirectory,E:\Data\debug_data,J:\debug_data
+OutputDirectory,D:\debug_data,J:\debug_data
 #OutputDirectory,D:\special_data,J:\special_data
 # Directory to temporarily store video to
-TmpOutputDirectory,E:\Data\tmpdata,J:\tmpdata
+TmpOutputDirectory,D:\tmpdata,J:\tmpdata
 # Names of hard drives, corresponding to the ordered OutputDirectory list
 HardDriveName,(bransonlab-ww1:Internal_D;bransonlab-ww2:Internal_D;bransonlab-ww3:Internal_D;bransonlab-ww4:Internal_D),(bransonlab-ww1:HD2;bransonlab-ww2:HD1;bransonlab-ww3:HD4;bransonlab-ww4:HD3)
 # Camera adaptor
