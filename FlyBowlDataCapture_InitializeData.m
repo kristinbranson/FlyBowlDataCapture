@@ -337,6 +337,10 @@ handles.isdefault.WishList = true;
 
 % possible values for wishlist
 handles.WishLists = handles.params.WishListRange(1):handles.params.WishListRange(2);
+% add -1 as a possible value to indicate no wish list
+if ~ismember(-1,handles.WishLists),
+  handles.Wishlists = [-1,handles.WishLists];
+end
 
 % if WishList not stored in rc file, choose first WishList
 if ~isfield(handles.previous_values,'WishList') || ...
