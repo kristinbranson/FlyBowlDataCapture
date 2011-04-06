@@ -38,7 +38,7 @@ fprintf(fid,'<?xml version="1.0"?>\n');
 % name of assay
 fprintf(fid,'<experiment assay="%s" ',handles.params.MetaData_AssayName);
 % start datetime
-fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,handles.dateformat));
+fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,handles.datetimeformat));
 % name of experimenter
 fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 % always same experiment protocol
@@ -53,7 +53,7 @@ apparatusUniqueName = sprintf('Rig%s__Plate%s__Lid%s__Bowl%s__Camera%s__Computer
   handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Lid,handles.Assay_Bowl,...
   handles.CameraUniqueID,handles.ComputerName,handles.params.HardDriveName);
 % apparatus full id and parts
-fprintf(fid,'    <apparatus id="%s" environmental_chamber="%s" rig="%s" plate="%s" top_plate="%s" bowl="%s" camera="%s" computer="%s" harddrive="%s"/>\n',...
+fprintf(fid,'    <apparatus id="%s" room="%s" rig="%s" plate="%s" top_plate="%s" bowl="%s" camera="%s" computer="%s" harddrive="%s"/>\n',...
   apparatusUniqueName,...
   handles.Assay_Room,handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Lid,handles.Assay_Bowl,...
   handles.CameraUniqueID,...
@@ -69,6 +69,12 @@ fprintf(fid,'gender="%s" ',handles.params.MetaData_Gender);
 fprintf(fid,'cross_date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyymmdd'));
 % hours starved
 fprintf(fid,'hours_starved="%f" ',starvation_time);
+% barcode
+fprintf(fid,'cross_barcode="%d" ',handles.barcode);
+% flip
+fprintf(fid,'flip_used="%d" ',handles.params.PreAssayHandling_FlipUsed);
+% wish list
+fprintf(fid,'wish_list="%d" ',handles.WishList);
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'count="0">\n');
 % TODO: genotype
@@ -77,12 +83,14 @@ fprintf(fid,'      <genotype>%s__%s</genotype>\n',handles.Fly_LineName,handles.p
 
 % choose rearing protocol based on incubator ID
 i = find(strcmp(handles.Rearing_IncubatorID,handles.Rearing_IncubatorIDs),1);
-fprintf(fid,'      <rearing protocol="%s" ',handles.params.MetaData_RearingProtocols{i});
-fprintf(fid,'incubator="%s" ',handles.Rearing_IncubatorID);
+fprintf(fid,'      <rearing rearing_protocol="%s" ',handles.params.MetaData_RearingProtocols{i});
+fprintf(fid,'rearing_incubator="%s" ',handles.Rearing_IncubatorID);
 fprintf(fid,'/>\n');
 
 % always same handling protocol
-fprintf(fid,'      <handling protocol="%s" ',handles.params.MetaData_HandlingProtocols{1});
+fprintf(fid,'      <handling handling_protocol="%s" ',handles.params.MetaData_HandlingProtocols{1});
+% person who crossed flies
+fprintf(fid,'handler_cross="%s" ',handles.PreAssayHandling_CrossHandler);
 % person who sorted flies
 fprintf(fid,'handler_sorting="%s" ',handles.PreAssayHandling_SortingHandler);
 % time since sorting, in hours
@@ -134,8 +142,8 @@ TechnicalNotes = sprintf('%s\\n',TechnicalNotes{:});
 TechnicalNotes = TechnicalNotes(1:end-2);
 fprintf(fid,'  <note_technical>%s</note_technical>\n',TechnicalNotes);
 % flags entered
-fprintf(fid,'  <flag_review>%s</flag_review>\n',handles.ReviewFlag);
-fprintf(fid,'  <flag_redo>%s</flag_redo>\n',handles.RedoFlag);
+fprintf(fid,'  <flag_review>%d</flag_review>\n',strcmpi(handles.Flag,'Review'));
+fprintf(fid,'  <flag_redo>%d</flag_redo>\n',strcmpi(handles.Flag,'Redo'));
 fprintf(fid,'  <flag_aborted>%d</flag_aborted>\n',handles.didabort);
 
 fprintf(fid,'</experiment>\n');

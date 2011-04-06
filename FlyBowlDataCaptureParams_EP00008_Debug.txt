@@ -1,9 +1,9 @@
 # Directory to store video to
 #OutputDirectory,D:\data,J:\data
-OutputDirectory,D:\debug_data,J:\debug_data
+OutputDirectory,E:\Data\debug_data,J:\debug_data
 #OutputDirectory,D:\special_data,J:\special_data
 # Directory to temporarily store video to
-TmpOutputDirectory,D:\tmpdata,J:\tmpdata
+TmpOutputDirectory,E:\Data\tmpdata,J:\tmpdata
 # Names of hard drives, corresponding to the ordered OutputDirectory list
 HardDriveName,(bransonlab-ww1:Internal_D;bransonlab-ww2:Internal_D;bransonlab-ww3:Internal_D;bransonlab-ww4:Internal_D),(bransonlab-ww1:HD2;bransonlab-ww2:HD1;bransonlab-ww3:HD4;bransonlab-ww4:HD3)
 # Camera adaptor
@@ -47,7 +47,7 @@ PreAssayHandling_StarvationDate_Range,0,1
 # List of possible Starvation Handler values
 PreAssayHandling_StarvationHandlers,hirokawaj,robiea
 # List of room names
-Assay_Rooms,1,2,3
+Assay_Rooms,2C.310.1,2C.310.2,2C.310.3
 # List of possible Rig values
 Assay_Rigs,1,2
 # List of possible Plate values
@@ -146,3 +146,9 @@ ScanLineYLim,60,250
 # min, max time between loading flies and starting recording
 MinFliesLoadedTime,25
 MaxFliesLoadedTime,225
+# List of possible Cross Handler values
+PreAssayHandling_CrossHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,unknown,zhengg
+# flip used
+PreAssayHandling_FlipUsed,1
+# wishlist number range
+WishListRange,5,15
