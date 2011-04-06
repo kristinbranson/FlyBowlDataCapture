@@ -45,7 +45,7 @@ PreAssayHandling_SortingHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,h
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
 # List of possible Starvation Handler values
-PreAssayHandling_StarvationHandlers,hirokawaj,robiea
+PreAssayHandling_StarvationHandlers,hirokawaj,robiea.robertss
 # List of room names
 Assay_Rooms,1,2,3
 # List of possible Rig values
