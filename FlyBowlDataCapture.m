@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 08-Mar-2011 16:36:01
+% Last Modified by GUIDE v2.5 06-Apr-2011 09:58:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -54,7 +54,7 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 
 % Choose default command line output for FlyBowlDataCapture
 
-handles.DEBUG = false;
+handles.DEBUG = true;
 handles.IsProcessingError = false;
 guidata(hObject,handles);
 
@@ -139,6 +139,11 @@ end
 % get a reference to the underlying java component for the log
 handles.jhedit_Status = findjobj(handles.edit_Status);
 handles.jedit_Status = handles.jhedit_Status.getComponent(0).getComponent(0);
+
+% barcode edit box
+handles.jhedit_Barcode = findjobj(handles.edit_Barcode);
+% always highlight when focus gained
+set(handles.jhedit_Barcode,'FocusGainedCallback',@HighlightEditText);
 
 guidata(hObject,handles);
 
@@ -261,6 +266,27 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+function [handles,success] = setLineName(handles,newname)
+
+success = false;
+hObject = handles.edit_Fly_LineName;
+oldname = get(hObject,'String');
+eventdata.String = newname;
+set(hObject,'String',newname);
+try
+  edit_Fly_LineName_Callback(hObject, eventdata, handles);
+  handles = guidata(hObject);
+  success = strcmp(newname,get(hObject,'String'));
+  CheckBarcodeConsistency(handles);
+  if ~success,
+    warndlg(sprintf('Line name %s not in list of allowed line names',newname),'Error setting line name','modal');    
+  end
+catch ME,
+  warndlg(getReport(ME),'Error setting line name','modal');
+  set(hObject,'String',oldname);
+  return;
+end
+
 
 % --- Executes on selection change in edit_Fly_LineName.
 function edit_Fly_LineName_Callback(hObject, eventdata, handles)
@@ -325,6 +351,8 @@ else
 end
 
 guidata(hObject,handles);
+
+CheckBarcodeConsistency(handles);
 
 % --- Executes during object creation, after setting all properties.
 function edit_Fly_LineName_CreateFcn(hObject, eventdata, handles)
@@ -1236,6 +1264,21 @@ handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
+function [handles,success] = setCrossDate(handles,newdatestr)
+
+success = false;
+hObject = handles.popupmenu_PreAssayHandling_CrossDate;
+v = find(strcmp(newdatestr,handles.PreAssayHandling_CrossDates),1);
+if isempty(v),
+  warndlg(sprintf('Cross date %s not allowed',newdatestr),'Error setting cross date');
+  CheckBarcodeConsistency(handles);
+  return;
+end
+set(hObject,'Value',v);
+popupmenu_PreAssayHandling_CrossDate_Callback(hObject, [], handles);
+handles = guidata(hObject);
+success = true;
+
 % --- Executes on selection change in popupmenu_PreAssayHandling_CrossDate.
 function popupmenu_PreAssayHandling_CrossDate_Callback(hObject, eventdata, handles)
 % hObject    handle to popupmenu_PreAssayHandling_CrossDate (see GCBO)
@@ -1261,6 +1304,7 @@ handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
+CheckBarcodeConsistency(handles);
 
 % --- Executes during object creation, after setting all properties.
 function popupmenu_PreAssayHandling_CrossDate_CreateFcn(hObject, eventdata, handles)
@@ -1275,29 +1319,29 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in popupmenu_RedoFlag.
-function popupmenu_RedoFlag_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu_RedoFlag (see GCBO)
+% --- Executes on selection change in popupmenu_Flag.
+function popupmenu_Flag_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Flag (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_RedoFlag contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu_RedoFlag
-handles.RedoFlag = handles.RedoFlags{get(hObject,'Value')};
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Flag contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_Flag
+handles.Flag = handles.Flags{get(hObject,'Value')};
 
 % no longer default
-handles.isdefault.RedoFlag = false;
+handles.isdefault.Flag = false;
 
 % set color
-set(handles.popupmenu_RedoFlag,'BackgroundColor',handles.changed_bkgdcolor);
+set(handles.popupmenu_Flag,'BackgroundColor',handles.changed_bkgdcolor);
 
 handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu_RedoFlag_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu_RedoFlag (see GCBO)
+function popupmenu_Flag_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Flag (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1307,39 +1351,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-% --- Executes on selection change in popupmenu_ReviewFlag.
-function popupmenu_ReviewFlag_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu_ReviewFlag (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_ReviewFlag contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu_ReviewFlag
-
-handles.ReviewFlag = handles.ReviewFlags{get(hObject,'Value')};
-
-% no longer default
-handles.isdefault.ReviewFlag = false;
-
-% set color
-set(handles.popupmenu_ReviewFlag,'BackgroundColor',handles.changed_bkgdcolor);
-
-handles = ChangedMetaData(handles);
-
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function popupmenu_ReviewFlag_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu_ReviewFlag (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 % --- Executes during object creation, after setting all properties.
 function figure_main_CreateFcn(hObject, eventdata, handles)
@@ -1852,6 +1863,238 @@ guidata(hObject,handles);
 % --- Executes during object creation, after setting all properties.
 function popupmenu_NDamagedFlies_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to popupmenu_NDamagedFlies (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in popupmenu_PreAssayHandling_CrossHandler.
+function popupmenu_PreAssayHandling_CrossHandler_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_CrossHandler (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_CrossHandler contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_CrossHandler
+
+% grab value
+v = get(handles.popupmenu_PreAssayHandling_CrossHandler,'Value');
+handles.PreAssayHandling_CrossHandler = handles.PreAssayHandling_CrossHandlers{v};
+
+% no longer default
+handles.isdefault.PreAssayHandling_CrossHandler = false;
+
+% set color
+set(handles.popupmenu_PreAssayHandling_CrossHandler,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_PreAssayHandling_CrossHandler_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_CrossHandler (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_Barcode_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_Barcode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_Barcode as text
+%        str2double(get(hObject,'String')) returns contents of edit_Barcode as a double
+
+% Get scan string and convert it to a number for querying the database
+scanStr = get(handles.edit_Barcode,'String');
+scanNum = str2double(scanStr);
+handles.barcode = scanNum;
+
+% Check that scanned result is a number
+if isnan(scanNum),
+  errMsg = sprintf('Scan Error: unable to convert scanned result, %s, to number', scanStr);
+  h = errordlg(errMsg);
+  uiwait(h);
+  return;
+end
+
+% Query database for barcode
+try
+  scanValue = FlyFQuery(scanNum);
+catch ME
+  errMsg = sprintf('Scan Error: %s', ME.message);
+  h = errordlg(errMsg);
+  uiwait(h);
+  return;
+end
+
+% save metadata read from barcode
+handles.barcodeData = struct('Fly_LineName',scanValue.Line_Name,...
+  'CrossDate',datestr(datenum(scanValue.Date_Crossed),handles.dateformat),...
+  'WishList',str2double(scanValue.Set_Number));
+
+% line name
+handles = setLineName(handles,handles.barcodeData.Fly_LineName);
+
+% cross date
+handles = setCrossDate(handles,handles.barcodeData.CrossDate);
+
+% set number
+handles = setWishList(handles,handles.barcodeData.WishList);
+
+% Highlight text
+set(handles.jhedit_Barcode,'SelectionStart', 0);
+set(handles.jhedit_Barcode,'SelectionEnd', length(scanStr)); 
+
+% Update handles structure
+guidata(hObject, handles);
+
+function CheckBarcodeConsistency(handles,fields)
+
+% no barcode data yet? then set color to require change
+if ~isfield(handles,'barcodeData'),
+  set(handles.edit_Barcode,'BackgroundColor',handles.shouldchange_bkgdcolor);
+  return;
+end
+
+if nargin < 2,
+  fields = fieldnames(handles.barcodeData);
+end
+
+% set background color that we have changed
+set(handles.edit_Barcode,'BackgroundColor',handles.changed_bkgdcolor);
+
+% check line name
+if ismember('Fly_LineName',fields) && ...
+    ~strcmp(handles.barcodeData.Fly_LineName,handles.Fly_LineName),
+  % set background color to indicate an error
+  set(handles.edit_Barcode,'BackgroundColor',handles.shouldchange_bkgdcolor);
+  set(handles.edit_Fly_LineName,'BackgroundColor',handles.shouldchange_bkgdcolor);
+end
+
+% check cross date
+if ismember('CrossDate',fields) && ...
+    ~strcmp(handles.barcodeData.CrossDate,handles.PreAssayHandling_CrossDate),
+  % set background color to indicate an error
+  set(handles.edit_Barcode,'BackgroundColor',handles.shouldchange_bkgdcolor);
+  set(handles.popupmenu_PreAssayHandling_CrossDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
+end
+
+% check set number
+if ismember('WishList',fields) && ...
+    handles.barcodeData.WishList ~= handles.WishList,
+  % set background color to indicate an error
+  set(handles.edit_Barcode,'BackgroundColor',handles.shouldchange_bkgdcolor);
+  set(handles.popupmenu_WishList,'BackgroundColor',handles.shouldchange_bkgdcolor);
+end
+
+% --- Executes during object creation, after setting all properties.
+function edit_Barcode_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_Barcode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton_ScanBarcode.
+function pushbutton_ScanBarcode_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_ScanBarcode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+handles.jhedit_Barcode.requestFocus;
+%set(handles.figure_main,'CurrentObject',);
+% Highlight text
+s = get(handles.edit_Barcode,'String');
+set(handles.jhedit_Barcode,'SelectionStart', 0);
+set(handles.jhedit_Barcode,'SelectionEnd', length(s)); 
+
+
+% --------------------------------------------------------------------
+function menu_Edit_ScanBarcode_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_Edit_ScanBarcode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% this menu is used just for the shortcut
+pushbutton_ScanBarcode_Callback(handles.pushbutton_ScanBarcode, eventdata, handles);
+
+function HighlightEditText(hObject,eventdata)
+
+s = get(hObject,'Text');
+set(hObject,'SelectionStart', 0);
+set(hObject,'SelectionEnd', length(s)); 
+
+function [handles,success] = setWishList(handles,newwishlist)
+
+success = false;
+
+hObject = handles.popupmenu_WishList;
+eventdata = [];
+
+oldv = get(hObject,'Value');
+v = find(newwishlist == handles.WishLists,1);
+if isempty(v),
+  return;
+end
+try
+  set(hObject,'Value',v);
+  popupmenu_WishList_Callback(hObject,eventdata,handles);
+  handles = guidata(hObject);
+  CheckBarcodeConsistency(handles);
+catch ME,
+  warndlg(getReport(ME),'Error setting wish list','modal');
+  set(hObject,'Value',oldv);
+  return;
+end
+success = true;
+
+% --- Executes on selection change in popupmenu_WishList.
+function popupmenu_WishList_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_WishList (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_WishList contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_WishList
+
+% grab value
+v = get(hObject,'Value');
+handles.WishList = handles.WishLists(v);
+
+% no longer default
+handles.isdefault.WishList = false;
+
+% set color
+set(handles.popupmenu_WishList,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+CheckBarcodeConsistency(handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_WishList_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_WishList (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 

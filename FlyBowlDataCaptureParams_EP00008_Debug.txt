@@ -47,7 +47,7 @@ PreAssayHandling_StarvationDate_Range,0,1
 # List of possible Starvation Handler values
 PreAssayHandling_StarvationHandlers,hirokawaj,robiea,robertss
 # List of room names
-Assay_Rooms,1,2,3
+Assay_Rooms,2C.310.1,2C.310.2,2C.310.3
 # List of possible Rig values
 Assay_Rigs,1,2
 # List of possible Plate values
@@ -146,3 +146,9 @@ ScanLineYLim,60,250
 # min, max time between loading flies and starting recording
 MinFliesLoadedTime,25
 MaxFliesLoadedTime,225
+# List of possible Cross Handler values
+PreAssayHandling_CrossHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,unknown,zhengg
+# flip used
+PreAssayHandling_FlipUsed,1
+# wishlist number range
+WishListRange,5,15

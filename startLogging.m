@@ -42,6 +42,7 @@ if handles.params.DoRecordTemp ~= 0,
   end
   addToStatus(handles,sprintf('Opened temperature file %s for writing',handles.TempFileName));
 end
+guidata(hObject,handles);
 
 % number of frames written
 handles.FrameCount = 0;

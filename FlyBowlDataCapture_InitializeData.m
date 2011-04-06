@@ -7,7 +7,7 @@ handles.version = '0.1';
 comment_char = '#';
 
 % date format
-handles.dateformat = 'yyyymmddTHHMMSS';
+handles.datetimeformat = 'yyyymmddTHHMMSS';
 
 % background color if value has not been changed from defaults
 handles.isdefault_bkgdcolor = [0,.2,.2];
@@ -150,7 +150,8 @@ try
     'UFMFMaxFracFgCompress','UFMFMaxBGNFrames','UFMFBGUpdatePeriod',...
     'UFMFBGKeyFramePeriod','UFMFMaxBoxLength','UFMFBackSubThresh',...
     'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
-    'ScanLineYLim','MinFliesLoadedTime','MaxFliesLoadedTime'};
+    'ScanLineYLim','MinFliesLoadedTime','MaxFliesLoadedTime',...
+    'PreAssayHandling_FlipUsed','WishListRange'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -317,6 +318,45 @@ set(handles.edit_Fly_LineName,'String',handles.Fly_LineName,...
 % we have not created the autofill version yet
 handles.isAutoComplete_edit_Fly_LineName = false;
 
+%% barcode
+
+handles.isdefault.barcode = true;
+
+% by default, -1 to indicate unkown
+handles.barcode = -1;
+
+% set current value, color to shouldchange
+s = num2str(handles.barcode);
+set(handles.edit_Barcode,'String',s,...
+  'BackgroundColor',handles.shouldchange_bkgdcolor);
+
+%% wishlist
+
+% whether this has been changed or not
+handles.isdefault.WishList = true;
+
+% possible values for wishlist
+handles.WishLists = handles.params.WishListRange(1):handles.params.WishListRange(2);
+% add -1 as a possible value to indicate no wish list
+if ~ismember(-1,handles.WishLists),
+  handles.Wishlists = [-1,handles.WishLists];
+end
+
+% if WishList not stored in rc file, choose first WishList
+if ~isfield(handles.previous_values,'WishList') || ...
+    ~ismember(handles.previous_values.WishList,handles.WishLists),
+  handles.previous_values.WishList = handles.WishLists(1);
+end
+
+% by default, previous WishList
+handles.WishList = handles.previous_values.WishList;
+
+% set possible values, current value, color to default
+s = cellstr(num2str(handles.WishLists'));
+set(handles.popupmenu_WishList,'String',s,...
+  'Value',find(handles.WishList == handles.WishLists,1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
+
 %% Incubator ID
 
 % whether this has been changed or not
@@ -364,6 +404,28 @@ handles.PreAssayHandling_CrossDate = datestr(handles.PreAssayHandling_CrossDate_
 % set possible values, current value, color to default
 set(handles.popupmenu_PreAssayHandling_CrossDate,'String',handles.PreAssayHandling_CrossDates,...
   'Value',find(strcmp(handles.PreAssayHandling_CrossDate,handles.PreAssayHandling_CrossDates),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
+
+%% Cross Handler
+
+% whether this has been changed or not
+handles.isdefault.PreAssayHandling_CrossHandler = true;
+
+% possible values for CrossHandler
+handles.PreAssayHandling_CrossHandlers = handles.params.PreAssayHandling_CrossHandlers;
+
+% if CrossHandler not stored in rc file, choose first CrossHandler
+if ~isfield(handles.previous_values,'PreAssayHandling_CrossHandler') || ...
+    ~ismember(handles.previous_values.PreAssayHandling_CrossHandler,handles.PreAssayHandling_CrossHandlers),
+  handles.previous_values.PreAssayHandling_CrossHandler = handles.PreAssayHandling_CrossHandlers{1};
+end
+
+% by default, previous CrossHandler
+handles.PreAssayHandling_CrossHandler = handles.previous_values.PreAssayHandling_CrossHandler;
+
+% set possible values, current value, color to default
+set(handles.popupmenu_PreAssayHandling_CrossHandler,'String',handles.PreAssayHandling_CrossHandlers,...
+  'Value',find(strcmp(handles.PreAssayHandling_CrossHandler,handles.PreAssayHandling_CrossHandlers),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Sorting Date
@@ -633,36 +695,20 @@ set(handles.popupmenu_NDamagedFlies,'String',handles.NDamagedFlies_str,...
   'Value',handles.NDamagedFlies+1);
 
 
-%% Redo Flag
+%% Flag
 
 % whether this has been changed or not
-handles.isdefault.RedoFlag = true;
+handles.isdefault.Flag = true;
 
-% possible values for RedoFlag
-handles.RedoFlags = handles.params.RedoFlags;
+% possible values for Flag
+handles.Flags = {'None','Review','Redo'};
 
-handles.RedoFlag = 'None';
-
-% set possible values, current value, color to default
-set(handles.popupmenu_RedoFlag,'String',handles.RedoFlags,...
-  'Value',find(strcmp(handles.RedoFlag,handles.RedoFlags),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
-
-%% Review Flag
-
-% whether this has been changed or not
-handles.isdefault.ReviewFlag = true;
-
-% possible values for ReviewFlag
-handles.ReviewFlags = handles.params.ReviewFlags;
-
-handles.ReviewFlag = 'None';
+handles.Flag = 'None';
 
 % set possible values, current value, color to default
-set(handles.popupmenu_ReviewFlag,'String',handles.ReviewFlags,...
-  'Value',find(strcmp(handles.ReviewFlag,handles.ReviewFlags),1),...
+set(handles.popupmenu_Flag,'String',handles.Flags,...
+  'Value',find(strcmp(handles.Flag,handles.Flags),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
-
 
 %% Technical Notes
 
