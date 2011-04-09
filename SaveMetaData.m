@@ -66,7 +66,7 @@ fprintf(fid,'effector="%s" ',handles.params.MetaData_Effector);
 % gender
 fprintf(fid,'gender="%s" ',handles.params.MetaData_Gender); 
 % cross date
-fprintf(fid,'cross_date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyymmdd'));
+fprintf(fid,'cross_date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,handles.datetimeformat));
 % hours starved
 fprintf(fid,'hours_starved="%f" ',starvation_time);
 % barcode
@@ -76,7 +76,7 @@ fprintf(fid,'flip_used="%d" ',handles.params.PreAssayHandling_FlipUsed);
 % wish list
 fprintf(fid,'wish_list="%d" ',handles.WishList);
 % count is set to 0 -- won't know this til after tracking
-fprintf(fid,'count="0">\n');
+fprintf(fid,'num_flies="0">\n');
 % TODO: genotype
 %fprintf(fid,'      <genotype>%s &amp; w+;;%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
 fprintf(fid,'      <genotype>%s__%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);

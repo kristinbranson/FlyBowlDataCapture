@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <experiment>
   <assay datatype="string" range_basic="FlyBowl" range_advanced="FlyBowl" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="manual" description="Name of assay" required="true" default="FlyBowl" last="FlyBowl"></assay>
   <exp_datetime datatype="datetime" range_basic="" range_advanced="" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Date and time at which the experiment was started. " required="true" default="" last="" />
@@ -8,7 +8,7 @@
     <id datatype="integer" range_basic="" range_advanced="" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="Session identifier" required="true" default="1" last="1"></id>
     <apparatus>
       <id datatype="string" range_basic="" range_advanced="" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Apparatus identifier, generated from rig, plate, bowl" required="true" default="" last=""></id>
-      <environmental_chamber datatype="string" range_basic="1,2,3" range_advanced="1,2,3" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Environmental chamber identifier." required="true" default="$LAST" last="" />
+      <room datatype="string" range_basic="2C.310.1" range_advanced="2C.310.1" units="" appear_basic="false" appear_advanced="false" entry="manual" description="Room identifier." required="true" default="$LAST" last="2C.310.1" />
       <rig datatype="string" range_basic="1,2" range_advanced="1,2" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Rig identifier." required="true" default="$LAST" last="" />
       <plate datatype="integer" range_basic="[1,40]" range_advanced="[1,40]" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Plate identifier." required="true" default="$LAST" last="" />
       <top_plate datatype="integer" range_basic="[1,40]" range_advanced="[1,40]" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Lid identifier." required="true" default="$LAST" last="" />
@@ -19,7 +19,7 @@
     </apparatus>
     <flies>
       <line datatype="string" range_basic="$LINENAME" range_advanced="$LINENAME" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Verified as legal line name in SAGE. New line names may be added to SAGE using the web interface. " required="true" default="$LAST" last="" />
-      <effector datatype="string" range_basic="TrpA" range_advanced="TrpA" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="manual" description="Verified as legal effector name in SAGE." required="true" default="$LAST" last="" />
+      <effector datatype="string" range_basic="UAS_dTrpA1_2_0002" range_advanced="UAS_dTrpA1_2_0002" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="manual" description="Verified as legal effector name in SAGE." required="true" default="$LAST" last="" />
       <gender datatype="string" range_basic="" range_advanced="" units="" appear_basic="true, readonly" appear_advanced="true, readonly" entry="acquire" description="The gender or genders of the flies. m=male, f=female, b=both, x=unknown" required="true" default="b" last="" />
       <cross_date datatype="datetime" range_basic="[now-29,now-22], days" range_advanced="[now-29,now-22], days" units="" appear_basic="true" appear_advanced="true" entry="manual" description="Date cross was made to generate this set of flies. " required="true" default="$LAST" last="" />
       <hours_starved datatype="float" range_basic="[0,48]" range_advanced="[0,48]" units="hours" appear_basic="true" appear_advanced="true" entry="manual" description="Number of hours flies were starved prior to start of experiment." required="true" default="$LAST" last="" />
