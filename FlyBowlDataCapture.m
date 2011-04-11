@@ -1931,6 +1931,11 @@ if isnan(scanNum),
   return;
 end
 
+% if querying disabled
+if isfield(handles.params,'DoSyncBarcode') && handles.params.DoSyncBarcode == 0,
+  guidata(hObject,handles);
+  return;
+end
 % Query database for barcode
 try
   scanValue = FlyFQuery(scanNum);
