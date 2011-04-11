@@ -153,4 +153,4 @@ PreAssayHandling_FlipUsed,1
 # wishlist number range
 WishListRange,5,15
 # whether to connect to FlyF2 to sync barcode with line name, etc.
-DoSyncBarcode,0
+DoSyncBarcode,1
