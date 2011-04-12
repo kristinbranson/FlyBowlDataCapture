@@ -54,6 +54,10 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 
 % Choose default command line output for FlyBowlDataCapture
 
+% make sure that we can close if we really really want to
+global FBDC_NTRIESCLOSE;
+FBDC_NTRIESCLOSE = 0;
+
 handles.DEBUG = true;
 handles.IsProcessingError = false;
 guidata(hObject,handles);
@@ -1213,6 +1217,18 @@ function figure_main_CloseRequestFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global FBDC_NTRIESCLOSE;
+FBDC_NTRIESCLOSE = FBDC_NTRIESCLOSE + 1;
+
+if FBDC_NTRIESCLOSE > 1,
+  res = questdlg('Force quit? We will try to hard-kill EVERYTHING.','Force quit?');
+  if strcmpi(res,'yes'),
+    FBDC_killall();
+  else
+    FBDC_NTRIESCLOSE = 0;
+  end
+end
+
 % Hint: delete(hObject) closes the figure
 [handles,didcancel] = CloseExperiment(handles);
 
@@ -1228,6 +1244,7 @@ if didcancel,
   if exist('hwaitbar','var') && ishandle(hwaitbar),
     delete(hwaitbar);
   end
+  FBDC_NTRIESCLOSE = 0;
   return;
 end
 if isfield(handles,'GUIInstanceFileName') && ...
@@ -1246,6 +1263,7 @@ if exist('hwaitbar','var') && ishandle(hwaitbar),
   delete(hwaitbar);
 end
 
+FBDC_NTRIESCLOSE = 0;
 uiresume(handles.figure_main);
 
 % --------------------------------------------------------------------
