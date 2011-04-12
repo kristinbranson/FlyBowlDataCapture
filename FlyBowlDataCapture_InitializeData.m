@@ -83,16 +83,15 @@ end
 
 %% delete existing imaqs and timers
 
-tmp = timerfind('Name','FBDC_RecordTimer');
-for i = 1:length(tmp),
-  if iscell(tmp),
-    delete(tmp{i});
-  else
-    delete(tmp(i));
-  end
-end
-for tmp = imaqfind('Name','FBDC_VideoInput'),
-  delete(tmp{1});
+FBDC_ClearTimers();
+FBDC_ClearVideoInputs();
+
+%% close log files
+
+global FBDC_TempFid;
+if ~isempty(FBDC_TempFid) && FBDC_TempFid > 0 && ~isempty(fopen(FBDC_TempFid)),
+  fclose(FBDC_TempFid);
+  FBDC_TempFid = -1;
 end
 
 %% reset experiment name
@@ -151,7 +150,8 @@ try
     'UFMFBGKeyFramePeriod','UFMFMaxBoxLength','UFMFBackSubThresh',...
     'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
     'ScanLineYLim','MinFliesLoadedTime','MaxFliesLoadedTime',...
-    'PreAssayHandling_FlipUsed','WishListRange'};
+    'PreAssayHandling_FlipUsed','WishListRange',...
+    'DoSyncBarcode'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));

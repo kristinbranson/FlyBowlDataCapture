@@ -1,5 +1,7 @@
 function success = TempProbe_GrabTemp(obj,event,hObject) %#ok<INUSL>
 
+global FBDC_TempFid;
+
 try
 
 success = false;
@@ -61,17 +63,17 @@ if handles.IsRecording,
   if handles.TempStreamDisabled,
     addToStatus(handles,'Temperature stream saving disabled');
   else
-    if ~isfield(handles,'TempFid'),
+    if isempty('FBDC_TempFid'),
       addToStatus(handles,{'TempFid not yet set. Skipping.'});
-    elseif handles.TempFid <= 0,
-      addToStatus(handles,sprintf('Temperature Fid = %d is invalid',handles.TempFid));
+    elseif FBDC_TempFid <= 0,
+      addToStatus(handles,sprintf('Temperature Fid = %d is invalid',FBDC_TempFid));
     else
-      [filename,permission] = fopen(handles.TempFid);
+      [filename,permission] = fopen(FBDC_TempFid);
       if isempty(filename) || isempty(permission),
-        addToStatus(handles,sprintf('Temperature Fid = %d is invalid',handles.TempFid));
+        addToStatus(handles,sprintf('Temperature Fid = %d is invalid',FBDC_TempFid));
       else
         try
-          fprintf(handles.TempFid,'%f,%f\n',timestamp,temp);
+          fprintf(FBDC_TempFid,'%f,%f\n',timestamp,temp);
           success = true;
         catch ME,
           addToStatus(handles,{'Error writing temperature to file',getReport(ME,'extended','hyperlinks','off')});

@@ -2,6 +2,13 @@ function handles = renameVideoFile(handles)
 
 addToStatus(handles,'Renaming experiment...');
 
+% files that are open
+openfids = fopen('all');
+openfilenames = cell(size(openfids));
+for i = 1:numel(openfids),
+  openfilenames{i} = fopen(openfids(i));
+end
+
 oldfilename = handles.FileName;
 if handles.params.DoRecordTemp ~= 0,
   oldtempfilename = handles.TempFileName;
@@ -26,6 +33,13 @@ if exist(newfilename,'file') && ~exist(oldfilename,'file'),
   return;
 end
 
+i = find(strcmp(oldfilename,openfilenames),1);
+if ~isempty(i),
+  addToStatus(handles,sprintf('Trying to rename %s to %s, but %s is open. Closing ...',oldfilename,newfilename));
+  fclose(openfids(i));
+  openfilenames(i) = [];
+  openfids(i) = [];
+end
 addToStatus(handles,sprintf('Renaming movie file from %s to %s',oldfilename,newfilename));
 [success,msg] = renamefile(oldfilename,newfilename);
 if success,
@@ -46,9 +60,18 @@ if handles.params.DoRecordTemp ~= 0,
   filestr = 'temperature.txt';
   newfilename = fullfile(handles.ExperimentDirectory,filestr);
   addToStatus(handles,sprintf('Renaming temperature stream file from %s to %s',oldtempfilename,newfilename));
+  
   if ~exist(oldtempfilename,'file'),
     addToStatus(handles,sprintf('Temperature file %s does not exist, could not rename %s',oldtempfilename,newfilename));
   else
+    
+    % close the file if nec
+    i = find(strcmp(oldtempfilename,openfilenames),1);
+    if ~isempty(i),
+      addToStatus(handles,sprintf('Trying to rename %s to %s, but %s is open. Closing ...',oldtempfilename,newfilename));
+      fclose(openfids(i));
+    end
+    
     [success,msg] = renamefile(oldtempfilename,newfilename);
     if success,
       %fprintf('Successfully renamed file from %s to %s\n',oldfilename,handles.FileName);
@@ -72,6 +95,14 @@ if strcmpi(handles.params.FileType,'ufmf'),
   if ~exist(oldfilename,'file'),
     addToStatus(handles,sprintf('UFMF log file %s does not exist, could not rename %s',oldfilename,newfilename));
   else
+    
+    % close the file if nec
+    i = find(strcmp(oldfilename,openfilenames),1);
+    if ~isempty(i),
+      addToStatus(handles,sprintf('Trying to rename %s to %s, but %s is open. Closing ...',oldfilename,newfilename));
+      fclose(openfids(i));
+    end
+    
     [success,msg] = renamefile(oldfilename,newfilename);
     if success,
       %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
@@ -92,6 +123,14 @@ if strcmpi(handles.params.FileType,'ufmf'),
   if ~exist(oldfilename,'file'),
     addToStatus(handles,sprintf('UFMF stats file %s does not exist, could not rename %s',oldfilename,newfilename));
   else
+    
+    % close the file if nec
+    i = find(strcmp(oldfilename,openfilenames),1);
+    if ~isempty(i),
+      addToStatus(handles,sprintf('Trying to rename %s to %s, but %s is open. Closing ...',oldfilename,newfilename));
+      fclose(openfids(i));
+    end
+    
     [success,msg] = renamefile(oldfilename,newfilename);
     if success,
       %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
