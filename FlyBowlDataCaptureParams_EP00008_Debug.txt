@@ -16,7 +16,7 @@ Imaq_VideoFormat,Format 7, Mode 0
 #FileType,fmf
 FileType,ufmf
 # Number of seconds to record
-RecordTime,1000
+RecordTime,20
 # whether to display the video preview with the jet colormap
 ColormapPreview,0
 # Shutter period
@@ -151,6 +151,6 @@ PreAssayHandling_CrossHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hib
 # flip used
 PreAssayHandling_FlipUsed,1
 # wishlist number range
-WishListRange,5,15
+WishListRange,-1,100
 # whether to connect to FlyF2 to sync barcode with line name, etc.
 DoSyncBarcode,1

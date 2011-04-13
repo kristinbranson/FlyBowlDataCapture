@@ -1,6 +1,6 @@
 # Directory to store video to
-#OutputDirectory,D:\data,J:\data
-OutputDirectory,D:\debug_data,J:\debug_data
+OutputDirectory,D:\data,J:\data
+#OutputDirectory,D:\debug_data,J:\debug_data
 #OutputDirectory,D:\special_data,J:\special_data
 # Directory to temporarily store video to
 TmpOutputDirectory,D:\tmpdata,J:\tmpdata
@@ -80,7 +80,7 @@ LogFileName,Log.txt
 MetaData_AssayName,FlyBowl
 # rearing protocols need 1 per incubator
 MetaData_RearingProtocols,RP_Olympiad_v009p0,RP_Olympiad_v009p0,RP_Olympiad_v009p0,RP_Olympiad_v009p0
-MetaData_HandlingProtocols,HP_flybowl_v003p0.xls
+MetaData_HandlingProtocols,HP_flybowl_v004p0.xls
 MetaData_ExpProtocols,EP_flybowl_v008p0.xls
 MetaData_Effector,UAS_dTrpA1_2_0002
 MetaData_Gender,b
