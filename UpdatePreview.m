@@ -1,5 +1,11 @@
 function UpdatePreview(obj,event,himage) 
 
+% stop if we've halted
+global FBDC_DIDHALT;
+if ~isempty(FBDC_DIDHALT) && FBDC_DIDHALT,
+  return;
+end
+
 % should we update?
 params = getappdata(himage,'PreviewParams');
 lastupdate = getappdata(himage,'LastPreviewUpdateTime');
@@ -35,6 +41,11 @@ if params.IsRecording && (currenttime - lastupdate < params.PreviewUpdatePeriod)
   return;
 end
 
+% make sure the figure is still there
+if ~ishandle(himage) || ~ishandle(params.axes_PreviewVideo),
+  return;
+end
+
 % Display image data.
 set(himage, 'CData', event.Data);
 
@@ -49,7 +60,7 @@ if params.IsRecording,
     
   daysrecording = now - params.StartRecording_Time_datenum;
   daysleft = params.RecordTimeDays - daysrecording;
-  if daysleft > 0,
+  if daysleft > 0 && ishandle(params.pushbutton_Done),
     set(params.pushbutton_Done,'String',datestr(daysleft,13));
   end
 end

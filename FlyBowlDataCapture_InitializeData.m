@@ -88,11 +88,14 @@ FBDC_ClearVideoInputs();
 
 %% close log files
 
-global FBDC_TempFid;
-if ~isempty(FBDC_TempFid) && FBDC_TempFid > 0 && ~isempty(fopen(FBDC_TempFid)),
-  fclose(FBDC_TempFid);
-  FBDC_TempFid = -1;
-end
+% global FBDC_TempFid;
+% if ~isempty(FBDC_TempFid) && FBDC_TempFid > 0 && ~isempty(fopen(FBDC_TempFid)),
+%   fclose(FBDC_TempFid);
+%   FBDC_TempFid = -1;
+% end
+
+% initialize that temperature file has not been opened yet
+handles.TempFileIsCreated = false;
 
 %% reset experiment name
 

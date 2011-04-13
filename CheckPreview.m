@@ -1,5 +1,17 @@
 function CheckPreview(obj,event,params)
 
+% stop if we've halted
+global FBDC_DIDHALT;
+if ~isempty(FBDC_DIDHALT) && FBDC_DIDHALT,
+  try
+    if strcmpi(get(obj,'Running'),'on'),
+      stop(obj);
+    end
+  catch ME
+    getReport(ME)
+  end
+end
+
 lastupdate = getappdata(params.hImage_Preview,'LastPreviewUpdateTime');
 if isinf(lastupdate), return; end
 dt = (now - lastupdate)*86400;

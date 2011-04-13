@@ -1,6 +1,6 @@
 function startLogging(hObject)
 
-global FBDC_TempFid;
+%global FBDC_TempFid;
 
 handles = guidata(hObject);
 
@@ -27,23 +27,24 @@ filestr = sprintf('FBDC_temperature_%s.txt',...
   datestr(handles.StartRecording_Time_datenum,handles.TmpDateStrFormat));
 handles.TempFileName = fullfile(handles.params.TmpOutputDirectory,filestr);
 addToStatus(handles,sprintf('Opening %s to write temperature stream',handles.TempFileName));
-FBDC_TempFid = -1;
+%FBDC_TempFid = -1;
 handles.NTempGrabAttempts = 0;
-if handles.params.DoRecordTemp ~= 0,
-  try
-    FBDC_TempFid = fopen(handles.TempFileName,'w');
-  catch ME,
-    addToStatus(handles,{sprintf('Error opening temperature file %s',handles.TempFileName),...
-      getReport(ME,'basic','hyperlinks','off')});
-  end
-  if FBDC_TempFid <= 0,
-    s = sprintf('Could not open temperature file %s',handles.TempFileName);
-    addToStatus(handles,s);
-    uiwait(errordlg(s,'Error opening temperature file'));
-    error(s);
-  end
-  addToStatus(handles,sprintf('Opened temperature file %s for writing',handles.TempFileName));
-end
+% if handles.params.DoRecordTemp ~= 0,
+%   try
+%     FBDC_TempFid = fopen(handles.TempFileName,'w');
+%     fprintf('Opened temperature file %s to fid %d\n',handles.TempFileName,FBDC_TempFid);
+%   catch ME,
+%     addToStatus(handles,{sprintf('Error opening temperature file %s',handles.TempFileName),...
+%       getReport(ME,'basic','hyperlinks','off')});
+%   end
+%   if FBDC_TempFid <= 0,
+%     s = sprintf('Could not open temperature file %s',handles.TempFileName);
+%     addToStatus(handles,s);
+%     uiwait(errordlg(s,'Error opening temperature file'));
+%     error(s);
+%   end
+%   addToStatus(handles,sprintf('Opened temperature file %s for writing',handles.TempFileName));
+% end
 guidata(hObject,handles);
 
 % number of frames written

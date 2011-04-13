@@ -1,5 +1,6 @@
 function MasterTempRecord_GrabTemp(obj,event,tc08_handle,Channels,ChannelFileNames,StartRunTimeStamp) %#ok<INUSL>
 
+
 % read temp in celcius
 UnitsCode = 0; 
 % max number of temps to grab at once -- this should be big enough to get
@@ -67,7 +68,7 @@ for i = 1:length(Channels),
   fid = fopen(ChannelFileNames{i},'w');
   if fid <= 0,
     if exist('hwarn','var') && ishandle(hwarn), delete(hwarn); end
-    hwarn = warndlg(sprintf('Could not open file %s for writing temperature data for channel %d\n',ChannelFileNames{i},Channel),'Error reading temperature');
+    hwarn = warndlg(sprintf('Could not open file %s for writing temperature data for channel %d\n',ChannelFileNames{i},Channels(i)),'Error reading temperature');
     continue;
   end
   fprintf(fid,'%f %f %d',timestamp,temp_v,overflow_v);
