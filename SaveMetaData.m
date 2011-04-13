@@ -5,8 +5,8 @@ handles = setExperimentName(handles);
 
 % back up metadata file if it exists
 if exist(handles.MetaDataFileName,'file'),
-  addToStatus(handles,sprintf('Copying metadata file to backup %s',handles.MetaDataFileName));
   bakfilename = [handles.MetaDataFileName,'.bak'];
+  addToStatus(handles,sprintf('Copying metadata file to backup %s',bakfilename));
   [success,msg] = copyfile(handles.MetaDataFileName,bakfilename);
   if ~success,
     warndlg(msg,'Error backing up metadatafile, aborting SaveMetaData','modal');
@@ -53,7 +53,7 @@ apparatusUniqueName = sprintf('Rig%s__Plate%s__Lid%s__Bowl%s__Camera%s__Computer
   handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Lid,handles.Assay_Bowl,...
   handles.CameraUniqueID,handles.ComputerName,handles.params.HardDriveName);
 % apparatus full id and parts
-fprintf(fid,'    <apparatus id="%s" room="%s" rig="%s" plate="%s" top_plate="%s" bowl="%s" camera="%s" computer="%s" harddrive="%s"/>\n',...
+fprintf(fid,'    <apparatus apparatus_id="%s" room="%s" rig="%s" plate="%s" top_plate="%s" bowl="%s" camera="%s" computer="%s" harddrive="%s"/>\n',...
   apparatusUniqueName,...
   handles.Assay_Room,handles.Assay_Rig,handles.Assay_Plate,handles.Assay_Lid,handles.Assay_Bowl,...
   handles.CameraUniqueID,...
@@ -75,6 +75,8 @@ fprintf(fid,'cross_barcode="%d" ',handles.barcode);
 fprintf(fid,'flip_used="%d" ',handles.params.PreAssayHandling_FlipUsed);
 % wish list
 fprintf(fid,'wish_list="%d" ',handles.WishList);
+% robot stock copy. set this to unknown for now
+fprintf(fid,'robot_stock_copy="unknown" ');
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'num_flies="0">\n');
 % TODO: genotype
@@ -141,10 +143,12 @@ end
 TechnicalNotes = sprintf('%s\\n',TechnicalNotes{:});
 TechnicalNotes = TechnicalNotes(1:end-2);
 fprintf(fid,'  <notes_technical>%s</notes_technical>\n',TechnicalNotes);
+fprintf(fid,'  <notes_keyword></notes_keyword>\n');
 % flags entered
 fprintf(fid,'  <flag_review>%d</flag_review>\n',strcmpi(handles.Flag,'Review'));
 fprintf(fid,'  <flag_redo>%d</flag_redo>\n',strcmpi(handles.Flag,'Redo'));
 fprintf(fid,'  <flag_aborted>%d</flag_aborted>\n',handles.didabort);
+fprintf(fid,'  <flag_legacy>0</flag_legacy>\n');
 
 fprintf(fid,'</experiment>\n');
 

@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 06-Apr-2011 09:58:34
+% Last Modified by GUIDE v2.5 12-Apr-2011 16:08:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,10 +55,13 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 % Choose default command line output for FlyBowlDataCapture
 
 % make sure that we can close if we really really want to
-global FBDC_NTRIESCLOSE;
-FBDC_NTRIESCLOSE = 0;
+%global FBDC_NTRIESCLOSE;
+%FBDC_NTRIESCLOSE = 0;
 
-handles.DEBUG = true;
+global FBDC_DIDHALT;
+FBDC_DIDHALT = false;
+
+handles.DEBUG = false;
 handles.IsProcessingError = false;
 guidata(hObject,handles);
 
@@ -882,10 +885,26 @@ function FliesLoaded_Timer_Stop(obj,event,params)
 
 % time since flies loaded, in seconds
 dt = (now - params.FliesLoaded_Time_datenum)*86400;
-set(params.pushbutton_FliesLoaded,'String',sprintf('Load Time: %.2f',dt));
-set(params.pushbutton_StartRecording,'String','Start Recording');
+if ishandle(params.pushbutton_FliesLoaded),
+  set(params.pushbutton_FliesLoaded,'String',sprintf('Load Time: %.2f',dt));
+end
+if ishandle(params.pushbutton_StartRecording),
+  set(params.pushbutton_StartRecording,'String','Start Recording');
+end
 
 function FliesLoaded_Timer_Callback(obj,event,params)
+
+% stop if we've halted
+global FBDC_DIDHALT;
+if ~isempty(FBDC_DIDHALT) && FBDC_DIDHALT,
+  try
+    if strcmpi(get(obj,'Running'),'on'),
+      stop(obj);
+    end
+  catch ME
+    getReport(ME)
+  end
+end
 
 % time since flies loaded, in seconds
 dt = (now - params.FliesLoaded_Time_datenum)*86400;
@@ -1217,20 +1236,23 @@ function figure_main_CloseRequestFcn(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global FBDC_NTRIESCLOSE;
-FBDC_NTRIESCLOSE = FBDC_NTRIESCLOSE + 1;
-
-if FBDC_NTRIESCLOSE > 1,
-  res = questdlg('Force quit? We will try to hard-kill EVERYTHING.','Force quit?');
-  if strcmpi(res,'yes'),
-    FBDC_killall();
-  else
-    FBDC_NTRIESCLOSE = 0;
-  end
-end
+% global FBDC_NTRIESCLOSE;
+% if isempty(FBDC_NTRIESCLOSE),
+%   FBDC_NTRIESCLOSE = 0;
+% end
+% FBDC_NTRIESCLOSE = FBDC_NTRIESCLOSE + 1;
+% 
+% if FBDC_NTRIESCLOSE > 1,
+%   res = questdlg('Force quit? We will try to hard-kill EVERYTHING.','Force quit?');
+%   if strcmpi(res,'yes'),
+%     FBDC_killall();
+%   else
+%     FBDC_NTRIESCLOSE = 0;
+%   end
+% end
 
 % Hint: delete(hObject) closes the figure
-[handles,didcancel] = CloseExperiment(handles);
+[handles,didcancel] = CloseExperiment(handles,true);
 
 hwaitbar = waitbar(0,'Closing GUI');
 
@@ -1244,9 +1266,10 @@ if didcancel,
   if exist('hwaitbar','var') && ishandle(hwaitbar),
     delete(hwaitbar);
   end
-  FBDC_NTRIESCLOSE = 0;
+  %FBDC_NTRIESCLOSE = 0;
   return;
 end
+
 if isfield(handles,'GUIInstanceFileName') && ...
     exist(handles.GUIInstanceFileName,'file'),
   delete(handles.GUIInstanceFileName);
@@ -1263,7 +1286,7 @@ if exist('hwaitbar','var') && ishandle(hwaitbar),
   delete(hwaitbar);
 end
 
-FBDC_NTRIESCLOSE = 0;
+%clear FBDC_NTRIESCLOSE;
 uiresume(handles.figure_main);
 
 % --------------------------------------------------------------------
@@ -1471,7 +1494,17 @@ handles = RecordConfiguration(handles);
 
 guidata(hObject,handles);
 
-function [handles,didcancel] = CloseExperiment(handles)
+function [handles,didcancel] = CloseExperiment(handles,isclosefig)
+
+if nargin < 2,
+  isclosefig = false;
+end
+
+if isclosefig,
+  % store that we are trying to close
+  global FBDC_DIDHALT;
+  FBDC_DIDHALT = true;
+end
 
 hObject = handles.figure_main;
 didabort = false;
@@ -2126,3 +2159,17 @@ function popupmenu_WishList_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes during object deletion, before destroying properties.
+function pushbutton_Abort_DeleteFcn(hObject, eventdata, handles)
+% hObject    handle to pushbutton_Abort (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes during object deletion, before destroying properties.
+function pushbutton_Done_DeleteFcn(hObject, eventdata, handles)
+% hObject    handle to pushbutton_Done (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

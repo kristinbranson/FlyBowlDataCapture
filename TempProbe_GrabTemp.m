@@ -1,11 +1,29 @@
 function success = TempProbe_GrabTemp(obj,event,hObject) %#ok<INUSL>
 
-global FBDC_TempFid;
+% stop if we've halted
+global FBDC_DIDHALT;
+if ~isempty(FBDC_DIDHALT) && FBDC_DIDHALT,
+  try
+    if strcmpi(get(obj,'Running'),'on'),
+      stop(obj);
+    end
+  catch ME
+    getReport(ME)
+  end
+end
+
+%global FBDC_TempFid;
 
 try
 
 success = false;
 handles = guidata(hObject);
+
+% check if we are quitting
+if ~isfield(handles,'figure_main') || ~ishandle(handles.figure_main),
+  return;
+end
+
 if handles.params.DoRecordTemp == 0,
   return;
 end
@@ -63,17 +81,19 @@ if handles.IsRecording,
   if handles.TempStreamDisabled,
     addToStatus(handles,'Temperature stream saving disabled');
   else
-    if isempty('FBDC_TempFid'),
-      addToStatus(handles,{'TempFid not yet set. Skipping.'});
-    elseif FBDC_TempFid <= 0,
-      addToStatus(handles,sprintf('Temperature Fid = %d is invalid',FBDC_TempFid));
-    else
-      [filename,permission] = fopen(FBDC_TempFid);
-      if isempty(filename) || isempty(permission),
-        addToStatus(handles,sprintf('Temperature Fid = %d is invalid',FBDC_TempFid));
+    if isfield(handles,'TempFileName'),
+      if handles.TempFileIsCreated,
+        TempFid = fopen(handles.TempFileName,'a');
+      else
+        TempFid = fopen(handles.TempFileName,'w');
+        handles.TempFileIsCreated = true;
+      end
+      if TempFid <= 0,
+        addToStatus(handles,sprintf('Could not open file %s',handles.TempFileName));
       else
         try
-          fprintf(FBDC_TempFid,'%f,%f\n',timestamp,temp);
+          fprintf(TempFid,'%f,%f\n',timestamp,temp);
+          fclose(TempFid);
           success = true;
         catch ME,
           addToStatus(handles,{'Error writing temperature to file',getReport(ME,'extended','hyperlinks','off')});
@@ -94,6 +114,12 @@ if handles.IsRecording,
   end
 end
 guidata(hObject,handles);
+
+% check if we are quitting
+if ~isfield(handles,'figure_main') || ~ishandle(handles.figure_main),
+  return;
+end
+
 set(handles.hLine_Status_Temp,'XData',handles.Status_Temp_History(1,:)-handles.Status_Temp_History(1,end),...
   'YData',handles.Status_Temp_History(2,:));
 drawnow;

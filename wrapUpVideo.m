@@ -1,6 +1,6 @@
 function wrapUpVideo(obj,event,hObject,AdaptorName,didabort) %#ok<INUSL>
 
-global FBDC_TempFid;
+%global FBDC_TempFid;
 
 hwait = waitbar(0,'Closing video file: stopping recording');
 
@@ -79,20 +79,20 @@ if ~(strcmpi(AdaptorName,'gdcam') || strcmpi(AdaptorName,'udcam')),
   
 end
 
-handles = guidata(hObject);
-
-hwait = mywaitbar(.6,hwait,'Closing video file: closing temperature stream file.');
-
-% close temperature file
-if handles.params.DoRecordTemp ~= 0 && ~isempty(FBDC_TempFid) && ...
-    FBDC_TempFid > 0 && ~isempty(fopen(FBDC_TempFid)),
-  try
-    fclose(FBDC_TempFid);
-  catch ME,
-    addToStatus(handles,{'Error closing temperature stream file:',getReport(ME)});
-    warndlg(getReport(ME),'Error closing temperature stream file','modal');
-  end
-end
+% handles = guidata(hObject);
+% 
+% hwait = mywaitbar(.6,hwait,'Closing video file: closing temperature stream file.');
+% 
+% % close temperature file
+% if handles.params.DoRecordTemp ~= 0 && ~isempty(FBDC_TempFid) && ...
+%     FBDC_TempFid > 0 && ~isempty(fopen(FBDC_TempFid)),
+%   try
+%     fclose(FBDC_TempFid);
+%   catch ME,
+%     addToStatus(handles,{'Error closing temperature stream file:',getReport(ME)});
+%     warndlg(getReport(ME),'Error closing temperature stream file','modal');
+%   end
+% end
 
 % no longer recording
 %fprintf('No longer recording.\n');

@@ -35,7 +35,7 @@ end
 
 i = find(strcmp(oldfilename,openfilenames),1);
 if ~isempty(i),
-  addToStatus(handles,sprintf('Trying to rename %s to %s, but %s is open. Closing ...',oldfilename,newfilename));
+  addToStatus(handles,sprintf('Closing %s to rename %s to %s.',oldfilename,oldfilename,newfilename));
   fclose(openfids(i));
   openfilenames(i) = [];
   openfids(i) = [];
@@ -68,7 +68,7 @@ if handles.params.DoRecordTemp ~= 0,
     % close the file if nec
     i = find(strcmp(oldtempfilename,openfilenames),1);
     if ~isempty(i),
-      addToStatus(handles,sprintf('Trying to rename %s to %s, but %s is open. Closing ...',oldtempfilename,newfilename));
+      addToStatus(handles,sprintf('Closing %s to rename %s to %s.',oldtempfilename,oldtempfilename,newfilename));
       fclose(openfids(i));
     end
     
@@ -99,7 +99,7 @@ if strcmpi(handles.params.FileType,'ufmf'),
     % close the file if nec
     i = find(strcmp(oldfilename,openfilenames),1);
     if ~isempty(i),
-      addToStatus(handles,sprintf('Trying to rename %s to %s, but %s is open. Closing ...',oldfilename,newfilename));
+      addToStatus(handles,sprintf('Closing %s to rename %s to %s.',oldfilename,oldfilename,newfilename));
       fclose(openfids(i));
     end
     
@@ -127,7 +127,7 @@ if strcmpi(handles.params.FileType,'ufmf'),
     % close the file if nec
     i = find(strcmp(oldfilename,openfilenames),1);
     if ~isempty(i),
-      addToStatus(handles,sprintf('Trying to rename %s to %s, but %s is open. Closing ...',oldfilename,newfilename));
+      addToStatus(handles,sprintf('Closing %s to rename %s to %s.',oldfilename,oldfilename,newfilename));
       fclose(openfids(i));
     end
     
