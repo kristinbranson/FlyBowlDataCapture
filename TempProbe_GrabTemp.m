@@ -81,12 +81,16 @@ if handles.IsRecording,
   if handles.TempStreamDisabled,
     addToStatus(handles,'Temperature stream saving disabled');
   else
-    if isfield(handles,'TempFileName'),
+    if isfield(handles,'TempFileName') && ~isempty(handles.TempFileName),
       if handles.TempFileIsCreated,
         TempFid = fopen(handles.TempFileName,'a');
       else
-        TempFid = fopen(handles.TempFileName,'w');
-        handles.TempFileIsCreated = true;
+        if exist(handles.TempFileName,'file'),
+          addToStatus(handles,sprintf('TempFileIsCreated == false, but %s exists',handles.TempFileName));
+        else
+          TempFid = fopen(handles.TempFileName,'w');
+          handles.TempFileIsCreated = true;
+        end
       end
       if TempFid <= 0,
         addToStatus(handles,sprintf('Could not open file %s',handles.TempFileName));

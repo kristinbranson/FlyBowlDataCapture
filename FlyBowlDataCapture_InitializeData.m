@@ -96,6 +96,9 @@ FBDC_ClearVideoInputs();
 
 % initialize that temperature file has not been opened yet
 handles.TempFileIsCreated = false;
+if isfield(handles,'TempFileName'),
+  handles = rmfield(handles,'TempFileName');
+end
 
 %% reset experiment name
 
