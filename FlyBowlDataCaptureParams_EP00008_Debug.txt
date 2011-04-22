@@ -157,4 +157,4 @@ DoSyncBarcode,1
 # screen type
 ScreenType,primary
 # screen reason
-ScreenReason,Standard
+ScreenReason,standard
