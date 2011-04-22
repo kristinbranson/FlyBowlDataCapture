@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-project>
-  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.zip" build-checksum="1615456630" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
+  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.zip" build-checksum="1944679969" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
     <param.project.name>C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj</param.project.name>
     <param.target.type>Windows Standalone Application</param.target.type>
     <param.appname>FlyBowlDataCapture001</param.appname>
@@ -129,6 +129,7 @@
       <file>${PROJECT_ROOT}\USBTC08_error_table.m</file>
       <file>${PROJECT_ROOT}\USBTC08_temp_units_code.m</file>
       <file>${PROJECT_ROOT}\usbtc08Header.m</file>
+      <file>${PROJECT_ROOT}\version.txt</file>
       <file>${PROJECT_ROOT}\vidError.m</file>
       <file>${PROJECT_ROOT}\wrapUpVideo.m</file>
       <file>${PROJECT_ROOT}\writeFrame.m</file>

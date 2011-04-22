@@ -155,3 +155,7 @@ PreAssayHandling_FlipUsed,1
 WishListRange,5,15
 # whether to connect to FlyF2 to sync barcode with line name, etc.
 DoSyncBarcode,1
+# screen type
+ScreenType,primary
+# screen reason
+ScreenReason,Standard

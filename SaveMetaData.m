@@ -43,6 +43,32 @@ fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,han
 fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 % always same experiment protocol
 fprintf(fid,'protocol="%s" ',handles.params.MetaData_ExpProtocols{1});
+% screen type
+if isfield(handles.params,'ScreenType'),
+  ScreenType = handles.params.ScreenType;
+else
+  ScreenType = 'primary';
+end
+fprintf(fid,'screen_type="%s" ',ScreenType);
+% screen reason
+if isfield(handles.params,'ScreenReason'),
+  ScreenReason = handles.params.ScreenReason;
+else
+  ScreenReason = 'standard';
+end
+fprintf(fid,'screen_reason="%s" ',ScreenReason);
+% data capture code version
+if exist('version.txt','file'),
+  try
+    ver = importdata('version.txt');
+    if isnumeric(ver),
+      ver = num2str(ver);
+    end
+    fprintf(fid,'data_capture_version="%s" ',ver);
+  catch ME,
+    addToStatus(handles,{'Could not read version from version.txt',getReport(ME)});
+  end
+end
 fprintf(fid,'>\n');
 
 % session container
