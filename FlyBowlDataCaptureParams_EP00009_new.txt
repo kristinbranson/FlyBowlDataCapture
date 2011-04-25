@@ -152,7 +152,7 @@ PreAssayHandling_CrossHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hib
 # flip used
 PreAssayHandling_FlipUsed,1
 # wishlist number range
-WishListRange,5,15
+WishListRange,55,100
 # whether to connect to FlyF2 to sync barcode with line name, etc.
 DoSyncBarcode,1
 # screen type

@@ -5,7 +5,7 @@ OutputDirectory,D:\debug_data,J:\debug_data
 # Directory to temporarily store video to
 TmpOutputDirectory,D:\tmpdata,J:\tmpdata
 # Names of hard drives, corresponding to the ordered OutputDirectory list
-HardDriveName,(bransonlab-ww1:Internal_D;bransonlab-ww2:Internal_D;bransonlab-ww3:Internal_D;bransonlab-ww4:Internal_D),(bransonlab-ww1:HD2;bransonlab-ww2:HD1;bransonlab-ww3:HD4;bransonlab-ww4:HD3)
+HardDriveName,(bransonlab-ww1:Internal_D;bransonlab-ww2:Internal_D;bransonlab-ww3:Internal_D;bransonlab-ww4:Internal_D),(bransonlab-ww1:HD2;bransonlab-ww2:HD1;bransonlab-ww3:HD5;bransonlab-ww4:HD3)
 # Camera adaptor
 #Imaq_Adaptor,dcam
 Imaq_Adaptor,udcam
@@ -16,7 +16,7 @@ Imaq_VideoFormat,Format 7, Mode 0
 #FileType,fmf
 FileType,ufmf
 # Number of seconds to record
-RecordTime,20
+RecordTime,1000
 # whether to display the video preview with the jet colormap
 ColormapPreview,0
 # Shutter period
@@ -32,7 +32,7 @@ Assay_Experimenters,hirokawaj,robiea,robertss,albins
 # Expected number of flies
 NFlies,20
 # List of possible Incubator ID values
-Rearing_IncubatorIDs,1,2,3,4,5 
+Rearing_IncubatorIDs,1,2,3,4,5
 # Range of Cross Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_CrossDate_Range,14,22
@@ -40,14 +40,14 @@ PreAssayHandling_CrossDate_Range,14,22
 # before today
 PreAssayHandling_SortingDate_Range,0,8
 # List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,unknown,zhengg,albins
+PreAssayHandling_SortingHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,ruizd,shustermand,unknown,zhengg,albins
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
-PreAssayHandling_StarvationDate_Range,-1,1
+PreAssayHandling_StarvationDate_Range,0,1
 # List of possible Starvation Handler values
-PreAssayHandling_StarvationHandlers,hirokawaj,robiea,albins
+PreAssayHandling_StarvationHandlers,hirokawaj,robiea,robertss,albins
 # List of room names
-Assay_Rooms,1,2,3
+Assay_Rooms,2C.310.1,2C.310.2,2C.310.3
 # List of possible Rig values
 Assay_Rigs,1,2
 # List of possible Plate values
@@ -78,11 +78,12 @@ MetaDataFileName,Metadata.xml
 LogFileName,Log.txt
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
-MetaData_RearingProtocols,rc6,rc6,rc6,rc6,rc6
-MetaData_HandlingProtocols,HP0005.xml
-MetaData_ExpProtocols,EP0009.xml
+# rearing protocols need 1 per incubator
+MetaData_RearingProtocols,RP_Olympiad_v006p1.xls,RP_Olympiad_v006p1.xls,RP_Olympiad_v006p1.xls,RP_Olympiad_v006p1.xls,RP_Olympiad_v006p1.xls
+MetaData_HandlingProtocols,HP_flybowl_v005p1.xls
+MetaData_ExpProtocols,EP_flybowl_v010p0.xls
 MetaData_Effector,EXT_CantonS_1101243
-MetaData_Gender,b
+MetaData_Gender,f
 MetaData_RoomTemperatureSetPoint,29
 MetaData_RoomHumiditySetPoint,60
 # limits of y-axis for frame rate plot
@@ -146,3 +147,15 @@ ScanLineYLim,60,250
 # min, max time between loading flies and starting recording
 MinFliesLoadedTime,25
 MaxFliesLoadedTime,225
+# List of possible Cross Handler values
+PreAssayHandling_CrossHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,unknown,zhengg,albins
+# flip used
+PreAssayHandling_FlipUsed,0
+# wishlist number range
+WishListRange,-1,1
+# whether to connect to FlyF2 to sync barcode with line name, etc.
+DoSyncBarcode,1
+# screen type
+ScreenType,non_olympiad
+# screen reason
+ScreenReason,standard

@@ -148,11 +148,11 @@ ScanLineYLim,60,250
 MinFliesLoadedTime,25
 MaxFliesLoadedTime,225
 # List of possible Cross Handler values
-PreAssayHandling_CrossHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,unknown,zhengg
+PreAssayHandling_CrossHandlers,unknown,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,zhengg
 # flip used
 PreAssayHandling_FlipUsed,1
 # wishlist number range
-WishListRange,5,15
+WishListRange,55,100
 # whether to connect to FlyF2 to sync barcode with line name, etc.
 DoSyncBarcode,1
 # screen type
