@@ -1,3 +1,4 @@
+<<<<<<< HEAD:FlyBowlDataCaptureParams_EP00013_Debug.txt
 # Directory to store video to
 #OutputDirectory,D:\data,J:\data
 OutputDirectory,D:\debug_data,J:\debug_data
@@ -148,7 +149,7 @@ ScanLineYLim,60,250
 MinFliesLoadedTime,25
 MaxFliesLoadedTime,225
 # List of possible Cross Handler values
-PreAssayHandling_CrossHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,unknown,zhengg,albins
+PreAssayHandling_CrossHandlers,unknown,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,zhengg,albins
 # flip used
 PreAssayHandling_FlipUsed,0
 # wishlist number range
@@ -159,3 +160,5 @@ DoSyncBarcode,1
 ScreenType,non_olympiad
 # screen reason
 ScreenReason,standard
+# control fly line names
+ControlLineNames,pBDPGAL4U

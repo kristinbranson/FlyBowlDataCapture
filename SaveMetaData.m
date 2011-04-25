@@ -56,6 +56,12 @@ if isfield(handles.params,'ScreenReason'),
 else
   ScreenReason = 'standard';
 end
+% set to control if it is a control fly
+if isfield(handles.params,'ControlLineNames'),
+  if ismember(handles.Fly_LineName,handles.params.ControlLineNames),
+    ScreenReason = 'control';
+  end
+end
 fprintf(fid,'screen_reason="%s" ',ScreenReason);
 % data capture code version
 if exist('version.txt','file'),

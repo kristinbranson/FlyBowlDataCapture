@@ -159,3 +159,5 @@ DoSyncBarcode,1
 ScreenType,primary
 # screen reason
 ScreenReason,standard
+# control fly line names
+ControlLineNames,pBDPGAL4U
