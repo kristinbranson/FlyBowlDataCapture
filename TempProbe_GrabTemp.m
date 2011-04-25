@@ -87,9 +87,12 @@ if handles.IsRecording,
       else
         if exist(handles.TempFileName,'file'),
           addToStatus(handles,sprintf('TempFileIsCreated == false, but %s exists',handles.TempFileName));
+          TempFid = -1;
         else
           TempFid = fopen(handles.TempFileName,'w');
           handles.TempFileIsCreated = true;
+          guidata(hObject,handles);
+          addToStatus(handles,sprintf('Created temperature file %s',handles.TempFileName));
         end
       end
       if TempFid <= 0,

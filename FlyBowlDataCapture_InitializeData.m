@@ -61,7 +61,7 @@ handles.SAGECodeDir = '../SAGE/MATLABInterface/Trunk';
 handles.JCtraxCodeDir = '../JCtrax';
 
 % max number of times to try to grab temperature and fail
-handles.MaxNTempGrabAttempts = 10;
+handles.MaxNTempGrabAttempts = 30;
 
 % add JCtrax to path
 if ~isdeployed,
@@ -99,6 +99,9 @@ handles.TempFileIsCreated = false;
 if isfield(handles,'TempFileName'),
   handles = rmfield(handles,'TempFileName');
 end
+
+% initialize that temperature stream saving is enabled
+handles.TempStreamDisabled = false;
 
 %% reset experiment name
 
