@@ -146,3 +146,17 @@ ScanLineYLim,60,250
 # min, max time between loading flies and starting recording
 MinFliesLoadedTime,25
 MaxFliesLoadedTime,225
+# List of possible Cross Handler values
+PreAssayHandling_CrossHandlers,unknown,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,zhengg
+# flip used
+PreAssayHandling_FlipUsed,1
+# wishlist number range
+WishListRange,5,15
+# whether to connect to FlyF2 to sync barcode with line name, etc.
+DoSyncBarcode,1
+# screen type
+ScreenType,primary
+# screen reason
+ScreenReason,standard
+# control fly line names
+ControlLineNames,pBDPGAL4U
