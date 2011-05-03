@@ -162,3 +162,5 @@ ScreenType,non_olympiad
 ScreenReason,standard
 # control fly line names
 ControlLineNames,pBDPGAL4U
+# days between cross and flip
+flip_days,0

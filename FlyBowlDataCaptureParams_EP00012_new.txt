@@ -159,3 +159,5 @@ DoSyncBarcode,1
 ScreenType,non_olympiad
 # screen reason
 ScreenReason,control
+# days between cross and flip
+flip_days,0
