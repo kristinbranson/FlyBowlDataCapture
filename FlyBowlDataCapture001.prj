@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-project>
-  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.zip" build-checksum="2404867982" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
+  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.zip" build-checksum="869874897" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
     <param.project.name>C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj</param.project.name>
     <param.target.type>Windows Standalone Application</param.target.type>
     <param.appname>FlyBowlDataCapture001</param.appname>
@@ -144,6 +144,7 @@
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002_Special.txt</file>
       <file>${PROJECT_ROOT}\matlab.prf</file>
       <file>${PROJECT_ROOT}\QuickStats_Stats_20110120T175100.mat</file>
+      <file>${PROJECT_ROOT}\QuickStats_Stats_20110428T130126.mat</file>
       <file>${PROJECT_ROOT}\SageLineNames.txt</file>
       <file>${PROJECT_ROOT}\SAGEReadParams.txt</file>
       <file>${PROJECT_ROOT}\usbtc08.dll</file>

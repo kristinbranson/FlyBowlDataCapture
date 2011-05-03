@@ -140,7 +140,7 @@ UFMFBGKeyFramePeriodInit,1,10,25,50,75
 # lookup table from rig+bowl to whether to rotate the preview image
 DoRotatePreviewImage,(1,A,1),(1,B,1),(1,C,0),(1,D,0),(2,A,1),(2,B,1),(2,C,0),(2,D,0)
 # Name of mat file containing quickstats stats
-QuickStatsStatsFileName,QuickStats_Stats_20110120T175100.mat
+QuickStatsStatsFileName,QuickStats_Stats_20110428T130126.mat
 # y-axis limits for scan lines
 ScanLineYLim,60,250
 # min, max time between loading flies and starting recording
