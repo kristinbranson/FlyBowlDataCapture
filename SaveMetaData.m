@@ -99,6 +99,15 @@ fprintf(fid,'effector="%s" ',handles.params.MetaData_Effector);
 fprintf(fid,'gender="%s" ',handles.params.MetaData_Gender); 
 % cross date
 fprintf(fid,'cross_date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,handles.datetimeformat));
+% flip_date
+if ~isfield(handles.params,'flip_days'),
+  warning('flipdays not input. Not storing flip_date.');
+else
+  flip_datenum = handles.PreAssayHandling_CrossDate_datenum + handles.params.flip_days;
+  handles.flip_date = datestr(flip_datenum,handles.datetimeformat);
+  fprintf(fid,'flip_date="%s" ',handles.flip_date);
+end
+
 % hours starved
 fprintf(fid,'hours_starved="%f" ',starvation_time);
 % barcode
