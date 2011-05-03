@@ -64,17 +64,8 @@ if isfield(handles.params,'ControlLineNames'),
 end
 fprintf(fid,'screen_reason="%s" ',ScreenReason);
 % data capture code version
-if exist('version.txt','file'),
-  try
-    ver = importdata('version.txt');
-    if isnumeric(ver),
-      ver = num2str(ver);
-    end
-    fprintf(fid,'data_capture_version="%s" ',ver);
-  catch ME,
-    addToStatus(handles,{'Could not read version from version.txt',getReport(ME)});
-  end
-end
+fprintf(fid,'data_capture_version="%s" ',handles.version);
+
 fprintf(fid,'>\n');
 
 % session container

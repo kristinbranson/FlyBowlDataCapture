@@ -1,7 +1,17 @@
 function handles = FlyBowlDataCapture_InitializeData(handles)
 
-% version
-handles.version = '0.1';
+% data capture code version
+handles.version = '??';
+if exist('version.txt','file'),
+  try
+    ver = importdata('version.txt');
+    if isnumeric(ver),
+      ver = num2str(ver);
+    end
+    handles.version = ver;
+  catch
+  end
+end
 
 % comment character in params file
 comment_char = '#';
@@ -930,6 +940,8 @@ if ~isfield(handles.params,'MaxFliesLoadedTime'),
   handles.params.MaxFliesLoadedTime = inf;
 end
 
+%% figure title
+set(handles.figure_main,'Name',sprintf('FlyBowlDataCapture v.%s',handles.version));
 
 %% Initialization complete
 handles.GUIInitialization_Time_datenum = now;
