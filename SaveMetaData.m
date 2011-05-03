@@ -111,9 +111,10 @@ fprintf(fid,'wish_list="%d" ',handles.WishList);
 fprintf(fid,'robot_stock_copy="unknown" ');
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'num_flies="0">\n');
-% TODO: genotype
+
+% no longer recording genotype
 %fprintf(fid,'      <genotype>%s &amp; w+;;%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
-fprintf(fid,'      <genotype>%s__%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
+%fprintf(fid,'      <genotype>%s__%s</genotype>\n',handles.Fly_LineName,handles.params.MetaData_Effector);
 
 % choose rearing protocol based on incubator ID
 i = find(strcmp(handles.Rearing_IncubatorID,handles.Rearing_IncubatorIDs),1);
