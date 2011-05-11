@@ -1,4 +1,0 @@
-host: mysql3
-database: sage
-username: sageRead
-password: sageRead
