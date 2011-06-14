@@ -41,7 +41,6 @@ PreAssayHandling_CrossDate_Range,14,22
 PreAssayHandling_SortingDate_Range,1,8
 # List of possible Sorting Handler values
 PreAssayHandling_SortingHandlers,unknown,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,phillipsm,robertss,robiea,rowellw,ruizd,shustermand,zhengg
-PreAssayHandling_SortingHandlers,unknown,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,phillipsm,robertss,robiea,rowellw,ruizd,shustermand,zhengg
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
@@ -80,7 +79,7 @@ LogFileName,Log.txt
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
 # rearing protocols need 1 per incubator
-MetaData_RearingProtocols,RP_Olympiad_v008p1.xls,RP_Olympiad_v008p1.xls,RP_Olympiad_v008p1.xls,RP_Olympiad_v008p1.xls
+MetaData_RearingProtocols,RP_Olympiad_v009p0.xls,RP_Olympiad_v009p0.xls,RP_Olympiad_v009p0.xls,RP_Olympiad_v009p0.xls
 MetaData_HandlingProtocols,HP_flybowl_v004p0.xls
 MetaData_ExpProtocols,EP_flybowl_v008p0.xls
 MetaData_Effector,UAS_dTrpA1_2_0002
