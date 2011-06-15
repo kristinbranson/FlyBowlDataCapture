@@ -49,7 +49,7 @@ end
 %end
 
 % name of Sage parameters file
-handles.SageParamsFile = 'SAGEReadParams.txt';
+%handles.SageParamsFile = 'SAGEReadParams.txt';
 
 % now
 handles.now = now;
