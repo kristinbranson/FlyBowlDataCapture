@@ -142,11 +142,33 @@
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002.txt</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002_Debug.txt</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00002_Special.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00003.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00003_Debug.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00003_Special.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00004.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00005.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00006.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00006_Debug.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00007.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00007_Debug.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00008.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00008_Debug.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00008_new.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00009.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00009_new.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00010.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00010_new.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00011.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00011_new.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00012.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00012_new.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00013.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00013_Debug.txt</file>
+      <file>${PROJECT_ROOT}\FlyBowlDataCaptureParams_EP00013_new.txt</file>
       <file>${PROJECT_ROOT}\matlab.prf</file>
       <file>${PROJECT_ROOT}\QuickStats_Stats_20110120T175100.mat</file>
       <file>${PROJECT_ROOT}\QuickStats_Stats_20110428T130126.mat</file>
       <file>${PROJECT_ROOT}\SageLineNames.txt</file>
-      <file>${PROJECT_ROOT}\SAGEReadParams.txt</file>
       <file>${PROJECT_ROOT}\usbtc08.dll</file>
       <file>${PROJECT_ROOT}\usbtc08.h</file>
       <file>${PROJECT_ROOT}\usbtc08.lib</file>
