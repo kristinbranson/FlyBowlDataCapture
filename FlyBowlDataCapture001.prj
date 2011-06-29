@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-project>
-  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.zip" build-checksum="40156926" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
+  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.zip" build-checksum="3068201583" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
     <param.project.name>C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj</param.project.name>
     <param.target.type>Windows Standalone Application</param.target.type>
     <param.appname>FlyBowlDataCapture001</param.appname>
@@ -181,6 +181,10 @@
     <matlab>
       <root>C:\Program Files\MATLAB\R2010b</root>
       <path>
+        <directory>${PROJECT_ROOT}\findjobj</directory>
+        <directory>${PROJECT_ROOT}\..\SAGE\MATLABInterface\Trunk</directory>
+        <directory>${PROJECT_ROOT}\..\JCtrax\filehandling</directory>
+        <directory>${PROJECT_ROOT}\..\JCtrax\misc</directory>
         <directory>C:\Users\labadmin\Documents\MATLAB</directory>
         <directory>C:\Users\labadmin\Documents\FlyBowl\Code\JCtrax\misc</directory>
         <directory>C:\Users\labadmin\Documents\FlyBowl\Code\JCtrax\filehandling</directory>
