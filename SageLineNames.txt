@@ -324,6 +324,9 @@ GR60F09
 GR71G01
 P0163
 poxn-Gal4_14-1-7
+flylight
+EXT_P_w_mC_ato_GAL4_3_6_14a
+w_UAS-mCD8-GFP_atoGal4-14a_UAS-LacZ
 olympiad
 attP2
 EXT_CantonS_1101243

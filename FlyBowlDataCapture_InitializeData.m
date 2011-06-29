@@ -248,6 +248,7 @@ handles.ComputerName = strtrim(handles.ComputerName);
 
 %% hard drive needs special parsing
 if isfield(handles.params,'HardDriveName'),
+  didmatch = false
   s = handles.params.HardDriveName;
   if s(1) == '(' && s(end) == ')',
     s = s(2:end-1);
@@ -257,8 +258,14 @@ if isfield(handles.params,'HardDriveName'),
     parts1 = regexp(parts{i},':','split');
     if strcmpi(parts1{1},handles.ComputerName),
       handles.params.HardDriveName = parts1{2};
+      didmatch = true;
       break;
     end
+  end
+  if ~didmatch,
+    s = 'Could not match computer name to hard drive lookup table';
+    errordlg(s);
+    error(s);
   end
 end
 
