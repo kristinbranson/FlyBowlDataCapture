@@ -73,6 +73,11 @@ function output = FlyFQuery( barcode )
         output.(fieldName) = char(output.(fieldName));
      end
      
+     % remove bottle stock ID from control line names
+     if ~isempty(regexp(output.Line_Name,'^pBDPGAL4U_.*$','once')),
+       output.Line_Name = 'pBDPGAL4U';
+     end
+     
 end
 
 % -------------------------------------------------------------------------
