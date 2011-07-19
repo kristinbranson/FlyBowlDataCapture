@@ -5,7 +5,7 @@ OutputDirectory,D:\debug_data,J:\debug_data
 # Directory to temporarily store video to
 TmpOutputDirectory,D:\tmpdata,J:\tmpdata
 # Names of hard drives, corresponding to the ordered OutputDirectory list
-HardDriveName,(bransonlab-ww1:Internal_D;bransonlab-ww2:Internal_D;bransonlab-ww3:Internal_D;bransonlab-ww4:Internal_D;bransonlab-ww5:Internal_D),(bransonlab-ww1:HD2;bransonlab-ww2:HD1;bransonlab-ww3:HD5;bransonlab-ww4:HD3;bransonlab-ww5:HD2)
+HardDriveName,(bransonlab-ww1:Internal_D;bransonlab-ww2:Internal_D;bransonlab-ww3:Internal_D;bransonlab-ww4:Internal_D;bransonlab-ww5:Internal_D),(bransonlab-ww1:HD2;bransonlab-ww2:HD1;bransonlab-ww3:HD5;bransonlab-ww4:HD3;bransonlab-ww5:HD4)
 # Camera adaptor
 #Imaq_Adaptor,dcam
 Imaq_Adaptor,udcam
@@ -28,7 +28,7 @@ Imaq_Brightness,25
 # Prefix of movie file
 MovieFilePrefix,movie
 # List of possible Experimenter values
-Assay_Experimenters,hirokawaj,robiea,robertss
+Assay_Experimenters,hirokawaj,phillipsm10,robiea,robertss
 # Expected number of flies
 NFlies,20
 # List of possible Incubator ID values
@@ -40,12 +40,12 @@ PreAssayHandling_CrossDate_Range,14,22
 # before today
 PreAssayHandling_SortingDate_Range,1,8
 # List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,unknown,zhengg
+PreAssayHandling_SortingHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,phillipsm10,robertss,robiea,rowellw,shustermand,unknown,zhengg
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
 # List of possible Starvation Handler values
-PreAssayHandling_StarvationHandlers,hirokawaj,robiea,robertss
+PreAssayHandling_StarvationHandlers,hirokawaj,phillipsm10,robiea,robertss
 # List of room names
 Assay_Rooms,2C.310.1,2C.310.2,2C.310.3
 # List of possible Rig values
@@ -53,7 +53,7 @@ Assay_Rigs,1,2
 # List of possible Plate values
 Assay_Plates,10,11,12,13,14
 # List of possible Lid values
-Assay_Lids,01,02
+Assay_Lids,01,02,03
 # List of possible Bowl values
 Assay_Bowls,A,B,C,D
 # List of possible Redo flags
