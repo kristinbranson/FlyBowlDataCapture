@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 09-Aug-2011 16:25:08
+% Last Modified by GUIDE v2.5 09-Aug-2011 17:33:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -193,6 +193,7 @@ handles.GUIInstance_prev = {
   'Assay_Rig'
   'Assay_Plate'
   'Assay_Lid'
+  'Assay_VisualSurround'
   'Assay_Bowl'
   'DeviceID'
   'TempProbeID'
@@ -1082,6 +1083,14 @@ function pushbutton_Done_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% check if barcode is entered
+if handles.params.CheckBarcode && handles.barcode < 0,
+  res = questdlg('Barcode not entered. Continue closing experiment?','Bad Barcode','Yes','No','Cancel','Cancel');
+  if ~strcmp(res,'Yes'),
+    return;
+  end  
+end
+
 handles = DisableGUI(handles);
 
 CloseQuickStatsFigures(handles);
@@ -1456,7 +1465,10 @@ function menu_File_New_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 if handles.GUIIsInitialized,
-  handles = CloseExperiment(handles);
+  [handles,didcancel] = CloseExperiment(handles);
+  if didcancel,
+    return;
+  end
 end
 CloseQuickStatsFigures(handles);
 
@@ -1545,6 +1557,19 @@ if exist('hwaitbar','var') && ishandle(hwaitbar),
   waitbar(.2,hwaitbar,s);
 else
   hwaitbar = waitbar(.2,s);
+end
+
+% check if barcode is entered
+if ~didabort && handles.GUIIsInitialized && ...
+    handles.params.CheckBarcode && handles.barcode < 0,
+  res = questdlg('Barcode not entered. Continue closing experiment?','Bad barcode','Yes','No','Cancel','Cancel');
+  if ~strcmp(res,'Yes'),
+    if exist('hwaitbar','var') && ishandle(hwaitbar),
+      delete(hwaitbar);
+    end
+    didcancel = true;
+    return;
+  end  
 end
 
 % save metadata
@@ -1670,7 +1695,7 @@ handles.menus_disable = [handles.menu_Edit,handles.menu_File_SaveMetaData,handle
 chil = [chil;handles.menus_disable'];
 for i = 1:length(chil),
   if ishandle(chil(i)) && ~strcmpi(get(chil(i),'Enable'),'on') && ...
-      (~handles.IsAdvancedMode && ismember(chil(i),handles.advanced_controls)),
+      (handles.IsAdvancedMode || ~ismember(chil(i),handles.advanced_controls)),
     try
       set(chil(i),'Enable','on');
     catch
@@ -2192,3 +2217,48 @@ else
   set(hObject,'Checked','on');
 end  
 guidata(hObject,handles);
+
+% --------------------------------------------------------------------
+function menu_HardEnableButtons_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_HardEnableButtons (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+h = [handles.pushbutton_ShiftFlyTemp,handles.pushbutton_FliesLoaded,handles.pushbutton_StartRecording];
+set(h,'Enable','on');
+
+
+% --- Executes on selection change in popupmenu_Assay_VisualSurround.
+function popupmenu_Assay_VisualSurround_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Assay_VisualSurround (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Assay_VisualSurround contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_Assay_VisualSurround
+
+% grab value
+v = get(handles.popupmenu_Assay_VisualSurround,'Value');
+handles.Assay_VisualSurround = handles.Assay_VisualSurrounds{v};
+
+% no longer default
+handles.isdefault.Assay_VisualSurround = false;
+
+% set color
+set(handles.popupmenu_Assay_VisualSurround,'BackgroundColor',handles.changed_bkgdcolor);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_Assay_VisualSurround_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Assay_VisualSurround (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

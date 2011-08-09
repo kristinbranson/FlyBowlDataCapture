@@ -170,7 +170,7 @@ try
     'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
     'ScanLineYLim','MinFliesLoadedTime','MaxFliesLoadedTime',...
     'PreAssayHandling_FlipUsed','WishListRange',...
-    'DoSyncBarcode','flip_days'};
+    'DoSyncBarcode','flip_days','CheckBarcode'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -687,6 +687,27 @@ set(handles.popupmenu_Assay_Lid,'String',handles.Assay_Lids,...
   'Value',find(strcmp(handles.Assay_Lid,handles.Assay_Lids),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
+%% VisualSurround
+
+% whether this has been changed or not
+handles.isdefault.Assay_VisualSurround = true;
+
+% possible values for StarvationHandler
+handles.Assay_VisualSurrounds = handles.params.Assay_VisualSurrounds;
+
+% if StarvationHandler not stored in rc file, choose first StarvationHandler
+if ~isfield(handles.previous_values,'Assay_VisualSurround') || ...
+    ~ismember(handles.previous_values.Assay_VisualSurround,handles.Assay_VisualSurrounds),
+  handles.previous_values.Assay_VisualSurround = handles.Assay_VisualSurrounds{1};
+end
+
+% by default, previous StarvationHandler
+handles.Assay_VisualSurround = handles.previous_values.Assay_VisualSurround;
+
+% set possible values, current value, color to default
+set(handles.popupmenu_Assay_VisualSurround,'String',handles.Assay_VisualSurrounds,...
+  'Value',find(strcmp(handles.Assay_VisualSurround,handles.Assay_VisualSurrounds),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Bowl
 
