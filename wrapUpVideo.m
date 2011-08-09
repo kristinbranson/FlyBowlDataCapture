@@ -169,7 +169,9 @@ set(handles.text_Status_FrameRate,'String',sprintf('Ave: %.1f',handles.FrameCoun
 set(handles.pushbutton_Abort,'Enable','off','BackgroundColor',handles.grayed_bkgdcolor);
 
 % enable switching cameras
-set(handles.popupmenu_DeviceID,'Enable','on');
+if handles.IsAdvancedMode,
+  set(handles.popupmenu_DeviceID,'Enable','on');
+end
 set(handles.menu_Edit_DetectCameras,'Enable','on');
 
 % enable file menus

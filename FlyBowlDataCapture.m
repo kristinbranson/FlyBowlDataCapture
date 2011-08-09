@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 12-Apr-2011 16:08:19
+% Last Modified by GUIDE v2.5 09-Aug-2011 16:25:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -190,7 +190,6 @@ function handles = LoadPreviousValues(handles)
 % Read previous values
 handles.previous_values = struct;
 handles.GUIInstance_prev = {
-  'Assay_Room'
   'Assay_Rig'
   'Assay_Plate'
   'Assay_Lid'
@@ -1670,7 +1669,8 @@ chil = findobj(handles.figure_main,'type','uicontrol');
 handles.menus_disable = [handles.menu_Edit,handles.menu_File_SaveMetaData,handles.menu_File_Close];
 chil = [chil;handles.menus_disable'];
 for i = 1:length(chil),
-  if ishandle(chil(i)) && ~strcmpi(get(chil(i),'Enable'),'on'),
+  if ishandle(chil(i)) && ~strcmpi(get(chil(i),'Enable'),'on') && ...
+      (~handles.IsAdvancedMode && ismember(chil(i),handles.advanced_controls)),
     try
       set(chil(i),'Enable','on');
     catch
@@ -1764,40 +1764,40 @@ else
 end
 
 
-% --- Executes on selection change in popupmenu_Assay_Room.
-function popupmenu_Assay_Room_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu_Assay_Room (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Assay_Room contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu_Assay_Room
-
-% grab value
-v = get(handles.popupmenu_Assay_Room,'Value');
-handles.Assay_Room = handles.Assay_Rooms{v};
-
-% no longer default
-handles.isdefault.Assay_Room = false;
-
-% set color
-set(handles.popupmenu_Assay_Room,'BackgroundColor',handles.changed_bkgdcolor);
-
-handles = ChangedMetaData(handles);
-
-guidata(hObject,handles);
+% % --- Executes on selection change in popupmenu_Assay_Room.
+% function popupmenu_Assay_Room_Callback(hObject, eventdata, handles)
+% % hObject    handle to popupmenu_Assay_Room (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Assay_Room contents as cell array
+% %        contents{get(hObject,'Value')} returns selected item from popupmenu_Assay_Room
+% 
+% % grab value
+% v = get(handles.popupmenu_Assay_Room,'Value');
+% handles.Assay_Room = handles.Assay_Rooms{v};
+% 
+% % no longer default
+% handles.isdefault.Assay_Room = false;
+% 
+% % set color
+% set(handles.popupmenu_Assay_Room,'BackgroundColor',handles.changed_bkgdcolor);
+% 
+% handles = ChangedMetaData(handles);
+% 
+% guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu_Assay_Room_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu_Assay_Room (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+% function popupmenu_Assay_Room_CreateFcn(hObject, eventdata, handles)
+% % hObject    handle to popupmenu_Assay_Room (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    empty - handles not created until after all CreateFcns called
+% 
+% % Hint: popupmenu controls usually have a white background on Windows.
+% %       See ISPC and COMPUTER.
+% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+%     set(hObject,'BackgroundColor','white');
+% end
 
 
 % --------------------------------------------------------------------
@@ -2173,3 +2173,22 @@ function pushbutton_Done_DeleteFcn(hObject, eventdata, handles)
 % hObject    handle to pushbutton_Done (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function menu_advanced_mode_Callback(hObject, eventdata, handles)
+% hObject    handle to menu_advanced_mode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+v = get(hObject,'Checked');
+if strcmp(v,'on'),
+  handles.IsAdvancedMode = false;
+  set(handles.advanced_controls,'Enable','off');
+  set(hObject,'Checked','off');
+else
+  handles.IsAdvancedMode = true;
+  set(handles.advanced_controls,'Enable','on');
+  set(hObject,'Checked','on');
+end  
+guidata(hObject,handles);

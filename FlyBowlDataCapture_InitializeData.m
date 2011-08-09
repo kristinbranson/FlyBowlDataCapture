@@ -186,7 +186,8 @@ try
     'UFMFLogFileName','UFMFStatFileName','PreconSensorSerialPort',...
     'DoRotatePreviewImage',...
     'QuickStatsStatsFileName',...
-    'ScreenType','ScreenReason'};
+    'ScreenType','ScreenReason',...
+    'Assay_Room'};
   for i = 1:length(notlist_params),
     fn = notlist_params{i};
     if ischar(handles.params.(fn){1}),
@@ -248,7 +249,7 @@ handles.ComputerName = strtrim(handles.ComputerName);
 
 %% hard drive needs special parsing
 if isfield(handles.params,'HardDriveName'),
-  didmatch = false
+  didmatch = false;
   s = handles.params.HardDriveName;
   if s(1) == '(' && s(end) == ')',
     s = s(2:end-1);
@@ -597,25 +598,27 @@ set(handles.popupmenu_PreAssayHandling_StarvationHandler,'String',handles.PreAss
 
 %% Room
 
-% whether this has been changed or not
-handles.isdefault.Assay_Room = true;
-
-% possible values for room
-handles.Assay_Rooms = handles.params.Assay_Rooms;
-
-% if StarvationHandler not stored in rc file, choose first room
-if ~isfield(handles.previous_values,'Assay_Room') || ...
-    ~ismember(handles.previous_values.Assay_Room,handles.Assay_Rooms),
-  handles.previous_values.Assay_Room = handles.Assay_Rooms{1};
-end
-
-% by default, previous room
-handles.Assay_Room = handles.previous_values.Assay_Room;
-
-% set possible values, current value, color to default
-set(handles.popupmenu_Assay_Room,'String',handles.Assay_Rooms,...
-  'Value',find(strcmp(handles.Assay_Room,handles.Assay_Rooms),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+handles.Assay_Room = handles.params.Assay_Room;
+% 
+% % whether this has been changed or not
+% handles.isdefault.Assay_Room = true;
+% 
+% % possible values for room
+% handles.Assay_Rooms = handles.params.Assay_Rooms;
+% 
+% % if StarvationHandler not stored in rc file, choose first room
+% if ~isfield(handles.previous_values,'Assay_Room') || ...
+%     ~ismember(handles.previous_values.Assay_Room,handles.Assay_Rooms),
+%   handles.previous_values.Assay_Room = handles.Assay_Rooms{1};
+% end
+% 
+% % by default, previous room
+% handles.Assay_Room = handles.previous_values.Assay_Room;
+% 
+% % set possible values, current value, color to default
+% set(handles.popupmenu_Assay_Room,'String',handles.Assay_Rooms,...
+%   'Value',find(strcmp(handles.Assay_Room,handles.Assay_Rooms),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 
 %% Rig
@@ -746,6 +749,15 @@ set(handles.edit_TechnicalNotes,'String',handles.TechnicalNotes);
 
 handles.BehaviorNotes = 'None';
 set(handles.edit_BehaviorNotes,'String',handles.BehaviorNotes);
+
+%% Advanced editing mode
+
+% disable advanced editing mode
+handles.IsAdvancedMode = false;
+set(handles.menu_advanced_mode,'Checked','off');
+handles.advanced_controls = setdiff(findall(handles.uipanel_advanced,'Type','uicontrol'),...
+  findall(handles.uipanel_advanced,'Type','uicontrol','Style','text'));
+set(handles.advanced_controls,'Enable','off');
 
 %% Detect Cameras
 

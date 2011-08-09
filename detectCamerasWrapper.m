@@ -24,8 +24,10 @@ else
   % set possible values, current value, color to default
   set(handles.popupmenu_DeviceID,'String',cellstr(num2str(handles.DeviceIDs(:))),...
     'Value',find(handles.DeviceID == handles.DeviceIDs,1),...
-    'BackgroundColor',handles.isdefault_bkgdcolor,...
-    'Enable','on');
+    'BackgroundColor',handles.isdefault_bkgdcolor);
+  if handles.IsAdvancedMode,
+    set(handles.popupmenu_DeviceId,'Enable','on');
+  end
   
   % enable initialize camera button
   set(handles.pushbutton_InitializeCamera,'Enable','on');
