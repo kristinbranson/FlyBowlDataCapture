@@ -97,7 +97,7 @@ TempPlotYLim,25,35
 # Whether to try to connect over the network to Sage to query line names
 DoQuerySage,1
 # Time in between temperature readings
-TempProbePeriod,1
+TempProbePeriod,5
 # Which channels have temperature probes
 TempProbeChannels,1,2
 # Thermocouple types
@@ -169,3 +169,5 @@ ControlLineNames,pBDPGAL4U
 flip_days,4
 # whether to check that the barcode >= 0
 CheckBarcode,1
+# whether to couple camera and temperature probe start
+CoupleCameraTempProbeStart,1

@@ -12,7 +12,9 @@ if isfield(handles,'TempProbe_IsInitialized') && handles.TempProbe_IsInitialized
     handles.Status_Temp_History(:) = nan;
     set(handles.hLine_Status_Temp,'XData',handles.Status_Temp_History(1,:),...
       'YData',handles.Status_Temp_History(2,:));
-    set(handles.pushbutton_InitializeTempProbe,'Visible','on');
+    if handles.params.CoupleCameraTempProbeStart == 0,
+      set(handles.pushbutton_InitializeTempProbe,'Visible','on');
+    end
   catch ME,
     uiwait(warndlg({'Error stopping temperature probe.',getReport(ME)},'Error stopping temperature probe'));
   end

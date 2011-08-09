@@ -225,9 +225,12 @@ function FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles)
 
 try
 
-guidata(hObject,handles);
-
-delete(handles.figure_main);
+  if ishandle(hObject),    
+    guidata(hObject,handles);
+  end
+  if ishandle(handles.figure_main),
+    delete(handles.figure_main);
+  end
 
 catch ME
   s = sprintf('Error while closing GUI: %s\n',getReport(ME));
@@ -1237,6 +1240,15 @@ end
 
 guidata(hObject,handles);
 
+if handles.params.CoupleCameraTempProbeStart ~= 0,
+
+  % wait a second
+  pause(1);
+
+  % initialize the temperature probe too
+  pushbutton_InitializeTempProbe_Callback(hObject, eventdata, handles);
+
+end
 
 % --- Executes when user attempts to close figure_main.
 function figure_main_CloseRequestFcn(hObject, eventdata, handles)

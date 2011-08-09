@@ -170,7 +170,7 @@ try
     'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
     'ScanLineYLim','MinFliesLoadedTime','MaxFliesLoadedTime',...
     'PreAssayHandling_FlipUsed','WishListRange',...
-    'DoSyncBarcode','flip_days','CheckBarcode'};
+    'DoSyncBarcode','flip_days','CheckBarcode','CoupleCameraTempProbeStart'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -856,6 +856,12 @@ if (handles.params.DoRecordTemp == 0) || isempty(handles.TempProbeIDs),
   set(handles.pushbutton_InitializeTempProbe,'Enable','off','String','No Temp Probe');
 else
   set(handles.pushbutton_InitializeTempProbe,'Enable','on');
+end
+
+% remove the temp probe start button
+if handles.params.CoupleCameraTempProbeStart ~= 0 && isfield(handles,'pushbutton_InitializeTempProbe') && ...
+    ishandle(handles.pushbutton_InitializeTempProbe),
+  delete(handles.pushbutton_InitializeTempProbe);  
 end
 
 %% Abort
