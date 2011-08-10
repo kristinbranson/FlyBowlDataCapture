@@ -850,18 +850,20 @@ end
 %% Initialize Temperature Probe
 
 handles.InitializeTempProbe_bkgdcolor = [.071,.212,.141];
-set(handles.pushbutton_InitializeTempProbe,'BackgroundColor',handles.InitializeTempProbe_bkgdcolor,...
-  'String','Init Temp Probe','Visible','on');
-if (handles.params.DoRecordTemp == 0) || isempty(handles.TempProbeIDs),
-  set(handles.pushbutton_InitializeTempProbe,'Enable','off','String','No Temp Probe');
-else
-  set(handles.pushbutton_InitializeTempProbe,'Enable','on');
-end
-
-% remove the temp probe start button
-if handles.params.CoupleCameraTempProbeStart ~= 0 && isfield(handles,'pushbutton_InitializeTempProbe') && ...
+if isfield(handles,'pushbutton_InitializeTempProbe') && ...
     ishandle(handles.pushbutton_InitializeTempProbe),
-  delete(handles.pushbutton_InitializeTempProbe);  
+  set(handles.pushbutton_InitializeTempProbe,'BackgroundColor',handles.InitializeTempProbe_bkgdcolor,...
+    'String','Init Temp Probe','Visible','on');
+  if (handles.params.DoRecordTemp == 0) || isempty(handles.TempProbeIDs),
+    set(handles.pushbutton_InitializeTempProbe,'Enable','off','String','No Temp Probe');
+  else
+    set(handles.pushbutton_InitializeTempProbe,'Enable','on');
+  end
+  
+  % remove the temp probe start button
+  if handles.params.CoupleCameraTempProbeStart ~= 0,
+    delete(handles.pushbutton_InitializeTempProbe);
+  end
 end
 
 %% Abort

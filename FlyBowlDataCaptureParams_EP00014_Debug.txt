@@ -16,7 +16,7 @@ Imaq_VideoFormat,Format 7, Mode 0
 #FileType,fmf
 FileType,ufmf
 # Number of seconds to record
-RecordTime,1000
+RecordTime,10
 # whether to display the video preview with the jet colormap
 ColormapPreview,1
 # Shutter period

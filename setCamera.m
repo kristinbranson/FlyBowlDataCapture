@@ -110,6 +110,7 @@ if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
   end
   if isfield(handles.params,'UFMFLogFileName'),
     set(handles.vid.Source,'debugFileName',handles.TmpUFMFLogFileName);
+    fprintf('Set log file to %s\n',handles.TmpUFMFLogFileName);
   end
   if isfield(handles.params,'UFMFStatFileName'),
     set(handles.vid.Source,'statFileName',handles.TmpUFMFStatFileName);
