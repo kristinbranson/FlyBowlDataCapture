@@ -1,5 +1,4 @@
-function MasterTempRecord_GrabTemp(obj,event,tc08_handle,Channels,ChannelFileNames,StartRunTimeStamp) %#ok<INUSL>
-
+function MasterTempRecord_GrabTemp(obj,event,tc08_handle,Channels,ChannelFileNames,StartRunTimeStamp,LogFileName) %#ok<INUSD,INUSL>
 
 % read temp in celcius
 UnitsCode = 0; 
@@ -12,6 +11,8 @@ FillMissing = 0;
 persistent temps_p;
 persistent overflow_p;
 persistent times_ms_p;
+
+try
 
 % allocate pointers for storing temp and overflow
 if isempty(temps_p),
@@ -51,6 +52,7 @@ for i = 1:length(Channels),
   
   % no readings available
   if nreadings == 0,
+    AddToLogFile(LogFileName,'%s: No readings available\n',datestr(now,30));
     continue;
   end
   
@@ -81,6 +83,14 @@ end
 
 if exist('hwarn','var') && ishandle(hwarn),
   delete(hwarn);
+end
+
+catch ME,
+
+  uiwait(warndlg(getReport(ME),'Error grabbing temperature'));
+  
+  AddToLogFile(LogFileName,'%s: Error grabbing temperature: %s\n',datestr(now,30),getReport(ME));
+  
 end
 
 % ok = calllib('usbtc08','usb_tc08_get_single',...

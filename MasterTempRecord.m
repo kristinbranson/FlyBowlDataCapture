@@ -2,6 +2,9 @@ function [success,info] = MasterTempRecord(varargin)
 
 global MasterTempRecordInfo;
 
+success = false;
+info = struct;
+
 % where we will save temperature data
 TempRecordDir = '.TempRecordData';
 IsMasterFileStr = 'IsMaster.mat';
@@ -26,9 +29,6 @@ Reject60Hz = 0;
   'Channels',Channels,'ChannelTypes',ChannelTypes,'Reject60Hz',Reject60Hz,...
   'TempRecordDir',TempRecordDir,'IsMasterFileStr',IsMasterFileStr,...
   'ChannelFileStr',ChannelFileStr);
-
-success = false;
-info = struct;
 
 IsMasterFile = fullfile(TempRecordDir,IsMasterFileStr);
 ChannelFileNames = cell(1,numel(Channels));
@@ -94,6 +94,7 @@ if tc08_handle == 0,
     return;
   elseif tc08_handle == 0,
     errordlg('Could not connect to TC08 temperature probe. Open failed and closing did not help. ','Error connecting to TC08 temperature probe');
+    return;
   end
     
 end
@@ -137,11 +138,23 @@ for i = 1:NChannelsTotal,
   end
 end
 
+% open a log file
+LogFileName = fullfile(TempRecordDir,'Log.txt');
+LogFID = fopen(LogFileName,'a');
+if LogFID < 0,
+  errordlg('Failed to open MasterTempRecord log file','Error starting MasterTempRecord');
+  return;
+end
+
+fprintf(LogFID,'\n\n***** MasterTempRecord started at %s *****\n',datestr(StartRunTimeStamp,'yyyymmddTHHMMSS'));
+
+fclose(LogFID);
+
 MasterTempRecord_timer=timer('ExecutionMode','FixedRate','Period',Period,...
-  'TimerFcn',{@MasterTempRecord_GrabTemp,tc08_handle,Channels,ChannelFileNames,StartRunTimeStamp},...
+  'TimerFcn',{@MasterTempRecord_GrabTemp,tc08_handle,Channels,ChannelFileNames,StartRunTimeStamp,LogFileName},...
   'StartDelay',1,...
   'Name','MasterTempRecord_USBTC08_Timer',...
-  'StopFcn',{@MasterTempRecord_Stop,tc08_handle,IsMasterFile,ChannelFileNames});
+  'StopFcn',{@MasterTempRecord_Stop,tc08_handle,IsMasterFile,ChannelFileNames,LogFileName});
 
 calllib('usbtc08','usb_tc08_run',tc08_handle,Period*1000);
 
@@ -157,6 +170,7 @@ info.MasterTempRecord_timer = MasterTempRecord_timer;
 info.StartRunTimeStamp = StartRunTimeStamp;
 info.Period = Period;
 info.ChannelTypes = ChannelTypes;
+info.LogFileName = LogFileName;
 info.GUI = MasterTempRecordGUI(info);
 
 MasterTempRecordInfo = info;

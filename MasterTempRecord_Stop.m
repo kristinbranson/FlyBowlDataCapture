@@ -1,6 +1,8 @@
-function MasterTempRecord_Stop(obj,event,tc08_handle,IsMasterFile,ChannelFileNames) %#ok<INUSL>
+function MasterTempRecord_Stop(obj,event,tc08_handle,IsMasterFile,ChannelFileNames,LogFileName) %#ok<INUSL>
 
 global MasterTempRecordInfo;
+
+try
 
 GUIhandle = [];
 if isstruct(MasterTempRecordInfo) && isfield(MasterTempRecordInfo,'GUI') && ...
@@ -52,3 +54,11 @@ if ~isempty(GUIhandle) && ishandle(GUIhandle),
   delete(GUIhandle);
 end
 
+AddToLogFile(LogFileName,'%s: Stopped MasterTempRecord\n',datestr(now,30));
+
+catch ME,
+  
+  uiwait(warndlg(getReport(ME),'Error stopping MasterTempRecord'));
+  AddToLogFile(LogFileName,'%s: Error stopping MasterTempRecord: %s\n',datestr(now,30),getReport(ME));
+
+end
