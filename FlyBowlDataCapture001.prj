@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-project>
-  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.zip" build-checksum="3254784389" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
+  <configuration target="target.standalone.win" target-name="Windows Standalone Application" name="FlyBowlDataCapture001" location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture" file="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj" preferred-package-type="package.type.zip" build-checksum="373362162" preferred-package-location="C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture">
     <param.project.name>C:\Users\labadmin\Documents\FlyBowl\Code\FlyBowlDataCapture\FlyBowlDataCapture001.prj</param.project.name>
     <param.target.type>Windows Standalone Application</param.target.type>
     <param.appname>FlyBowlDataCapture001</param.appname>
@@ -87,6 +87,7 @@
       <file>${PROJECT_ROOT}\FlyBowlDataCapture.fig</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCapture.m</file>
       <file>${PROJECT_ROOT}\FlyBowlDataCapture_InitializeData.m</file>
+      <file>${PROJECT_ROOT}\FlyBoyQuery.m</file>
       <file>${PROJECT_ROOT}\getEffectorNames.m</file>
       <file>${PROJECT_ROOT}\getExperimentName.m</file>
       <file>${PROJECT_ROOT}\getGUIInstance.m</file>
@@ -107,10 +108,12 @@
       <file>${PROJECT_ROOT}\MasterTempRecordGUI.m</file>
       <file>${PROJECT_ROOT}\myerrordlg.m</file>
       <file>${PROJECT_ROOT}\myparse.m</file>
+      <file>${PROJECT_ROOT}\mysql-connector-java-5.0.8-bin.jar</file>
       <file>${PROJECT_ROOT}\mywaitbar.m</file>
       <file>${PROJECT_ROOT}\openVideoFile.m</file>
       <file>${PROJECT_ROOT}\parseIsCameraRunningFileName.m</file>
       <file>${PROJECT_ROOT}\PreconSensorTest.m</file>
+      <file>${PROJECT_ROOT}\QuickStats_Stats_20110914T022555.mat</file>
       <file>${PROJECT_ROOT}\readLineNames.m</file>
       <file>${PROJECT_ROOT}\readUFMFDiagnostics.m</file>
       <file>${PROJECT_ROOT}\RecordConfiguration.m</file>
