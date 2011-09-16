@@ -39,7 +39,7 @@ function output = FlyFQuery( barcode )
     %jarpath = strcat(pwd,filesep,'sljc.jar'); 
     jarpath = getJarPath();
     
-    if isempty(ismember(javaclasspath, jarpath))
+    if ~ismember(jarpath,javaclasspath),
         javaaddpath(jarpath, '-end');
     end    
     

@@ -158,6 +158,8 @@ try
   % some values are numbers
   numeric_params = {'PreAssayHandling_CrossDate_Range',...
     'PreAssayHandling_SortingDate_Range','PreAssayHandling_StarvationDate_Range',...
+    'PreAssayHandling_SortingHour_Range','PreAssayHandling_StarvationHour_Range',...
+    'PreAssayHandling_SortingHour_Interval','PreAssayHandling_StarvationHour_Interval',...
     'Imaq_ROIPosition','NFlies','RecordTime','PreviewUpdatePeriod',...
     'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
     'FrameRatePlotYLim','TempPlotYLim','DoQuerySage','Imaq_FrameRate',...
@@ -353,6 +355,9 @@ handles.isdefault.barcode = true;
 % by default, -1 to indicate unkown
 handles.barcode = -1;
 
+% code for FlyBowl for FlyBoyQuery
+handles.FlyBoyAssayCode = 'FB';
+
 % set current value, color to shouldchange
 s = num2str(handles.barcode);
 set(handles.edit_Barcode,'String',s,...
@@ -485,22 +490,39 @@ set(handles.popupmenu_PreAssayHandling_SortingDate,'String',handles.PreAssayHand
 
 %% Sorting Hour
 
+% allowed sorting hours
+handles.PreAssayHandling_SortingHour_datenums = ...
+  (handles.params.PreAssayHandling_SortingHour_Range(1):handles.params.PreAssayHandling_SortingHour_Interval:handles.params.PreAssayHandling_SortingHour_Range(2))/24;
+handles.PreAssayHandling_SortingHours = ...
+  cellstr(datestr(handles.PreAssayHandling_SortingHour_datenums,'HH:MM'));
+
 % whether this has been changed or not
 handles.isdefault.PreAssayHandling_SortingHour = true;
 
-% if IncubatorID not stored in rc file, choose now
-if ~isfield(handles.previous_values,'PreAssayHandling_SortingHour'),
-  handles.previous_values.PreAssayHandling_SortingHour = datestr(handles.now,handles.hourformat);
+% if SortingHour stored in rc file, use previous value
+if isfield(handles.previous_values,'PreAssayHandling_SortingHour') && ...
+    ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'??:??') && ...
+    ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'99:99'),
+  d = rem(datenum(handles.previous_values.PreAssayHandling_SortingHour,'HH:MM'),1);
+  v = argmin(abs(handles.PreAssayHandling_SortingHour_datenums-d));
+  handles.PreAssayHandling_SortingHour = handles.PreAssayHandling_SortingHours{v};
+  handles.PreAssayHandling_SortingHour_datenum = handles.PreAssayHandling_SortingHour_datenums(v);
+else
+  % otherwise, use unknown
+  handles.PreAssayHandling_SortingHour_datenum = nan;
+  v = numel(handles.PreAssayHandling_SortingHours)+1;
+  handles.PreAssayHandling_SortingHour = '??:??';
 end
 
-% by default, previous IncubatorID
-handles.PreAssayHandling_SortingHour = handles.previous_values.PreAssayHandling_SortingHour;
+% add unknown to list of possible values
+handles.PreAssayHandling_SortingHours{end+1} = '??:??';
+handles.PreAssayHandling_SortingHour_datenums(end+1) = nan;
 
 % set possible values, current value, color to default
-set(handles.edit_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHour,...
+set(handles.popupmenu_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHours,...
+  'Value',v,...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
-handles.PreAssayHandling_SortingHour_datenum = rem(datenum(handles.PreAssayHandling_SortingHour),1);
 handles.PreAssayHandling_SortingTime_datenum = handles.PreAssayHandling_SortingDate_datenum + ...
   handles.PreAssayHandling_SortingHour_datenum;
 
@@ -555,22 +577,39 @@ set(handles.popupmenu_PreAssayHandling_StarvationDate,'String',handles.PreAssayH
 
 %% Starvation Hour
 
+% allowed starvation hours
+handles.PreAssayHandling_StarvationHour_datenums = ...
+  (handles.params.PreAssayHandling_StarvationHour_Range(1):handles.params.PreAssayHandling_StarvationHour_Interval:handles.params.PreAssayHandling_StarvationHour_Range(2))/24;
+handles.PreAssayHandling_StarvationHours = ...
+  cellstr(datestr(handles.PreAssayHandling_StarvationHour_datenums,'HH:MM'));
+
 % whether this has been changed or not
 handles.isdefault.PreAssayHandling_StarvationHour = true;
 
-% if IncubatorID not stored in rc file, choose now
-if ~isfield(handles.previous_values,'PreAssayHandling_StarvationHour'),
-  handles.previous_values.PreAssayHandling_StarvationHour = datestr(handles.now,handles.hourformat);
+% if StarvationHour stored in rc file, use previous value
+if isfield(handles.previous_values,'PreAssayHandling_StarvationHour') && ...
+    ~strcmp(handles.previous_values.PreAssayHandling_StarvationHour,'??:??') && ...
+    ~strcmp(handles.previous_values.PreAssayHandling_StarvationHour,'99:99'),
+  d = rem(datenum(handles.previous_values.PreAssayHandling_StarvationHour,'HH:MM'),1);
+  v = argmin(abs(handles.PreAssayHandling_StarvationHour_datenums-d));
+  handles.PreAssayHandling_StarvationHour = handles.PreAssayHandling_StarvationHours{v};
+  handles.PreAssayHandling_StarvationHour_datenum = handles.PreAssayHandling_StarvationHour_datenums(v);
+else
+  % otherwise, use unknown
+  handles.PreAssayHandling_StarvationHour_datenum = nan;
+  v = numel(handles.PreAssayHandling_StarvationHours)+1;
+  handles.PreAssayHandling_StarvationHour = '??:??';
 end
 
-% by default, previous IncubatorID
-handles.PreAssayHandling_StarvationHour = handles.previous_values.PreAssayHandling_StarvationHour;
+% add unknown to list of possible values
+handles.PreAssayHandling_StarvationHours{end+1} = '??:??';
+handles.PreAssayHandling_StarvationHour_datenums(end+1) = nan;
 
 % set possible values, current value, color to default
-set(handles.edit_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHour,...
+set(handles.popupmenu_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHours,...
+  'Value',v,...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
-handles.PreAssayHandling_StarvationHour_datenum = rem(datenum(handles.PreAssayHandling_StarvationHour),1);
 handles.PreAssayHandling_StarvationTime_datenum = handles.PreAssayHandling_StarvationDate_datenum + ...
   handles.PreAssayHandling_StarvationHour_datenum;
 
@@ -770,6 +809,9 @@ set(handles.edit_TechnicalNotes,'String',handles.TechnicalNotes);
 
 handles.BehaviorNotes = 'None';
 set(handles.edit_BehaviorNotes,'String',handles.BehaviorNotes);
+
+%% robot stock copy
+handles.RobotID = 'unknown';
 
 %% Advanced editing mode
 

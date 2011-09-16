@@ -27,8 +27,20 @@ sorting_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_S
 % unknown sorting time
 if isnan(sorting_time),
   sorting_time = -1;
+elseif sorting_time < 0,
+  addToStatus(handles,'Hours sorted is negative. Storing as unknown.');
+  warndlg('Hours sorted is negative. Storing as unknown','Metadata Warning');
+  sorting_time = -1;
 end
-starvation_time = max(0,(handles.StartRecording_Time_datenum - handles.PreAssayHandling_StarvationTime_datenum)*24);
+starvation_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_StarvationTime_datenum)*24;
+% unknown starvation time
+if isnan(starvation_time),
+  starvation_time = -1;
+elseif starvation_time < 0,
+  addToStatus(handles,'Hours starved is negative. Storing as 0.');
+  starvation_time = 0;
+end
+
 % in seconds
 shift_time = (handles.StartRecording_Time_datenum - handles.ShiftFlyTemp_Time_datenum)*24*60*60;
 load_time = (handles.StartRecording_Time_datenum - handles.FliesLoaded_Time_datenum)*24*60*60;
@@ -108,7 +120,7 @@ fprintf(fid,'flip_used="%d" ',handles.params.PreAssayHandling_FlipUsed);
 % wish list
 fprintf(fid,'wish_list="%d" ',handles.WishList);
 % robot stock copy. set this to unknown for now
-fprintf(fid,'robot_stock_copy="unknown" ');
+fprintf(fid,'robot_stock_copy="%s" ',handles.RobotID);
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'num_flies="0">\n');
 
@@ -141,7 +153,13 @@ fprintf(fid,'datetime_sorting="%s" ',s);
 % person who moved flies to starvation material
 fprintf(fid,'handler_starvation="%s" ',handles.PreAssayHandling_StarvationHandler);
 % absolute datetime the flies were moved to starvation material
-fprintf(fid,'datetime_starvation="%s" ',datestr(handles.PreAssayHandling_StarvationTime_datenum,'yyyymmddTHHMMSS'));
+% handle missing starvation time
+if isnan(handles.PreAssayHandling_SortingTime_datenum),
+  s = [datestr(handles.PreAssayHandling_StarvationDate_datenum,'yyyymmdd'),'T999999'];
+else
+  s = datestr(handles.PreAssayHandling_StarvationTime_datenum,'yyyymmddTHHMMSS');
+end
+fprintf(fid,'datetime_starvation="%s" ',s);
 % seconds between bringing vials into hot temperature environment and
 % experiment start
 fprintf(fid,'seconds_shiftflytemp="%f" ',shift_time);

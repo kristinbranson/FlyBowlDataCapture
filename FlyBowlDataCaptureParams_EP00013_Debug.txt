@@ -1,4 +1,3 @@
-<<<<<<< HEAD:FlyBowlDataCaptureParams_EP00013_Debug.txt
 # Directory to store video to
 #OutputDirectory,D:\data,J:\data
 OutputDirectory,D:\debug_data,J:\debug_data
@@ -6,7 +5,7 @@ OutputDirectory,D:\debug_data,J:\debug_data
 # Directory to temporarily store video to
 TmpOutputDirectory,D:\tmpdata,J:\tmpdata
 # Names of hard drives, corresponding to the ordered OutputDirectory list
-HardDriveName,(bransonlab-ww1:Internal_D;bransonlab-ww2:Internal_D;bransonlab-ww3:Internal_D;bransonlab-ww4:Internal_D),(bransonlab-ww1:HD2;bransonlab-ww2:HD1;bransonlab-ww3:HD5;bransonlab-ww4:HD3)
+HardDriveName,(bransonlab-ww1:Internal_D;bransonlab-ww2:Internal_D;bransonlab-ww3:Internal_D;bransonlab-ww4:Internal_D;bransonlab-ww5:Internal_D),(bransonlab-ww1:HD2;bransonlab-ww2:HD1;bransonlab-ww3:HD5;bransonlab-ww4:HD3;bransonlab-ww5:HD4)
 # Camera adaptor
 #Imaq_Adaptor,dcam
 Imaq_Adaptor,udcam
@@ -17,9 +16,9 @@ Imaq_VideoFormat,Format 7, Mode 0
 #FileType,fmf
 FileType,ufmf
 # Number of seconds to record
-RecordTime,1000
+RecordTime,10
 # whether to display the video preview with the jet colormap
-ColormapPreview,0
+ColormapPreview,1
 # Shutter period
 Imaq_Shutter,100
 # Gain
@@ -29,7 +28,7 @@ Imaq_Brightness,25
 # Prefix of movie file
 MovieFilePrefix,movie
 # List of possible Experimenter values
-Assay_Experimenters,hirokawaj,robiea,robertss,albins
+Assay_Experimenters,albins,hirokawaj,phillipsm10,robiea,robertss
 # Expected number of flies
 NFlies,20
 # List of possible Incubator ID values
@@ -41,20 +40,24 @@ PreAssayHandling_CrossDate_Range,14,22
 # before today
 PreAssayHandling_SortingDate_Range,0,8
 # List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,ruizd,shustermand,unknown,zhengg,albins
+PreAssayHandling_SortingHandlers,albins,unknown,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,phillipsm10,robertss,robiea,rowellw,ruizd,shustermand,zhengg
 # Range of Starvation Dates to show -- minimum and maximum number of days 
 # before today
 PreAssayHandling_StarvationDate_Range,0,1
 # List of possible Starvation Handler values
-PreAssayHandling_StarvationHandlers,hirokawaj,robiea,robertss,albins
+PreAssayHandling_StarvationHandlers,albins,hirokawaj,phillipsm10,robiea,robertss
 # List of room names
 Assay_Rooms,2C.310.1,2C.310.2,2C.310.3
+# Assay room number
+Assay_Room,2C.310.1
 # List of possible Rig values
 Assay_Rigs,1,2
 # List of possible Plate values
-Assay_Plates,10,11,12,13,14
+Assay_Plates,10,11,12,13,14,15,16,17,18
+# List of possible Visual Surround values
+Assay_VisualSurrounds,1,2,3,4
 # List of possible Lid values
-Assay_Lids,01,02
+Assay_Lids,01,02,03,04,05,06
 # List of possible Bowl values
 Assay_Bowls,A,B,C,D
 # List of possible Redo flags
@@ -83,7 +86,7 @@ MetaData_AssayName,FlyBowl
 MetaData_RearingProtocols,RP_Olympiad_v006p1.xls,RP_Olympiad_v006p1.xls,RP_Olympiad_v006p1.xls,RP_Olympiad_v006p1.xls,RP_Olympiad_v006p1.xls
 MetaData_HandlingProtocols,HP_flybowl_v005p1.xls
 MetaData_ExpProtocols,EP_flybowl_v010p0.xls
-MetaData_Effector,EXT_CantonS_1101243
+MetaData_Effector,CTRL_CantonS_1101243_0016
 MetaData_Gender,f
 MetaData_RoomTemperatureSetPoint,29
 MetaData_RoomHumiditySetPoint,60
@@ -94,7 +97,7 @@ TempPlotYLim,25,35
 # Whether to try to connect over the network to Sage to query line names
 DoQuerySage,1
 # Time in between temperature readings
-TempProbePeriod,1
+TempProbePeriod,5
 # Which channels have temperature probes
 TempProbeChannels,1,2
 # Thermocouple types
@@ -142,14 +145,14 @@ UFMFBGKeyFramePeriodInit,1,10,25,50,75
 # lookup table from rig+bowl to whether to rotate the preview image
 DoRotatePreviewImage,(1,A,1),(1,B,1),(1,C,0),(1,D,0),(2,A,1),(2,B,1),(2,C,0),(2,D,0)
 # Name of mat file containing quickstats stats
-QuickStatsStatsFileName,QuickStats_Stats_20110120T175100.mat
+QuickStatsStatsFileName,QuickStats_Stats_20110428T130126.mat
 # y-axis limits for scan lines
 ScanLineYLim,60,250
 # min, max time between loading flies and starting recording
 MinFliesLoadedTime,25
 MaxFliesLoadedTime,225
 # List of possible Cross Handler values
-PreAssayHandling_CrossHandlers,unknown,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,robertss,robiea,rowellw,shustermand,zhengg,albins
+PreAssayHandling_CrossHandlers,albins,unknown,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,phillipsm10,robertss,robiea,rowellw,shustermand,zhengg
 # flip used
 PreAssayHandling_FlipUsed,0
 # wishlist number range
@@ -159,8 +162,12 @@ DoSyncBarcode,1
 # screen type
 ScreenType,non_olympiad
 # screen reason
-ScreenReason,standard
+ScreenReason,control
 # control fly line names
-ControlLineNames,pBDPGAL4U
+ControlLineNames,pBDPGAL4U,EXT_CantonS_1101243
 # days between cross and flip
 flip_days,0
+# whether to check that the barcode >= 0
+CheckBarcode,1
+# whether to couple camera and temperature probe start
+CoupleCameraTempProbeStart,1
