@@ -1,4 +1,4 @@
-function output = FlyBoyQuery2Params( barcode, exp, deferrck)
+function output = FlyBoyQuery( barcode, exp, deferrck)
 %function output = FlyBoyQuery2Params( barcode, exp, deferrck )
 %FLYBOYQUERY Query FlyBoy database for information associated with a barcode
 %

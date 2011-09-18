@@ -1392,7 +1392,7 @@ success = false;
 
 vdate = find(strcmp(newdatestr,handles.PreAssayHandling_SortingDates),1);
 if isempty(vdate),
-  warndlg(sprintf('Sorting date %s not allowed',newsortingdatestr),'Error setting sorting date');
+  warndlg(sprintf('Sorting date %s not allowed',newdatestr),'Error setting sorting date');
   CheckBarcodeConsistency(handles);
   return;
 end
@@ -2144,7 +2144,7 @@ if isfield(scanValue,'Date_Crossed'),
   end
 end
 if isfield(scanValue,'Sorting_DateTime'),
-  if strcmp(scanValue.Sorting_DateTime,'000000T000000'),
+  if strcmp(scanValue.Sorting_DateTime,'00000000T000000'),
     handles.barcodeData = rmfield(handles.barcodeData,'Sorting_DateTime');
   else
     try

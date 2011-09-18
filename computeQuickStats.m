@@ -752,7 +752,9 @@ end
 
 ShowUFMFPos = [FigPos(1)+ShowUFMFBorderLeft,FigPos(2)+ShowUFMFBorderBottom,nan,nan];
 %out.showufmf_handle = showufmf('UFMFName',MovieFile,'BackSubThresh',BackSubThreshLow);
-out.showufmf_handle = showufmf('UFMFName',MovieFile,'BackSubThresh',BackSubThreshLow,'FigPos',ShowUFMFPos);
+% start on frame with the most foreground boxes
+out.showufmf_handle = showufmf('UFMFName',MovieFile,'BackSubThresh',BackSubThreshLow,'FigPos',ShowUFMFPos,...
+  'FirstFrame','maxnboxes');
 
 %% succeeded
 success = true;
