@@ -92,7 +92,7 @@ function output = FlyBoyQuery( barcode, exp, deferrck)
     end
     
      drv = com.mysql.jdbc.Driver;
-     url = 'jdbc:mysql://mysql2/flyboy?user=flyfRead&password=flyfRead';
+     url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
      con = drv.connect(url,'');
      stm = con.createStatement;
 
@@ -140,28 +140,4 @@ function output = FlyBoyQuery( barcode, exp, deferrck)
      
      
    
-end
-
-function jarPath = getJarPath()
-% Returns path to jdbc sljc.jar file. 
-dirPath = getMFileDir();
-% for i = 1:2
-%     dirPath = stripLastDir(dirPath);
-% end
-jarPath = sprintf('%sjdbc%sdriver%slib%s%s',dirPath,filesep,filesep,filesep,'sljc.jar');
-end
-
-% -------------------------------------------------------------------------
-function dirPath = getMFileDir()
-% Returns the directory of the current mfile.
-filePath = mfilename('fullpath');
-sepPos = findstr(filePath,filesep);
-dirPath = filePath(1:sepPos(end));
-end
-
-% -------------------------------------------------------------------------
-function newDirPath = stripLastDir(origDirPath)
-% Strip the last directory from the given directory path
-sepPos = findstr(origDirPath,filesep);
-newDirPath = origDirPath(1:sepPos(end-1));
 end
