@@ -503,14 +503,11 @@ handles.isdefault.PreAssayHandling_SortingHour = true;
 if isfield(handles.previous_values,'PreAssayHandling_SortingHour') && ...
     ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'??:??') && ...
     ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'99:99'),
-  d = rem(datenum(handles.previous_values.PreAssayHandling_SortingHour,'HH:MM'),1);
-  v = argmin(abs(handles.PreAssayHandling_SortingHour_datenums-d));
-  handles.PreAssayHandling_SortingHour = handles.PreAssayHandling_SortingHours{v};
-  handles.PreAssayHandling_SortingHour_datenum = handles.PreAssayHandling_SortingHour_datenums(v);
+  handles.PreAssayHandling_SortingHour = handles.previous_values.PreAssayHandling_SortingHour;
+  handles.PreAssayHandling_SortingHour_datenum = rem(datenum(handles.previous_values.PreAssayHandling_SortingHour,'HH:MM'),1);
 else
   % otherwise, use unknown
   handles.PreAssayHandling_SortingHour_datenum = nan;
-  v = numel(handles.PreAssayHandling_SortingHours)+1;
   handles.PreAssayHandling_SortingHour = '??:??';
 end
 
@@ -519,8 +516,10 @@ handles.PreAssayHandling_SortingHours{end+1} = '??:??';
 handles.PreAssayHandling_SortingHour_datenums(end+1) = nan;
 
 % set possible values, current value, color to default
-set(handles.popupmenu_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHours,...
-  'Value',v,...
+% set(handles.popupmenu_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHours,...
+%   'Value',v,...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
+set(handles.edit_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHour,...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 handles.PreAssayHandling_SortingTime_datenum = handles.PreAssayHandling_SortingDate_datenum + ...
