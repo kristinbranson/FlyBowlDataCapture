@@ -83,13 +83,13 @@ function output = FlyBoyQuery( barcode, exp, deferrck)
         deferrck=0;
     end
         
-    % Make sure that the MySQL JAR file can be found.
-    thisPath = mfilename('fullpath');
-    parentDir = fileparts(thisPath);
-    jarpath = fullfile(parentDir, 'mysql-connector-java-5.0.8-bin.jar');
-    if ~ismember(jarpath,javaclasspath)
-        javaaddpath(jarpath, '-end');
-    end
+%     % Make sure that the MySQL JAR file can be found.
+%     thisPath = mfilename('fullpath');
+%     parentDir = fileparts(thisPath);
+%     jarpath = fullfile(parentDir, 'mysql-connector-java-5.0.8-bin.jar');
+%     if ~ismember(jarpath,javaclasspath)
+%         javaaddpath(jarpath, '-end');
+%     end
     
      drv = com.mysql.jdbc.Driver;
      url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';

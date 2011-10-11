@@ -58,6 +58,14 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 %global FBDC_NTRIESCLOSE;
 %FBDC_NTRIESCLOSE = 0;
 
+% Make sure that the MySQL JAR file for FlyBoyQuery can be found.
+thisPath = mfilename('fullpath');
+parentDir = fileparts(thisPath);
+jarpath = fullfile(parentDir, 'mysql-connector-java-5.0.8-bin.jar');
+if ~ismember(jarpath,javaclasspath)
+  javaaddpath(jarpath, '-end');
+end
+
 global FBDC_DIDHALT;
 FBDC_DIDHALT = false;
 

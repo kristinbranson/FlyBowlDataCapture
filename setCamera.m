@@ -134,7 +134,15 @@ if strcmpi(handles.params.Imaq_Adaptor,'udcam'),
     v(1:l) = handles.params.UFMFBGKeyFramePeriodInit(1:l);
     set(handles.vid.Source,'bgKeyFramePeriodInit',v);
   end
+  
+  try
+    udcam_version = get(handles.vid.Source,'version');
+  catch
+    udcam_version = '????';
+  end
+  addToStatus(handles,sprintf('UDCAM version %s',udcam_version));
 
+  
 end
 
 % get camera unique ID if available
