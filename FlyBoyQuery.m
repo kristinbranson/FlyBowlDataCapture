@@ -1,4 +1,4 @@
-function output = FlyBoyQuery( barcode, exp, deferrck)
+function output = FlyBoyQuery( barcode, exp, deferrck, stm)
 %function output = FlyBoyQuery2Params( barcode, exp, deferrck )
 %FLYBOYQUERY Query FlyBoy database for information associated with a barcode
 %
@@ -91,15 +91,31 @@ function output = FlyBoyQuery( barcode, exp, deferrck)
 %         javaaddpath(jarpath, '-end');
 %     end
     
-     drv = com.mysql.jdbc.Driver;
-     url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
-     con = drv.connect(url,'');
-     stm = con.createStatement;
+     didconnect = false;
+     if nargin < 4 || ~isa(stm,'com.mysql.jdbc.Statement'),
+       didconnect = true;
+       drv = com.mysql.jdbc.Driver;
+       url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
+       con = drv.connect(url,'');
+       stm = con.createStatement;
+     end
 
      qry = strcat('select RobotID, Stock_Name, Date_Crossed, Reporter,',...
          ' Wish_list, handler_cross, handler_sorting_',exp,', handler_sorting_',...
          exp,'_DateTime from project_crosses_expanded_vw where Barcode_CrossSerialNumber=',bc);
-     res = stm.executeQuery(qry);
+     try
+       res = stm.executeQuery(qry);
+     catch ME
+       if didconnect,
+         error(ME);
+       else
+         drv = com.mysql.jdbc.Driver;
+         url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
+         con = drv.connect(url,'');
+         stm = con.createStatement;
+         res = stm.executeQuery(qry);
+       end
+     end
      
      output = 0;
 

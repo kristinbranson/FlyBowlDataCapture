@@ -1,18 +1,20 @@
-function handles = setExperimentName(handles)
+function [handles,success] = setExperimentName(handles)
+
+success = true;
 
 if isfield(handles,'ExperimentName'),
   oldexperimentname = handles.ExperimentName;
 else
   oldexperimentname = '';
 end
-handles.ExperimentName = getExperimentName(handles);
-if strcmp(handles.ExperimentName,oldexperimentname),
+NewExperimentName = getExperimentName(handles);
+if strcmp(NewExperimentName,oldexperimentname),
   return;
 end
 if isempty(oldexperimentname),
-  addToStatus(handles,sprintf('Experiment name initialized to %s',handles.ExperimentName));
-elseif ~strcmp(handles.ExperimentName,oldexperimentname),
-  addToStatus(handles,sprintf('Experiment renamed from %s to %s',oldexperimentname,handles.ExperimentName));
+  addToStatus(handles,sprintf('Experiment name initialized to %s',NewExperimentName));
+elseif ~strcmp(NewExperimentName,oldexperimentname),
+  addToStatus(handles,sprintf('Experiment renamed from %s to %s',oldexperimentname,NewExperimentName));
 end
 
 % save old names in case we will be renaming
@@ -22,19 +24,33 @@ else
   OldExperimentDirectory = '';
 end
 
+if isfield(handles,'QuickStats') && ...
+    isfield(handles.QuickStats,'showufmf_handle') && ...
+    ishandle(handles.QuickStats.showufmf_handle),
+  res = questdlg('Need to close showufmf to change experiment name. Proceed?','Close UFMF?','Close UFMF','Cancel','Close UFMF');
+  if ~strcmpi(res,'Close UFMF'),
+    addToStatus(handles,'Renaming experiment aborted.');
+    success = false;
+    return;
+  end
+  delete(handles.QuickStats.showufmf_handle);
+end
+
+
 % construct experiment directory name
-handles.ExperimentDirectory = fullfile(handles.params.OutputDirectory,handles.ExperimentName);
+NewExperimentDirectory = fullfile(handles.params.OutputDirectory,NewExperimentName);
 
 % move experiment directory if it exists
 if ~isempty(OldExperimentDirectory) && ...
-    ~strcmp(OldExperimentDirectory,handles.ExperimentDirectory) && ...
+    ~strcmp(OldExperimentDirectory,NewExperimentDirectory) && ...
     exist(OldExperimentDirectory,'file'),
-  addToStatus(handles,sprintf('Trying to rename experiment directory from %s to %s\n',OldExperimentDirectory,handles.ExperimentDirectory));
+  addToStatus(handles,sprintf('Trying to rename experiment directory from %s to %s\n',OldExperimentDirectory,NewExperimentDirectory));
+    
   for renametry = 1:5,
-    [success,msg] = renamefile(OldExperimentDirectory,handles.ExperimentDirectory);
-    if success, break; end
+    [success1,msg] = renamefile(OldExperimentDirectory,NewExperimentDirectory);
+    if success1, break; end
     addToStatus(handles,sprintf('Rename %s -> %s failed on try %d',...
-      OldExperimentDirectory,handles.ExperimentDirectory,renametry));
+      OldExperimentDirectory,NewExperimentDirectory,renametry));
     openfids = fopen('all');
     s = {sprintf('The following files are open, and will be closed:')};
     for filei = 1:numel(openfids),
@@ -44,24 +60,31 @@ if ~isempty(OldExperimentDirectory) && ...
     fclose(openfids);
     pause(3);
   end
-  if ~success,
+  if ~success1,
     s = sprintf('Could not rename old experiment directory %s to %s: %s',...
-      OldExperimentDirectory,handles.ExperimentDirectory,msg);
+      OldExperimentDirectory,NewExperimentDirectory,msg);
     addToStatus(handles,s);
     uiwait(errordlg(s,'Error saving metadata'));
+    success = false;
+  else
+    handles.ExperimentDirectory = NewExperimentDirectory;
+    handles.ExperimentName = NewExperimentName;
   end
 end
 
 % create directory if it does not exist
-if ~exist(handles.ExperimentDirectory,'file'),
-  addToStatus(handles,sprintf('Creating experiment directory %s\n',handles.ExperimentDirectory));
-  [success,msg] = mkdir(handles.ExperimentDirectory);
-  if ~success,
-    s = sprintf('Could not create experiment directory %s: %s',handles.ExperimentDirectory,msg);
+if success && ~exist(NewExperimentDirectory,'file'),
+  addToStatus(handles,sprintf('Creating experiment directory %s\n',NewExperimentDirectory));
+  [success1,msg] = mkdir(NewExperimentDirectory);
+  if ~success1,
+    s = sprintf('Could not create experiment directory %s: %s',NewExperimentDirectory,msg);
     addToStatus(handles,s);
     guidata(handles.figure_main,handles);
     uiwait(errordlg(s,'Error saving metadata'));
     error(s);
+  else
+    handles.ExperimentDirectory = NewExperimentDirectory;
+    handles.ExperimentName = NewExperimentName;
   end
 end
 
@@ -92,5 +115,7 @@ if isempty(OldExperimentDirectory) && exist(handles.ExperimentDirectory,'file'),
   if ~success1,
     addToStatus(handles,{sprintf('Error copying params file %s into directory %s:',...
       handles.params_file,handles.ExperimentDirectory),msg});
+    success = false;
   end
 end
+

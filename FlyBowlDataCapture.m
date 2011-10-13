@@ -65,6 +65,11 @@ jarpath = fullfile(parentDir, 'mysql-connector-java-5.0.8-bin.jar');
 if ~ismember(jarpath,javaclasspath)
   javaaddpath(jarpath, '-end');
 end
+% also connect to the database
+drv = com.mysql.jdbc.Driver;
+url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
+con = drv.connect(url,'');
+handles.FlyBoy_stm = con.createStatement;
 
 global FBDC_DIDHALT;
 FBDC_DIDHALT = false;
@@ -2129,7 +2134,7 @@ end
 % Query database for barcode
 try
   %scanValue = FlyFQuery(scanNum);
-  scanValue = FlyBoyQuery( scanNum, handles.FlyBoyAssayCode, 1);
+  scanValue = FlyBoyQuery( scanNum, handles.FlyBoyAssayCode, 1, handles.FlyBoy_stm);
 catch ME
   errMsg = sprintf('Scan Error: %s', ME.message);
   h = errordlg(errMsg);

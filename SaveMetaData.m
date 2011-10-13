@@ -1,15 +1,22 @@
-function handles = SaveMetaData(handles)
+function [handles,success] = SaveMetaData(handles)
+
+success = true;
 
 % construct experiment name, directory
-handles = setExperimentName(handles);
+[handles,success1] = setExperimentName(handles);
+if ~success1,
+  addToStatus(handles,'Failed to set experiment name. Aborting SaveMetaData.');
+  success = false;
+end
 
 % back up metadata file if it exists
 if exist(handles.MetaDataFileName,'file'),
   bakfilename = [handles.MetaDataFileName,'.bak'];
   addToStatus(handles,sprintf('Copying metadata file to backup %s',bakfilename));
-  [success,msg] = copyfile(handles.MetaDataFileName,bakfilename);
-  if ~success,
+  [success1,msg] = copyfile(handles.MetaDataFileName,bakfilename);
+  if ~success1,
     warndlg(msg,'Error backing up metadatafile, aborting SaveMetaData','modal');
+    success = false;
     return;
   end
 end
@@ -206,12 +213,16 @@ fprintf(fid,'</experiment>\n');
 fclose(fid);
 
 % meta data does not need to be saved now
-handles.MetaDataNeedsSave = false;
-set(handles.pushbutton_SaveMetaData,'BackgroundColor',handles.grayed_bkgdcolor);
-
-% write to log file
-addToStatus(handles,{sprintf('Saved MetaData to file %s.',...
+if success,
+  handles.MetaDataNeedsSave = false;
+  set(handles.pushbutton_SaveMetaData,'BackgroundColor',handles.grayed_bkgdcolor);
+  % write to log file
+  addToStatus(handles,{sprintf('Saved MetaData to file %s.',...
     handles.MetaDataFileName)});
+else
+  addToStatus(handles,'Some errors encountered saving metadata to file');
+end
+
 
 % % write the extra metadata file
 % filestr = sprintf('ExtraMetadata_%s_Rig%sPlate%sBowl%s_%s.xml',handles.Fly_LineName,...
