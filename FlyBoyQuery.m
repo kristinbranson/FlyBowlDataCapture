@@ -92,6 +92,10 @@ function output = FlyBoyQuery( barcode, exp, deferrck, stm)
 %     end
     
      didconnect = false;
+     if nargin > 4 && ~isa(stm,'com.mysql.jdbc.Statement'),
+       warning('bad jdbc statement');
+     end
+
      if nargin < 4 || ~isa(stm,'com.mysql.jdbc.Statement'),
        didconnect = true;
        drv = com.mysql.jdbc.Driver;

@@ -59,17 +59,21 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 %FBDC_NTRIESCLOSE = 0;
 
 % Make sure that the MySQL JAR file for FlyBoyQuery can be found.
-thisPath = mfilename('fullpath');
-parentDir = fileparts(thisPath);
-jarpath = fullfile(parentDir, 'mysql-connector-java-5.0.8-bin.jar');
-if ~ismember(jarpath,javaclasspath)
-  javaaddpath(jarpath, '-end');
+if isfield(handles.params,'DoSyncBarcode') && handles.params.DoSyncBarcode ~= 0,
+  handles.FlyBoy_stm = InitializeFlyBoy(handles);
 end
-% also connect to the database
-drv = com.mysql.jdbc.Driver;
-url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
-con = drv.connect(url,'');
-handles.FlyBoy_stm = con.createStatement;
+% thisPath = mfilename('fullpath');
+% parentDir = fileparts(thisPath);
+% jarpath = fullfile(parentDir, 'mysql-connector-java-5.0.8-bin.jar');
+% if ~ismember(jarpath,javaclasspath)
+%   javaaddpath(jarpath, '-end');
+% end
+% % also connect to the database
+% drv = com.mysql.jdbc.Driver;
+% url = 'jdbc:mysql://10.40.11.14:3306/flyboy?user=flyfRead&password=flyfRead';
+% %url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
+% con = drv.connect(url,'');
+% handles.FlyBoy_stm = con.createStatement;
 
 global FBDC_DIDHALT;
 FBDC_DIDHALT = false;
