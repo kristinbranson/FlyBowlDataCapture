@@ -10,6 +10,9 @@ if ~exist(handles.linename_file,'file') || (nargin > 1 && doforce),
   try
     handles.Fly_LineNames = getLineNames(handles);
     fid = fopen(handles.linename_file,'w');
+    if fid < 0,
+      error('Cannot open file %s for writing',handles.linename_file);
+    end
     fprintf(fid,'%s\n',handles.Fly_LineNames{:});
     fclose(fid);
     addToStatus(handles,{sprintf('%d line names successfully read from SAGE.',length(handles.Fly_LineNames))});

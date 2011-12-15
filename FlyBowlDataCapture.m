@@ -59,9 +59,6 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 %FBDC_NTRIESCLOSE = 0;
 
 % Make sure that the MySQL JAR file for FlyBoyQuery can be found.
-if isfield(handles.params,'DoSyncBarcode') && handles.params.DoSyncBarcode ~= 0,
-  handles.FlyBoy_stm = InitializeFlyBoy(handles);
-end
 % thisPath = mfilename('fullpath');
 % parentDir = fileparts(thisPath);
 % jarpath = fullfile(parentDir, 'mysql-connector-java-5.0.8-bin.jar');
@@ -143,6 +140,11 @@ end
 
 % initialize data
 handles = FlyBowlDataCapture_InitializeData(handles);
+
+% Make sure that the MySQL JAR file for FlyBoyQuery can be found.
+if isfield(handles.params,'DoSyncBarcode') && handles.params.DoSyncBarcode ~= 0,
+  handles.FlyBoy_stm = InitializeFlyBoy(handles);
+end
 
 if isempty(which('findjobj')) && exist('findjobj','dir'),
   addpath('findjobj');
