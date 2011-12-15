@@ -545,7 +545,7 @@ function edit_PreAssayHandling_SortingHour_Callback(hObject, eventdata, handles)
 % % make sure this is a valid time string
 s = get(handles.edit_PreAssayHandling_SortingHour,'String');
 s = strtrim(s);
-m = regexp(s,'^\d\d:\d\d$','match');
+m = regexp(s,'^[\d?][\d?]:[\d?][\d?]$','match');
 if isempty(m),
   set(handles.edit_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHour,...
     'BackgroundColor',handles.shouldchange_bkgdcolor);

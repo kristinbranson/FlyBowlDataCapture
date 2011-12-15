@@ -65,7 +65,7 @@ Assay_Plates,10,11,12,13,14,15,16,17,18
 # List of possible Visual Surround values
 Assay_VisualSurrounds,1,2,3,4
 # List of possible Lid values
-Assay_Lids,01,02,03,04,05,06
+Assay_Lids,01,02,03,04,05,06,07
 # List of possible Bowl values
 Assay_Bowls,A,B,C,D
 # List of possible Redo flags
@@ -93,7 +93,7 @@ MetaData_AssayName,FlyBowl
 # rearing protocols need 1 per incubator
 MetaData_RearingProtocols,RP_Olympiad_v008p2.xls,RP_Olympiad_v008p2.xls,RP_Olympiad_v008p2.xls,RP_Olympiad_v008p2.xls
 MetaData_HandlingProtocols,HP_flybowl_v004p0.xls
-MetaData_ExpProtocols,EP_flybowl_v010p1.xls
+MetaData_ExpProtocols,EP_flybowl_v010p0.xls
 MetaData_Effector,UAS_dTrpA1_2_0002
 MetaData_Gender,b
 MetaData_RoomTemperatureSetPoint,29
