@@ -143,7 +143,7 @@ handles = FlyBowlDataCapture_InitializeData(handles);
 
 % Make sure that the MySQL JAR file for FlyBoyQuery can be found.
 if isfield(handles.params,'DoSyncBarcode') && handles.params.DoSyncBarcode ~= 0,
-  handles.FlyBoy_stm = InitializeFlyBoy(handles);
+  handles.FlyBoy_stm = InitializeFlyBoy();
 end
 
 if isempty(which('findjobj')) && exist('findjobj','dir'),
