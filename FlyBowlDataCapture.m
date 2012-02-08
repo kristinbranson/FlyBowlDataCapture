@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 03-Oct-2011 13:56:50
+% Last Modified by GUIDE v2.5 07-Feb-2012 19:11:40
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -474,7 +474,7 @@ end
 
 if handles.isOrderingError(3),
   set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
-  set(handles.popupmenu_PreAssayHandling_StarvationHour,'BackgroundColor',handles.shouldchange_bkgdcolor);
+  set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.shouldchange_bkgdcolor);
 else
   if handles.isdefault.PreAssayHandling_StarvationDate,
     set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.isdefault_bkgdcolor);
@@ -482,9 +482,9 @@ else
     set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.changed_bkgdcolor);
   end
   if handles.isdefault.PreAssayHandling_StarvationHour,
-    set(handles.popupmenu_PreAssayHandling_StarvationHour,'BackgroundColor',handles.isdefault_bkgdcolor);
+    set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.isdefault_bkgdcolor);
   else
-    set(handles.popupmenu_PreAssayHandling_StarvationHour,'BackgroundColor',handles.changed_bkgdcolor);
+    set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.changed_bkgdcolor);
   end
 end
 
@@ -682,37 +682,38 @@ end
 
 
 
-function popupmenu_PreAssayHandling_StarvationHour_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu_PreAssayHandling_StarvationHour (see GCBO)
+function edit_PreAssayHandling_StarvationHour_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_PreAssayHandling_StarvationHour (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of popupmenu_PreAssayHandling_StarvationHour as text
-%        str2double(get(hObject,'String')) returns contents of popupmenu_PreAssayHandling_StarvationHour as a double
-
-% grab value
-v = get(handles.popupmenu_PreAssayHandling_StarvationHour,'Value');
-s = handles.PreAssayHandling_StarvationHours{v};
+% Hints: get(hObject,'String') returns contents of edit_PreAssayHandling_StarvationHour as text
+%        str2double(get(hObject,'String')) returns contents of edit_PreAssayHandling_StarvationHour as a double
 
 % % make sure this is a valid time string
-% s = strtrim(s);
-% m = regexp(s,'^\d\d:\d\d$','match');
-% if isempty(m),
-%   set(handles.popupmenu_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHour,...
-%     'BackgroundColor',handles.shouldchange_bkgdcolor);
-%   return;
-% end
-
-% store hour
+s = get(handles.edit_PreAssayHandling_StarvationHour,'String');
+s = strtrim(s);
+m = regexp(s,'^[\d?][\d?]:[\d?][\d?]$','match');
+if isempty(m),
+  set(handles.edit_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHour,...
+    'BackgroundColor',handles.shouldchange_bkgdcolor);
+  return;
+end
+  
 handles.PreAssayHandling_StarvationHour = s;
-% and hour datenum
+% unknown starvation hour
 if strcmpi(s,'??:??'),
   handles.PreAssayHandling_StarvationHour_datenum = nan;
 else
   handles.PreAssayHandling_StarvationHour_datenum = rem(datenum(s),1);
 end
 
-% and time datenum
+if handles.PreAssayHandling_StarvationHour_datenum < handles.params.PreAssayHandling_StarvationHour_Range(1)/24 || ...
+  handles.PreAssayHandling_StarvationHour_datenum > handles.params.PreAssayHandling_StarvationHour_Range(2)/24,
+  warndlg(sprintf('Starvation time %s outside of allowed range',handles.PreAssayHandling_StarvationHour),'Bad Starvation Time');
+end
+
+
 handles.PreAssayHandling_StarvationTime_datenum = ...
   handles.PreAssayHandling_StarvationDate_datenum + ...
   handles.PreAssayHandling_StarvationHour_datenum;
@@ -720,16 +721,56 @@ handles.PreAssayHandling_StarvationTime_datenum = ...
 % no longer default
 handles.isdefault.PreAssayHandling_StarvationHour = false;
 
-% highlight ordering errors
+% make sure date order is legal
 handles = CheckOrderingErrors(handles);
 
 handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
 
+CheckBarcodeConsistency(handles);
+
+% 
+% % grab value
+% v = get(handles.edit_PreAssayHandling_StarvationHour,'Value');
+% s = handles.PreAssayHandling_StarvationHours{v};
+% 
+% % % make sure this is a valid time string
+% % s = strtrim(s);
+% % m = regexp(s,'^\d\d:\d\d$','match');
+% % if isempty(m),
+% %   set(handles.edit_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHour,...
+% %     'BackgroundColor',handles.shouldchange_bkgdcolor);
+% %   return;
+% % end
+% 
+% % store hour
+% handles.PreAssayHandling_StarvationHour = s;
+% % and hour datenum
+% if strcmpi(s,'??:??'),
+%   handles.PreAssayHandling_StarvationHour_datenum = nan;
+% else
+%   handles.PreAssayHandling_StarvationHour_datenum = rem(datenum(s),1);
+% end
+% 
+% % and time datenum
+% handles.PreAssayHandling_StarvationTime_datenum = ...
+%   handles.PreAssayHandling_StarvationDate_datenum + ...
+%   handles.PreAssayHandling_StarvationHour_datenum;
+% 
+% % no longer default
+% handles.isdefault.PreAssayHandling_StarvationHour = false;
+% 
+% % highlight ordering errors
+% handles = CheckOrderingErrors(handles);
+% 
+% handles = ChangedMetaData(handles);
+% 
+% guidata(hObject,handles);
+
 % --- Executes during object creation, after setting all properties.
-function popupmenu_PreAssayHandling_StarvationHour_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu_PreAssayHandling_StarvationHour (see GCBO)
+function edit_PreAssayHandling_StarvationHour_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_PreAssayHandling_StarvationHour (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1412,6 +1453,22 @@ popupmenu_PreAssayHandling_SortingHandler_Callback(hObject, [], handles);
 handles = guidata(hObject);
 success = true;
 
+function [handles,success] = setStarvationHandler(handles,newstarvationhandler)
+
+success = false;
+hObject = handles.popupmenu_PreAssayHandling_StarvationHandler;
+v = find(strcmp(newstarvationhandler,handles.PreAssayHandling_StarvationHandlers),1);
+if isempty(v),
+  warndlg(sprintf('Starvation handler %s not allowed',newstarvationhandler),'Error setting starvation handler');
+  CheckBarcodeConsistency(handles);
+  return;
+end
+set(hObject,'Value',v);
+popupmenu_PreAssayHandling_StarvationHandler_Callback(hObject, [], handles);
+handles = guidata(hObject);
+success = true;
+
+
 function [handles,success] = setSortingDate(handles,newdatestr)
 
 success = false;
@@ -1426,6 +1483,22 @@ end
 set(handles.popupmenu_PreAssayHandling_SortingDate,'Value',vdate);
 popupmenu_PreAssayHandling_SortingDate_Callback(handles.popupmenu_PreAssayHandling_SortingDate, [], handles);
 handles = guidata(handles.popupmenu_PreAssayHandling_SortingDate);
+success = true;
+
+function [handles,success] = setStarvationDate(handles,newdatestr)
+
+success = false;
+
+vdate = find(strcmp(newdatestr,handles.PreAssayHandling_StarvationDates),1);
+if isempty(vdate),
+  warndlg(sprintf('Starvation date %s not allowed',newdatestr),'Error setting starvation date');
+  CheckBarcodeConsistency(handles);
+  return;
+end
+
+set(handles.popupmenu_PreAssayHandling_StarvationDate,'Value',vdate);
+popupmenu_PreAssayHandling_StarvationDate_Callback(handles.popupmenu_PreAssayHandling_StarvationDate, [], handles);
+handles = guidata(handles.popupmenu_PreAssayHandling_StarvationDate);
 success = true;
 
 function [handles,success] = setSortingHour(handles,newhourstr)
@@ -1452,6 +1525,29 @@ edit_PreAssayHandling_SortingHour_Callback(handles.edit_PreAssayHandling_Sorting
 handles = guidata(handles.edit_PreAssayHandling_SortingHour);
 success = true;
 
+function [handles,success] = setStarvationHour(handles,newhourstr)
+
+success = false; 
+
+newhourstr = strtrim(newhourstr);
+newhournum = datenum(newhourstr,'HH:MM');
+if isempty(newhournum),
+  return;
+end
+set(handles.edit_PreAssayHandling_StarvationHour,'String',newhourstr);
+% [mindiff,vhour] = min(abs(newhournum - handles.PreAssayHandling_StarvationHour_datenums));
+% starvationhourstr = handles.PreAssayHandling_StarvationHours{vhour};
+% % off by more than 1 min?
+% if mindiff > 1/1440,
+%   warndlg(sprintf('Rounding starvation hour %s scanned from barcode to %s',...
+%     datestr(rem(newhournum,1),'HH:MM'),starvationhourstr),'Rounding starvation hour');
+% end
+% 
+% set(handles.edit_PreAssayHandling_StarvationHour,'Value',vhour);
+edit_PreAssayHandling_StarvationHour_Callback(handles.edit_PreAssayHandling_StarvationHour, [], handles);
+
+handles = guidata(handles.edit_PreAssayHandling_StarvationHour);
+success = true;
 
 % --- Executes on selection change in popupmenu_PreAssayHandling_CrossDate.
 function popupmenu_PreAssayHandling_CrossDate_Callback(hObject, eventdata, handles)
@@ -2157,6 +2253,8 @@ end
 %   Handler_Cross
 %   Handler_Sorting (e.g. handler_sorting_BOX)
 %   Sorting_DateTime (e.g. handler_sorting_GC_DateTime)
+%   Handler_Starvation (e.g. handler_starvation_BOX)
+%   Starvation_DateTime (e.g. handler_starvation_GC_DateTime)
 s = {'Data read from barcode:'};
 fns = fieldnames(scanValue);
 for i = 1:numel(fns),
@@ -2195,6 +2293,27 @@ if isfield(scanValue,'Sorting_DateTime'),
     end
   end
 end
+if isfield(scanValue,'Starvation_DateTime'),
+  if strcmp(scanValue.Starvation_DateTime,'00000000T000000'),
+    handles.barcodeData = rmfield(handles.barcodeData,'Starvation_DateTime');
+  else
+    try
+      newdatenum = datenum(handles.barcodeData.Starvation_DateTime,handles.datetimeformat);
+      tmp = floor(newdatenum);
+      if tmp ~= 0,
+        handles.barcodeData.Starvation_Date = datestr(tmp,handles.dateformat);
+      end
+      tmp = rem(newdatenum,1);
+      if tmp ~= 0,
+        handles.barcodeData.Starvation_Hour = datestr(tmp,'HH:MM');
+      end
+    catch ME,
+      getReport(ME)
+      warndlg(sprintf('Could not parse starvation date time %s',newdatestr),'Error parsing barcode info');
+      handles.barcodeData = rmfield(handles.barcodeData,'Starvation_DateTime');
+    end
+  end
+end
 % convert to numbers
 if isfield(handles.barcodeData,'Set_Number'),
   handles.barcodeData.Set_Number = str2double(handles.barcodeData.Set_Number);
@@ -2202,6 +2321,9 @@ end
 % remove missing data
 if isfield(handles.barcodeData,'Handler_Sorting') && strcmpi(handles.barcodeData.Handler_Sorting,'unknown'),
   handles.barcodeData = rmfield(handles.barcodeData,'Handler_Sorting');
+end
+if isfield(handles.barcodeData,'Handler_Starvation') && strcmpi(handles.barcodeData.Handler_Starvation,'unknown'),
+  handles.barcodeData = rmfield(handles.barcodeData,'Handler_Starvation');
 end
 if isfield(handles.barcodeData,'Handler_Cross') && strcmpi(handles.barcodeData.Handler_Cross,'unknown'),
   handles.barcodeData = rmfield(handles.barcodeData,'Handler_Cross');
@@ -2243,6 +2365,19 @@ if isfield(handles.barcodeData,'Sorting_Date'),
 end
 if isfield(handles.barcodeData,'Sorting_Hour'),
   handles = setSortingHour(handles,handles.barcodeData.Sorting_Hour);
+end
+
+% starvation handler
+if isfield(handles.barcodeData,'Handler_Starvation'),
+  handles = setStarvationHandler(handles,handles.barcodeData.Handler_Starvation);
+end
+
+% starvation datetime
+if isfield(handles.barcodeData,'Starvation_Date'),
+  handles = setStarvationDate(handles,handles.barcodeData.Starvation_Date);
+end
+if isfield(handles.barcodeData,'Starvation_Hour'),
+  handles = setStarvationHour(handles,handles.barcodeData.Starvation_Hour);
 end
 
 % robot id

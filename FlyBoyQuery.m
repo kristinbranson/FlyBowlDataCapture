@@ -99,14 +99,18 @@ function output = FlyBoyQuery( barcode, exp, deferrck, stm)
      if nargin < 4 || ~isa(stm,'com.mysql.jdbc.Statement'),
        didconnect = true;
        drv = com.mysql.jdbc.Driver;
-       url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
+       url = 'jdbc:mysql://prd-db.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
        con = drv.connect(url,'');
        stm = con.createStatement;
      end
 
      qry = strcat('select RobotID, Stock_Name, Date_Crossed, Reporter,',...
-         ' Wish_list, handler_cross, handler_sorting_',exp,', handler_sorting_',...
-         exp,'_DateTime from project_crosses_expanded_vw where Barcode_CrossSerialNumber=',bc);
+         ' Wish_list, handler_cross',...
+         ', handler_sorting_',exp,...
+         ', handler_sorting_',exp,'_DateTime',...
+         ', handler_starvation_',exp,...
+         ', handler_starvation_',exp,'_DateTime',...
+         ' from project_crosses_expanded_vw where Barcode_CrossSerialNumber=',bc);
      try
        res = stm.executeQuery(qry);
      catch ME
@@ -129,6 +133,10 @@ function output = FlyBoyQuery( barcode, exp, deferrck, stm)
          if ~strcmp(date_sorted,'')
             date_sorted = datestr(datenum(date_sorted),'yyyymmddTHHMMSS');
          end
+         date_starved = char(res.getString(strcat('handler_starvation_',exp,'_DateTime')));
+         if ~strcmp(date_starved,'')
+            date_starved = datestr(datenum(date_starved),'yyyymmddTHHMMSS');
+         end
          
          output = struct('Line_Name',char(res.getString('Stock_Name')),...
              'Date_Crossed',date_crossed,...
@@ -136,7 +144,10 @@ function output = FlyBoyQuery( barcode, exp, deferrck, stm)
              'Set_Number',char(res.getString('Wish_List')),...
              'Handler_Cross',char(res.getString('handler_cross')),...
              'Handler_Sorting',char(res.getString(strcat('handler_sorting_',exp))),...
-             'Sorting_DateTime',date_sorted);             
+             'Sorting_DateTime',date_sorted,...
+             'Handler_Starvation',char(res.getString(strcat('handler_starvation_',exp))),...
+             'Starvation_DateTime',date_starved);
+             
      end
           
      if ~(isstruct(output))
@@ -156,8 +167,18 @@ function output = FlyBoyQuery( barcode, exp, deferrck, stm)
          if isempty (output.Sorting_DateTime)   %Sorting Time
              output.Sorting_DateTime='00000000T000000';
          end
+         
+         if isempty (output.Handler_Starvation)   %Starver
+           output.Handler_Starvation='unknown';
+         end
+         
+         if isempty (output.Starvation_DateTime)   %Sorting Time
+             output.Starvation_DateTime='00000000T000000';
+         end
      end
-     
-     
+%    
+%      fprintf('DEBUG!!!! REMOVE THIS\n');
+%      output.Handler_Starvation = 'hirokawaj';
+%      output.Starvation_DateTime = '20120206T100000';
    
 end

@@ -116,7 +116,7 @@ if ~ismember(jarpath,javaclasspath)
 end
 
 drv = com.mysql.jdbc.Driver;
-url = 'jdbc:mysql://10.40.11.14:3306/flyboy?user=flyfRead&password=flyfRead';
+url = 'jdbc:mysql://prd-db.int.janelia.org/flyboy?user=flyfRead&password=flyfRead';
 %url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
 con = drv.connect(url,'');
 stm = con.createStatement;
