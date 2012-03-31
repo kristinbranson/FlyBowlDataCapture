@@ -57,7 +57,9 @@ if ~isempty(OldExperimentDirectory) && ...
       s{end+1} = fopen(openfids(filei)); %#ok<AGROW>
     end
     addToStatus(handles,s);
-    fclose(openfids);
+    if ~isempty(openfids),
+      fclose(openfids);
+    end
     pause(3);
   end
   if ~success1,

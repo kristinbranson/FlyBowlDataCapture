@@ -29,27 +29,35 @@ if fid < 0,
   error(s); %#ok<SPERR>
 end
 
+handles.metadata = ReadConditionFile(handles);
+
 % in hours
-sorting_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_SortingTime_datenum)*24;
-% unknown sorting time
-if isnan(sorting_time),
-  sorting_time = -1;
-elseif sorting_time < 0,
-  addToStatus(handles,'Hours sorted is negative. Storing as unknown.');
-  warndlg('Hours sorted is negative. Storing as unknown','Metadata Warning');
-  sorting_time = -1;
-end
-starvation_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_StarvationTime_datenum)*24;
-% unknown starvation time
-if isnan(starvation_time),
-  starvation_time = -1;
-elseif starvation_time < 0,
-  addToStatus(handles,'Hours starved is negative. Storing as 0.');
-  starvation_time = 0;
-end
+sorting_time = handles.metadata.SortingTime;
+
+% sorting_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_SortingTime_datenum)*24;
+% % unknown sorting time
+% if isnan(sorting_time),
+%   sorting_time = -1;
+% elseif sorting_time < 0,
+%   addToStatus(handles,'Hours sorted is negative. Storing as unknown.');
+%   warndlg('Hours sorted is negative. Storing as unknown','Metadata Warning');
+%   sorting_time = -1;
+% end
+
+% TODO: read this from condition file
+starvation_time = handles.metadata.StarvationTime;
+% 
+% starvation_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_StarvationTime_datenum)*24;
+% % unknown starvation time
+% if isnan(starvation_time),
+%   starvation_time = -1;
+% elseif starvation_time < 0,
+%   addToStatus(handles,'Hours starved is negative. Storing as 0.');
+%   starvation_time = 0;
+% end
 
 % in seconds
-shift_time = (handles.StartRecording_Time_datenum - handles.ShiftFlyTemp_Time_datenum)*24*60*60;
+%shift_time = (handles.StartRecording_Time_datenum - handles.ShiftFlyTemp_Time_datenum)*24*60*60;
 load_time = (handles.StartRecording_Time_datenum - handles.FliesLoaded_Time_datenum)*24*60*60;
 
 % write the main metadata file
@@ -61,26 +69,12 @@ fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,han
 % name of experimenter
 fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 % always same experiment protocol
-fprintf(fid,'protocol="%s" ',handles.params.MetaData_ExpProtocols{1});
+fprintf(fid,'protocol="%s" ',handles.metadata.ExperimentProtocol);
 % screen type
-if isfield(handles.params,'ScreenType'),
-  ScreenType = handles.params.ScreenType;
-else
-  ScreenType = 'primary';
-end
+ScreenType = handles.metadata.ScreenType;
 fprintf(fid,'screen_type="%s" ',ScreenType);
 % screen reason
-if isfield(handles.params,'ScreenReason'),
-  ScreenReason = handles.params.ScreenReason;
-else
-  ScreenReason = 'standard';
-end
-% set to control if it is a control fly
-if isfield(handles.params,'ControlLineNames'),
-  if ismember(handles.Fly_LineName,handles.params.ControlLineNames),
-    ScreenReason = 'control';
-  end
-end
+ScreenReason = handles.metadata.ScreenReason;
 fprintf(fid,'screen_reason="%s" ',ScreenReason);
 % data capture code version
 fprintf(fid,'data_capture_version="%s" ',handles.version);
@@ -102,32 +96,26 @@ fprintf(fid,'    <apparatus apparatus_id="%s" room="%s" rig="%s" plate="%s" top_
   handles.ComputerName,...
   handles.params.HardDriveName);
 % line name
-fprintf(fid,'    <flies line="%s" ',handles.Fly_LineName);
+fprintf(fid,'    <flies line="%s" ',handles.metadata.LineName);
 % effector
-fprintf(fid,'effector="%s" ',handles.params.MetaData_Effector);
+fprintf(fid,'effector="%s" ',handles.metadata.Effector);
 % gender
-fprintf(fid,'gender="%s" ',handles.params.MetaData_Gender); 
+fprintf(fid,'gender="%s" ',handles.metadata.Gender); 
 % cross date
-fprintf(fid,'cross_date="%s" ',datestr(handles.PreAssayHandling_CrossDate_datenum,handles.datetimeformat));
+fprintf(fid,'cross_date="%s" ', handles.metadata.CrossDate);
 % flip_date
-if ~isfield(handles.params,'flip_days'),
-  warning('flipdays not input. Not storing flip_date.');
-else
-  flip_datenum = handles.PreAssayHandling_CrossDate_datenum + handles.params.flip_days;
-  handles.flip_date = datestr(flip_datenum,handles.datetimeformat);
-  fprintf(fid,'flip_date="%s" ',handles.flip_date);
-end
+fprintf(fid,'flip_date="%s" ',handles.metadata.FlipDate);
 
 % hours starved
 fprintf(fid,'hours_starved="%f" ',starvation_time);
 % barcode
-fprintf(fid,'cross_barcode="%d" ',handles.barcode);
+fprintf(fid,'cross_barcode="%d" ',-1);
 % flip
-fprintf(fid,'flip_used="%d" ',handles.params.PreAssayHandling_FlipUsed);
+fprintf(fid,'flip_used="%d" ',handles.metadata.FlipUsed);
 % wish list
-fprintf(fid,'wish_list="%d" ',handles.WishList);
+fprintf(fid,'wish_list="%d" ',-1);
 % robot stock copy. set this to unknown for now
-fprintf(fid,'robot_stock_copy="%s" ',handles.RobotID);
+fprintf(fid,'robot_stock_copy="%s" ',handles.metadata.RobotID);
 % count is set to 0 -- won't know this til after tracking
 fprintf(fid,'num_flies="0">\n');
 
@@ -137,39 +125,39 @@ fprintf(fid,'num_flies="0">\n');
 
 % choose rearing protocol based on incubator ID
 i = find(strcmp(handles.Rearing_IncubatorID,handles.Rearing_IncubatorIDs),1);
-fprintf(fid,'      <rearing rearing_protocol="%s" ',handles.params.MetaData_RearingProtocols{i});
+fprintf(fid,'      <rearing rearing_protocol="%s" ',handles.metadata.RearingProtocol);
 fprintf(fid,'rearing_incubator="%s" ',handles.Rearing_IncubatorID);
 fprintf(fid,'/>\n');
 
 % always same handling protocol
-fprintf(fid,'      <handling handling_protocol="%s" ',handles.params.MetaData_HandlingProtocols{1});
+fprintf(fid,'      <handling handling_protocol="%s" ',handles.metadata.HandlingProtocol);
 % person who crossed flies
-fprintf(fid,'handler_cross="%s" ',handles.PreAssayHandling_CrossHandler);
+fprintf(fid,'handler_cross="%s" ',handles.metadata.CrossHandler);
 % person who sorted flies
-fprintf(fid,'handler_sorting="%s" ',handles.PreAssayHandling_SortingHandler);
+fprintf(fid,'handler_sorting="%s" ',handles.metadata.SortingHandler);
 % time since sorting, in hours
 fprintf(fid,'hours_sorted="%f" ',sorting_time);
 % absolute datetime the flies were sorted at
 % handle missing sorting time
-if isnan(handles.PreAssayHandling_SortingTime_datenum),
-  s = [datestr(handles.PreAssayHandling_SortingDate_datenum,'yyyymmdd'),'T999999'];
-else
-  s = datestr(handles.PreAssayHandling_SortingTime_datenum,'yyyymmddTHHMMSS');
-end
-fprintf(fid,'datetime_sorting="%s" ',s);
+% if isnan(handles.PreAssayHandling_SortingTime_datenum),
+%   s = [datestr(handles.PreAssayHandling_SortingDate_datenum,'yyyymmdd'),'T999999'];
+% else
+%   s = datestr(handles.PreAssayHandling_SortingTime_datenum,'yyyymmddTHHMMSS');
+% end
+% fprintf(fid,'datetime_sorting="%s" ',s);
 % person who moved flies to starvation material
-fprintf(fid,'handler_starvation="%s" ',handles.PreAssayHandling_StarvationHandler);
+fprintf(fid,'handler_starvation="%s" ',handles.metadata.StarvationHandler);
 % absolute datetime the flies were moved to starvation material
 % handle missing starvation time
-if isnan(handles.PreAssayHandling_SortingTime_datenum),
-  s = [datestr(handles.PreAssayHandling_StarvationDate_datenum,'yyyymmdd'),'T999999'];
-else
-  s = datestr(handles.PreAssayHandling_StarvationTime_datenum,'yyyymmddTHHMMSS');
-end
-fprintf(fid,'datetime_starvation="%s" ',s);
+% if isnan(handles.PreAssayHandling_SortingTime_datenum),
+%   s = [datestr(handles.PreAssayHandling_StarvationDate_datenum,'yyyymmdd'),'T999999'];
+% else
+%   s = datestr(handles.PreAssayHandling_StarvationTime_datenum,'yyyymmddTHHMMSS');
+% end
+% fprintf(fid,'datetime_starvation="%s" ',s);
 % seconds between bringing vials into hot temperature environment and
 % experiment start
-fprintf(fid,'seconds_shiftflytemp="%f" ',shift_time);
+fprintf(fid,'seconds_shiftflytemp="%f" ',-1);
 % seconds between loading flies into arena and experiment start
 fprintf(fid,'seconds_fliesloaded="%f" ',load_time);
 % number of observed dead flies

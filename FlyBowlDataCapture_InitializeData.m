@@ -36,12 +36,14 @@ handles.grayed_bkgdcolor = 0.314 + zeros(1,3);
 handles.status_colors = [0,1,0;0,0,1;1,0,0;1,0,0;1,0,0];
 handles.status_color_names = {'GREEN','BLUE','RED','RED','RED'};
 
-% list of fly lines read frame Sage
-if ~isfield(handles.previous_values,'linename_file'),
-  handles.linename_file = 'SageLineNames.txt';
-else
-  handles.linename_file = handles.previous_values.linename_file;
-end
+% NO LINE NAME ENTRY
+% % list of fly lines read frame Sage
+% if ~isfield(handles.previous_values,'linename_file'),
+%   handles.linename_file = 'SageLineNames.txt';
+% else
+%   handles.linename_file = handles.previous_values.linename_file;
+% end
+
 %[filestr,pathstr] = uigetfile('*.txt','Choose Line Name File');
 %handles.linename_file = fullfile(pathstr,filestr);
 %if ~exist(handles.linename_file,'file'),
@@ -156,13 +158,8 @@ try
   fclose(fid);
   
   % some values are numbers
-  numeric_params = {'PreAssayHandling_CrossDate_Range',...
-    'PreAssayHandling_SortingDate_Range','PreAssayHandling_StarvationDate_Range',...
-    'PreAssayHandling_SortingHour_Range','PreAssayHandling_StarvationHour_Range',...
-    'PreAssayHandling_SortingHour_Interval','PreAssayHandling_StarvationHour_Interval',...
-    'Imaq_ROIPosition','NFlies','RecordTime','PreviewUpdatePeriod',...
-    'MetaData_RoomTemperatureSetPoint','MetaData_RoomHumiditySetPoint',...
-    'FrameRatePlotYLim','TempPlotYLim','DoQuerySage','Imaq_FrameRate',...
+  numeric_params = {'Imaq_ROIPosition','RecordTime','PreviewUpdatePeriod',...
+    'FrameRatePlotYLim','TempPlotYLim','Imaq_FrameRate',...
     'Imaq_Shutter','Imaq_Gain','Imaq_Brightness','TempProbePeriod','TempProbeChannels',...
     'TempProbeReject60Hz','DoRecordTemp','NPreconSamples','gdcamPreviewFrameInterval',...
     'Imaq_MaxFrameRate','UFMFPrintStats','UFMFStatStreamPrintFreq',...
@@ -171,8 +168,7 @@ try
     'UFMFBGKeyFramePeriod','UFMFMaxBoxLength','UFMFBackSubThresh',...
     'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
     'ScanLineYLim','MinFliesLoadedTime','MaxFliesLoadedTime',...
-    'PreAssayHandling_FlipUsed','WishListRange',...
-    'DoSyncBarcode','flip_days','CheckBarcode','CoupleCameraTempProbeStart'};
+    'CoupleCameraTempProbeStart'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -184,12 +180,12 @@ try
   % some values are not lists
   notlist_params = {'Imaq_Adaptor','Imaq_DeviceName','Imaq_VideoFormat',...
     'FileType','MetaData_AssayName',...
-    'MetaData_Effector','MetaData_Gender','MetaDataFileName','MovieFilePrefix','LogFileName',...
+    'MetaDataFileName','MovieFilePrefix','LogFileName',...
     'UFMFLogFileName','UFMFStatFileName','PreconSensorSerialPort',...
     'DoRotatePreviewImage',...
     'QuickStatsStatsFileName',...
-    'ScreenType','ScreenReason',...
-    'Assay_Room'};
+    'Assay_Room',...
+    'ConditionDirectory'};
   for i = 1:length(notlist_params),
     fn = notlist_params{i};
     if ischar(handles.params.(fn){1}),
@@ -310,85 +306,135 @@ set(handles.popupmenu_Assay_Experimenter,'String',handles.Assay_Experimenters,..
   'Value',find(strcmp(handles.Assay_Experimenter,handles.Assay_Experimenters),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
-%% Fly Line
+%% Experiment
 
 % whether this has been changed or not
-handles.isdefault.Fly_LineName = true;
-if ~isdeployed,
-  handles.IsSage = exist(handles.SAGECodeDir,'file');
-  try
-    addpath(handles.SAGECodeDir);
-  catch
-    handles.IsSage = false;
-  end
-else
-  handles.IsSage = exist('SAGE.Line','class');
-end
-if ~handles.IsSage,
-  addToStatus(handles,{sprintf('SAGE code directory %s could not be added to the path.',handles.SAGECodeDir)});
-end
-handles = readLineNames(handles,false);
+handles.isdefault.ExperimentType = true;
 
-% if line name not stored in rc file, choose first line name
-if ~isfield(handles.previous_values,'Fly_LineName') || ...
-    ~ismember(handles.previous_values.Fly_LineName,handles.Fly_LineNames),
-  handles.previous_values.Fly_LineName = handles.Fly_LineNames{1};
+handles = FindAllExperimentConditions(handles);
+
+% if experiment not stored in rc file, choose first experiment
+if ~isfield(handles.previous_values,'ExperimentType') || ...
+    ~ismember(handles.previous_values.ExperimentType,handles.ExperimentTypes),
+  handles.previous_values.ExperimentType = handles.ExperimentTypes{1};
 end
 
-% by default, previous line name
-handles.Fly_LineName = handles.previous_values.Fly_LineName;
+% by default, previous experiment type
+handles.ExperimentType = handles.previous_values.ExperimentType;
+i = find(strcmp(handles.ExperimentType,handles.ExperimentTypes),1);
+handles.ConditionNames = handles.Experiment2Conditions{i}(1,:);
+handles.ConditionFileNames = handles.Experiment2Conditions{i}(2,:);
+
+% set possible values, current value, color to default value
+set(handles.popupmenu_ExperimentType,'String',handles.ExperimentTypes,...
+  'Value',i,'BackgroundColor',handles.isdefault_bkgdcolor);
+
+%% Condition
+
+% whether this has been changed or not
+handles.isdefault.ConditionName = true;
+
+% if conditionnot stored in rc file, choose first condition
+if ~isfield(handles.previous_values,'ConditionName') || ...
+    ~ismember(handles.previous_values.ConditionName,handles.ConditionNames),
+  handles.previous_values.ConditionName = handles.ConditionNames{1};
+end
+
+% by default, previous condition type
+handles.ConditionName = handles.previous_values.ConditionName;
+i = find(strcmp(handles.ConditionName,handles.ConditionNames),1);
+handles.ConditionFileName = handles.ConditionFileNames{i};
 
 % set possible values, current value, color to shouldchange
-%set(handles.edit_Fly_LineName,'String',handles.Fly_LineNames,...
-%  'Value',find(strcmp(handles.Fly_LineName,handles.Fly_LineNames),1),...
-%  'BackgroundColor',handles.shouldchange_bkgdcolor);
-set(handles.edit_Fly_LineName,'String',handles.Fly_LineName,...
-  'BackgroundColor',handles.shouldchange_bkgdcolor);
+set(handles.popupmenu_Condition,'String',handles.ConditionNames,...
+  'Value',i,'BackgroundColor',handles.shouldchange_bkgdcolor);
 
-% we have not created the autofill version yet
-handles.isAutoComplete_edit_Fly_LineName = false;
+%% Fly Line
+
+% NO LINE NAME ENTRY
+
+% 
+% % whether this has been changed or not
+% handles.isdefault.Fly_LineName = true;
+% if ~isdeployed,
+%   handles.IsSage = exist(handles.SAGECodeDir,'file');
+%   try
+%     addpath(handles.SAGECodeDir);
+%   catch
+%     handles.IsSage = false;
+%   end
+% else
+%   handles.IsSage = exist('SAGE.Line','class');
+% end
+% if ~handles.IsSage,
+%   addToStatus(handles,{sprintf('SAGE code directory %s could not be added to the path.',handles.SAGECodeDir)});
+% end
+% handles = readLineNames(handles,false);
+% 
+% % if line name not stored in rc file, choose first line name
+% if ~isfield(handles.previous_values,'Fly_LineName') || ...
+%     ~ismember(handles.previous_values.Fly_LineName,handles.Fly_LineNames),
+%   handles.previous_values.Fly_LineName = handles.Fly_LineNames{1};
+% end
+% 
+% % by default, previous line name
+% handles.Fly_LineName = handles.previous_values.Fly_LineName;
+% 
+% % set possible values, current value, color to shouldchange
+% %set(handles.edit_Fly_LineName,'String',handles.Fly_LineNames,...
+% %  'Value',find(strcmp(handles.Fly_LineName,handles.Fly_LineNames),1),...
+% %  'BackgroundColor',handles.shouldchange_bkgdcolor);
+% set(handles.edit_Fly_LineName,'String',handles.Fly_LineName,...
+%   'BackgroundColor',handles.shouldchange_bkgdcolor);
+% 
+% % we have not created the autofill version yet
+% handles.isAutoComplete_edit_Fly_LineName = false;
 
 %% barcode
-
-handles.isdefault.barcode = true;
-
-% by default, -1 to indicate unkown
-handles.barcode = -1;
-
-% code for FlyBowl for FlyBoyQuery
-handles.FlyBoyAssayCode = 'FB';
-
-% set current value, color to shouldchange
-s = num2str(handles.barcode);
-set(handles.edit_Barcode,'String',s,...
-  'BackgroundColor',handles.shouldchange_bkgdcolor);
+%
+% NO BARCODE ENTRY
+% 
+% handles.isdefault.barcode = true;
+% 
+% % by default, -1 to indicate unkown
+% handles.barcode = -1;
+% 
+% % code for FlyBowl for FlyBoyQuery
+% handles.FlyBoyAssayCode = 'FB';
+% 
+% % set current value, color to shouldchange
+% s = num2str(handles.barcode);
+% set(handles.edit_Barcode,'String',s,...
+%   'BackgroundColor',handles.shouldchange_bkgdcolor);
 
 %% wishlist
 
-% whether this has been changed or not
-handles.isdefault.WishList = true;
-
-% possible values for wishlist
-handles.WishLists = handles.params.WishListRange(1):handles.params.WishListRange(2);
-% add -1 as a possible value to indicate no wish list
-if ~ismember(-1,handles.WishLists),
-  handles.Wishlists = [-1,handles.WishLists];
-end
-
-% if WishList not stored in rc file, choose first WishList
-if ~isfield(handles.previous_values,'WishList') || ...
-    ~ismember(handles.previous_values.WishList,handles.WishLists),
-  handles.previous_values.WishList = handles.WishLists(1);
-end
-
-% by default, previous WishList
-handles.WishList = handles.previous_values.WishList;
-
-% set possible values, current value, color to default
-s = cellstr(num2str(handles.WishLists'));
-set(handles.popupmenu_WishList,'String',s,...
-  'Value',find(handles.WishList == handles.WishLists,1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% NO WISHLIST ENTRY
+% 
+% % whether this has been changed or not
+% handles.isdefault.WishList = true;
+% 
+% % possible values for wishlist
+% handles.WishLists = handles.params.WishListRange(1):handles.params.WishListRange(2);
+% % add -1 as a possible value to indicate no wish list
+% if ~ismember(-1,handles.WishLists),
+%   handles.Wishlists = [-1,handles.WishLists];
+% end
+% 
+% % if WishList not stored in rc file, choose first WishList
+% if ~isfield(handles.previous_values,'WishList') || ...
+%     ~ismember(handles.previous_values.WishList,handles.WishLists),
+%   handles.previous_values.WishList = handles.WishLists(1);
+% end
+% 
+% % by default, previous WishList
+% handles.WishList = handles.previous_values.WishList;
+% 
+% % set possible values, current value, color to default
+% s = cellstr(num2str(handles.WishLists'));
+% set(handles.popupmenu_WishList,'String',s,...
+%   'Value',find(handles.WishList == handles.WishLists,1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Incubator ID
 
@@ -414,226 +460,230 @@ set(handles.popupmenu_Rearing_IncubatorID,'String',handles.Rearing_IncubatorIDs,
 
 %% Cross Date
 
-% whether this has been changed or not
-handles.isdefault.PreAssayHandling_CrossDate = true;
-
-% possible values for CrossDate
-minv = floor(handles.now) - handles.params.PreAssayHandling_CrossDate_Range(2);
-maxv = floor(handles.now) - handles.params.PreAssayHandling_CrossDate_Range(1);
-handles.PreAssayHandling_CrossDate_datenums = minv:maxv;
-handles.PreAssayHandling_CrossDates = cellstr(datestr(handles.PreAssayHandling_CrossDate_datenums,handles.dateformat));
-
-% if CrossDate not stored in rc file, choose first date
-if ~isfield(handles.previous_values,'PreAssayHandling_CrossDateOff') || ...
-    handles.previous_values.PreAssayHandling_CrossDateOff > handles.params.PreAssayHandling_CrossDate_Range(2) || ...
-    handles.previous_values.PreAssayHandling_CrossDateOff < handles.params.PreAssayHandling_CrossDate_Range(1),
-  handles.previous_values.PreAssayHandling_CrossDateOff = handles.params.PreAssayHandling_CrossDate_Range(2);
-end
-
-% by default, previous offset
-handles.PreAssayHandling_CrossDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_CrossDateOff;
-handles.PreAssayHandling_CrossDate = datestr(handles.PreAssayHandling_CrossDate_datenum,handles.dateformat);
-
-% set possible values, current value, color to default
-set(handles.popupmenu_PreAssayHandling_CrossDate,'String',handles.PreAssayHandling_CrossDates,...
-  'Value',find(strcmp(handles.PreAssayHandling_CrossDate,handles.PreAssayHandling_CrossDates),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% NO CROSS DATE ENTRY
+% 
+% % whether this has been changed or not
+% handles.isdefault.PreAssayHandling_CrossDate = true;
+% 
+% % possible values for CrossDate
+% minv = floor(handles.now) - handles.params.PreAssayHandling_CrossDate_Range(2);
+% maxv = floor(handles.now) - handles.params.PreAssayHandling_CrossDate_Range(1);
+% handles.PreAssayHandling_CrossDate_datenums = minv:maxv;
+% handles.PreAssayHandling_CrossDates = cellstr(datestr(handles.PreAssayHandling_CrossDate_datenums,handles.dateformat));
+% 
+% % if CrossDate not stored in rc file, choose first date
+% if ~isfield(handles.previous_values,'PreAssayHandling_CrossDateOff') || ...
+%     handles.previous_values.PreAssayHandling_CrossDateOff > handles.params.PreAssayHandling_CrossDate_Range(2) || ...
+%     handles.previous_values.PreAssayHandling_CrossDateOff < handles.params.PreAssayHandling_CrossDate_Range(1),
+%   handles.previous_values.PreAssayHandling_CrossDateOff = handles.params.PreAssayHandling_CrossDate_Range(2);
+% end
+% 
+% % by default, previous offset
+% handles.PreAssayHandling_CrossDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_CrossDateOff;
+% handles.PreAssayHandling_CrossDate = datestr(handles.PreAssayHandling_CrossDate_datenum,handles.dateformat);
+% 
+% % set possible values, current value, color to default
+% set(handles.popupmenu_PreAssayHandling_CrossDate,'String',handles.PreAssayHandling_CrossDates,...
+%   'Value',find(strcmp(handles.PreAssayHandling_CrossDate,handles.PreAssayHandling_CrossDates),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Cross Handler
-
-% whether this has been changed or not
-handles.isdefault.PreAssayHandling_CrossHandler = true;
-
-% possible values for CrossHandler
-handles.PreAssayHandling_CrossHandlers = handles.params.PreAssayHandling_CrossHandlers;
-
-% if CrossHandler not stored in rc file, choose first CrossHandler
-if ~isfield(handles.previous_values,'PreAssayHandling_CrossHandler') || ...
-    ~ismember(handles.previous_values.PreAssayHandling_CrossHandler,handles.PreAssayHandling_CrossHandlers),
-  handles.previous_values.PreAssayHandling_CrossHandler = handles.PreAssayHandling_CrossHandlers{1};
-end
-
-% by default, previous CrossHandler
-handles.PreAssayHandling_CrossHandler = handles.previous_values.PreAssayHandling_CrossHandler;
-
-% set possible values, current value, color to default
-set(handles.popupmenu_PreAssayHandling_CrossHandler,'String',handles.PreAssayHandling_CrossHandlers,...
-  'Value',find(strcmp(handles.PreAssayHandling_CrossHandler,handles.PreAssayHandling_CrossHandlers),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% NO ENTRY
+% % whether this has been changed or not
+% handles.isdefault.PreAssayHandling_CrossHandler = true;
+% 
+% % possible values for CrossHandler
+% handles.PreAssayHandling_CrossHandlers = handles.params.PreAssayHandling_CrossHandlers;
+% 
+% % if CrossHandler not stored in rc file, choose first CrossHandler
+% if ~isfield(handles.previous_values,'PreAssayHandling_CrossHandler') || ...
+%     ~ismember(handles.previous_values.PreAssayHandling_CrossHandler,handles.PreAssayHandling_CrossHandlers),
+%   handles.previous_values.PreAssayHandling_CrossHandler = handles.PreAssayHandling_CrossHandlers{1};
+% end
+% 
+% % by default, previous CrossHandler
+% handles.PreAssayHandling_CrossHandler = handles.previous_values.PreAssayHandling_CrossHandler;
+% 
+% % set possible values, current value, color to default
+% set(handles.popupmenu_PreAssayHandling_CrossHandler,'String',handles.PreAssayHandling_CrossHandlers,...
+%   'Value',find(strcmp(handles.PreAssayHandling_CrossHandler,handles.PreAssayHandling_CrossHandlers),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Sorting Date
-
-% whether this has been changed or not
-handles.isdefault.PreAssayHandling_SortingDate = true;
-
-% possible values for SortingDate
-minv = floor(handles.now) - handles.params.PreAssayHandling_SortingDate_Range(2);
-maxv = floor(handles.now) - handles.params.PreAssayHandling_SortingDate_Range(1);
-handles.PreAssayHandling_SortingDate_datenums = minv:maxv;
-handles.PreAssayHandling_SortingDates = cellstr(datestr(handles.PreAssayHandling_SortingDate_datenums,handles.dateformat));
-
-% if SortingDate not stored in rc file, choose first date
-if ~isfield(handles.previous_values,'PreAssayHandling_SortingDateOff') || ...
-    handles.previous_values.PreAssayHandling_SortingDateOff > handles.params.PreAssayHandling_SortingDate_Range(2) || ...
-    handles.previous_values.PreAssayHandling_SortingDateOff < handles.params.PreAssayHandling_SortingDate_Range(1),
-  handles.previous_values.PreAssayHandling_SortingDateOff = handles.params.PreAssayHandling_SortingDate_Range(2);
-end
-
-% by default, previous offset
-handles.PreAssayHandling_SortingDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_SortingDateOff;
-handles.PreAssayHandling_SortingDate = datestr(handles.PreAssayHandling_SortingDate_datenum,handles.dateformat);
-
-% set possible values, current value, color to default
-set(handles.popupmenu_PreAssayHandling_SortingDate,'String',handles.PreAssayHandling_SortingDates,...
-  'Value',find(strcmp(handles.PreAssayHandling_SortingDate,handles.PreAssayHandling_SortingDates),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% NO ENTRY
+% 
+% % whether this has been changed or not
+% handles.isdefault.PreAssayHandling_SortingDate = true;
+% 
+% % possible values for SortingDate
+% minv = floor(handles.now) - handles.params.PreAssayHandling_SortingDate_Range(2);
+% maxv = floor(handles.now) - handles.params.PreAssayHandling_SortingDate_Range(1);
+% handles.PreAssayHandling_SortingDate_datenums = minv:maxv;
+% handles.PreAssayHandling_SortingDates = cellstr(datestr(handles.PreAssayHandling_SortingDate_datenums,handles.dateformat));
+% 
+% % if SortingDate not stored in rc file, choose first date
+% if ~isfield(handles.previous_values,'PreAssayHandling_SortingDateOff') || ...
+%     handles.previous_values.PreAssayHandling_SortingDateOff > handles.params.PreAssayHandling_SortingDate_Range(2) || ...
+%     handles.previous_values.PreAssayHandling_SortingDateOff < handles.params.PreAssayHandling_SortingDate_Range(1),
+%   handles.previous_values.PreAssayHandling_SortingDateOff = handles.params.PreAssayHandling_SortingDate_Range(2);
+% end
+% 
+% % by default, previous offset
+% handles.PreAssayHandling_SortingDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_SortingDateOff;
+% handles.PreAssayHandling_SortingDate = datestr(handles.PreAssayHandling_SortingDate_datenum,handles.dateformat);
+% 
+% % set possible values, current value, color to default
+% set(handles.popupmenu_PreAssayHandling_SortingDate,'String',handles.PreAssayHandling_SortingDates,...
+%   'Value',find(strcmp(handles.PreAssayHandling_SortingDate,handles.PreAssayHandling_SortingDates),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Sorting Hour
-
-% allowed sorting hours
-handles.PreAssayHandling_SortingHour_datenums = ...
-  (handles.params.PreAssayHandling_SortingHour_Range(1):handles.params.PreAssayHandling_SortingHour_Interval:handles.params.PreAssayHandling_SortingHour_Range(2))/24;
-handles.PreAssayHandling_SortingHours = ...
-  cellstr(datestr(handles.PreAssayHandling_SortingHour_datenums,'HH:MM'));
-
-% whether this has been changed or not
-handles.isdefault.PreAssayHandling_SortingHour = true;
-
-% if SortingHour stored in rc file, use previous value
-if isfield(handles.previous_values,'PreAssayHandling_SortingHour') && ...
-    ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'??:??') && ...
-    ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'99:99'),
-  handles.PreAssayHandling_SortingHour = handles.previous_values.PreAssayHandling_SortingHour;
-  handles.PreAssayHandling_SortingHour_datenum = rem(datenum(handles.previous_values.PreAssayHandling_SortingHour,'HH:MM'),1);
-else
-  % otherwise, use unknown
-  handles.PreAssayHandling_SortingHour_datenum = nan;
-  handles.PreAssayHandling_SortingHour = '??:??';
-end
-
-% add unknown to list of possible values
-handles.PreAssayHandling_SortingHours{end+1} = '??:??';
-handles.PreAssayHandling_SortingHour_datenums(end+1) = nan;
-
-% set possible values, current value, color to default
-% set(handles.popupmenu_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHours,...
-%   'Value',v,...
+% NO ENTRY
+% % allowed sorting hours
+% handles.PreAssayHandling_SortingHour_datenums = ...
+%   (handles.params.PreAssayHandling_SortingHour_Range(1):handles.params.PreAssayHandling_SortingHour_Interval:handles.params.PreAssayHandling_SortingHour_Range(2))/24;
+% handles.PreAssayHandling_SortingHours = ...
+%   cellstr(datestr(handles.PreAssayHandling_SortingHour_datenums,'HH:MM'));
+% 
+% % whether this has been changed or not
+% handles.isdefault.PreAssayHandling_SortingHour = true;
+% 
+% % if SortingHour stored in rc file, use previous value
+% if isfield(handles.previous_values,'PreAssayHandling_SortingHour') && ...
+%     ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'??:??') && ...
+%     ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'99:99'),
+%   handles.PreAssayHandling_SortingHour = handles.previous_values.PreAssayHandling_SortingHour;
+%   handles.PreAssayHandling_SortingHour_datenum = rem(datenum(handles.previous_values.PreAssayHandling_SortingHour,'HH:MM'),1);
+% else
+%   % otherwise, use unknown
+%   handles.PreAssayHandling_SortingHour_datenum = nan;
+%   handles.PreAssayHandling_SortingHour = '??:??';
+% end
+% 
+% % add unknown to list of possible values
+% handles.PreAssayHandling_SortingHours{end+1} = '??:??';
+% handles.PreAssayHandling_SortingHour_datenums(end+1) = nan;
+% 
+% % set possible values, current value, color to default
+% % set(handles.popupmenu_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHours,...
+% %   'Value',v,...
+% %   'BackgroundColor',handles.isdefault_bkgdcolor);
+% set(handles.edit_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHour,...
 %   'BackgroundColor',handles.isdefault_bkgdcolor);
-set(handles.edit_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHour,...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
-
-handles.PreAssayHandling_SortingTime_datenum = handles.PreAssayHandling_SortingDate_datenum + ...
-  handles.PreAssayHandling_SortingHour_datenum;
+% 
+% handles.PreAssayHandling_SortingTime_datenum = handles.PreAssayHandling_SortingDate_datenum + ...
+%   handles.PreAssayHandling_SortingHour_datenum;
 
 %% Sorting Handler
-
-% whether this has been changed or not
-handles.isdefault.PreAssayHandling_SortingHandler = true;
-
-% possible values for SortingHandler
-handles.PreAssayHandling_SortingHandlers = handles.params.PreAssayHandling_SortingHandlers;
-
-% if SortingHandler not stored in rc file, choose first SortingHandler
-if ~isfield(handles.previous_values,'PreAssayHandling_SortingHandler') || ...
-    ~ismember(handles.previous_values.PreAssayHandling_SortingHandler,handles.PreAssayHandling_SortingHandlers),
-  handles.previous_values.PreAssayHandling_SortingHandler = handles.PreAssayHandling_SortingHandlers{1};
-end
-
-% by default, previous SortingHandler
-handles.PreAssayHandling_SortingHandler = handles.previous_values.PreAssayHandling_SortingHandler;
-
-% set possible values, current value, color to default
-set(handles.popupmenu_PreAssayHandling_SortingHandler,'String',handles.PreAssayHandling_SortingHandlers,...
-  'Value',find(strcmp(handles.PreAssayHandling_SortingHandler,handles.PreAssayHandling_SortingHandlers),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% NO ENTRY
+% % whether this has been changed or not
+% handles.isdefault.PreAssayHandling_SortingHandler = true;
+% 
+% % possible values for SortingHandler
+% handles.PreAssayHandling_SortingHandlers = handles.params.PreAssayHandling_SortingHandlers;
+% 
+% % if SortingHandler not stored in rc file, choose first SortingHandler
+% if ~isfield(handles.previous_values,'PreAssayHandling_SortingHandler') || ...
+%     ~ismember(handles.previous_values.PreAssayHandling_SortingHandler,handles.PreAssayHandling_SortingHandlers),
+%   handles.previous_values.PreAssayHandling_SortingHandler = handles.PreAssayHandling_SortingHandlers{1};
+% end
+% 
+% % by default, previous SortingHandler
+% handles.PreAssayHandling_SortingHandler = handles.previous_values.PreAssayHandling_SortingHandler;
+% 
+% % set possible values, current value, color to default
+% set(handles.popupmenu_PreAssayHandling_SortingHandler,'String',handles.PreAssayHandling_SortingHandlers,...
+%   'Value',find(strcmp(handles.PreAssayHandling_SortingHandler,handles.PreAssayHandling_SortingHandlers),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Starvation Date
-
-% whether this has been changed or not
-handles.isdefault.PreAssayHandling_StarvationDate = true;
-
-% possible values for StarvationDate
-minv = floor(handles.now) - handles.params.PreAssayHandling_StarvationDate_Range(2);
-maxv = floor(handles.now) - handles.params.PreAssayHandling_StarvationDate_Range(1);
-handles.PreAssayHandling_StarvationDate_datenums = minv:maxv;
-handles.PreAssayHandling_StarvationDates = cellstr(datestr(handles.PreAssayHandling_StarvationDate_datenums,handles.dateformat));
-
-% if StarvationDate not stored in rc file, choose first date
-if ~isfield(handles.previous_values,'PreAssayHandling_StarvationDateOff') || ...
-    handles.previous_values.PreAssayHandling_StarvationDateOff > handles.params.PreAssayHandling_StarvationDate_Range(2) || ...
-    handles.previous_values.PreAssayHandling_StarvationDateOff < handles.params.PreAssayHandling_StarvationDate_Range(1),
-  handles.previous_values.PreAssayHandling_StarvationDateOff = handles.params.PreAssayHandling_StarvationDate_Range(2);
-end
-
-% by default, previous offset
-handles.PreAssayHandling_StarvationDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_StarvationDateOff;
-handles.PreAssayHandling_StarvationDate = datestr(handles.PreAssayHandling_StarvationDate_datenum,handles.dateformat);
-
-% set possible values, current value, color to default
-set(handles.popupmenu_PreAssayHandling_StarvationDate,'String',handles.PreAssayHandling_StarvationDates,...
-  'Value',find(strcmp(handles.PreAssayHandling_StarvationDate,handles.PreAssayHandling_StarvationDates),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% NO ENTRY
+% 
+% % whether this has been changed or not
+% handles.isdefault.PreAssayHandling_StarvationDate = true;
+% 
+% % possible values for StarvationDate
+% minv = floor(handles.now) - handles.params.PreAssayHandling_StarvationDate_Range(2);
+% maxv = floor(handles.now) - handles.params.PreAssayHandling_StarvationDate_Range(1);
+% handles.PreAssayHandling_StarvationDate_datenums = minv:maxv;
+% handles.PreAssayHandling_StarvationDates = cellstr(datestr(handles.PreAssayHandling_StarvationDate_datenums,handles.dateformat));
+% 
+% % if StarvationDate not stored in rc file, choose first date
+% if ~isfield(handles.previous_values,'PreAssayHandling_StarvationDateOff') || ...
+%     handles.previous_values.PreAssayHandling_StarvationDateOff > handles.params.PreAssayHandling_StarvationDate_Range(2) || ...
+%     handles.previous_values.PreAssayHandling_StarvationDateOff < handles.params.PreAssayHandling_StarvationDate_Range(1),
+%   handles.previous_values.PreAssayHandling_StarvationDateOff = handles.params.PreAssayHandling_StarvationDate_Range(2);
+% end
+% 
+% % by default, previous offset
+% handles.PreAssayHandling_StarvationDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_StarvationDateOff;
+% handles.PreAssayHandling_StarvationDate = datestr(handles.PreAssayHandling_StarvationDate_datenum,handles.dateformat);
+% 
+% % set possible values, current value, color to default
+% set(handles.popupmenu_PreAssayHandling_StarvationDate,'String',handles.PreAssayHandling_StarvationDates,...
+%   'Value',find(strcmp(handles.PreAssayHandling_StarvationDate,handles.PreAssayHandling_StarvationDates),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Starvation Hour
-
-% allowed starvation hours
-handles.PreAssayHandling_StarvationHour_datenums = ...
-  (handles.params.PreAssayHandling_StarvationHour_Range(1):handles.params.PreAssayHandling_StarvationHour_Interval:handles.params.PreAssayHandling_StarvationHour_Range(2))/24;
-handles.PreAssayHandling_StarvationHours = ...
-  cellstr(datestr(handles.PreAssayHandling_StarvationHour_datenums,'HH:MM'));
-
-% whether this has been changed or not
-handles.isdefault.PreAssayHandling_StarvationHour = true;
-
-% if StarvationHour stored in rc file, use previous value
-if isfield(handles.previous_values,'PreAssayHandling_StarvationHour') && ...
-    ~strcmp(handles.previous_values.PreAssayHandling_StarvationHour,'??:??') && ...
-    ~strcmp(handles.previous_values.PreAssayHandling_StarvationHour,'99:99'),
-  d = rem(datenum(handles.previous_values.PreAssayHandling_StarvationHour,'HH:MM'),1);
-  v = argmin(abs(handles.PreAssayHandling_StarvationHour_datenums-d));
-  handles.PreAssayHandling_StarvationHour = handles.PreAssayHandling_StarvationHours{v};
-  handles.PreAssayHandling_StarvationHour_datenum = handles.PreAssayHandling_StarvationHour_datenums(v);
-else
-  % otherwise, use unknown
-  handles.PreAssayHandling_StarvationHour_datenum = nan;
-  v = numel(handles.PreAssayHandling_StarvationHours)+1;
-  handles.PreAssayHandling_StarvationHour = '??:??';
-end
-
-% add unknown to list of possible values
-handles.PreAssayHandling_StarvationHours{end+1} = '??:??';
-handles.PreAssayHandling_StarvationHour_datenums(end+1) = nan;
-
-% set(handles.popupmenu_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHours,...
-%   'Value',v,...
+% NO ENTRY
+% % allowed starvation hours
+% handles.PreAssayHandling_StarvationHour_datenums = ...
+%   (handles.params.PreAssayHandling_StarvationHour_Range(1):handles.params.PreAssayHandling_StarvationHour_Interval:handles.params.PreAssayHandling_StarvationHour_Range(2))/24;
+% handles.PreAssayHandling_StarvationHours = ...
+%   cellstr(datestr(handles.PreAssayHandling_StarvationHour_datenums,'HH:MM'));
+% 
+% % whether this has been changed or not
+% handles.isdefault.PreAssayHandling_StarvationHour = true;
+% 
+% % if StarvationHour stored in rc file, use previous value
+% if isfield(handles.previous_values,'PreAssayHandling_StarvationHour') && ...
+%     ~strcmp(handles.previous_values.PreAssayHandling_StarvationHour,'??:??') && ...
+%     ~strcmp(handles.previous_values.PreAssayHandling_StarvationHour,'99:99'),
+%   d = rem(datenum(handles.previous_values.PreAssayHandling_StarvationHour,'HH:MM'),1);
+%   v = argmin(abs(handles.PreAssayHandling_StarvationHour_datenums-d));
+%   handles.PreAssayHandling_StarvationHour = handles.PreAssayHandling_StarvationHours{v};
+%   handles.PreAssayHandling_StarvationHour_datenum = handles.PreAssayHandling_StarvationHour_datenums(v);
+% else
+%   % otherwise, use unknown
+%   handles.PreAssayHandling_StarvationHour_datenum = nan;
+%   v = numel(handles.PreAssayHandling_StarvationHours)+1;
+%   handles.PreAssayHandling_StarvationHour = '??:??';
+% end
+% 
+% % add unknown to list of possible values
+% handles.PreAssayHandling_StarvationHours{end+1} = '??:??';
+% handles.PreAssayHandling_StarvationHour_datenums(end+1) = nan;
+% 
+% % set(handles.popupmenu_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHours,...
+% %   'Value',v,...
+% %   'BackgroundColor',handles.isdefault_bkgdcolor);
+% set(handles.edit_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHour,...
 %   'BackgroundColor',handles.isdefault_bkgdcolor);
-set(handles.edit_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHour,...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
-
-handles.PreAssayHandling_StarvationTime_datenum = handles.PreAssayHandling_StarvationDate_datenum + ...
-  handles.PreAssayHandling_StarvationHour_datenum;
+% 
+% handles.PreAssayHandling_StarvationTime_datenum = handles.PreAssayHandling_StarvationDate_datenum + ...
+%   handles.PreAssayHandling_StarvationHour_datenum;
 
 %% Starvation Handler
-
-% whether this has been changed or not
-handles.isdefault.PreAssayHandling_StarvationHandler = true;
-
-% possible values for StarvationHandler
-handles.PreAssayHandling_StarvationHandlers = handles.params.PreAssayHandling_StarvationHandlers;
-
-% if StarvationHandler not stored in rc file, choose first StarvationHandler
-if ~isfield(handles.previous_values,'PreAssayHandling_StarvationHandler') || ...
-    ~ismember(handles.previous_values.PreAssayHandling_StarvationHandler,handles.PreAssayHandling_StarvationHandlers),
-  handles.previous_values.PreAssayHandling_StarvationHandler = handles.PreAssayHandling_StarvationHandlers{1};
-end
-
-% by default, previous StarvationHandler
-handles.PreAssayHandling_StarvationHandler = handles.previous_values.PreAssayHandling_StarvationHandler;
-
-% set possible values, current value, color to default
-set(handles.popupmenu_PreAssayHandling_StarvationHandler,'String',handles.PreAssayHandling_StarvationHandlers,...
-  'Value',find(strcmp(handles.PreAssayHandling_StarvationHandler,handles.PreAssayHandling_StarvationHandlers),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% 
+% % whether this has been changed or not
+% handles.isdefault.PreAssayHandling_StarvationHandler = true;
+% 
+% % possible values for StarvationHandler
+% handles.PreAssayHandling_StarvationHandlers = handles.params.PreAssayHandling_StarvationHandlers;
+% 
+% % if StarvationHandler not stored in rc file, choose first StarvationHandler
+% if ~isfield(handles.previous_values,'PreAssayHandling_StarvationHandler') || ...
+%     ~ismember(handles.previous_values.PreAssayHandling_StarvationHandler,handles.PreAssayHandling_StarvationHandlers),
+%   handles.previous_values.PreAssayHandling_StarvationHandler = handles.PreAssayHandling_StarvationHandlers{1};
+% end
+% 
+% % by default, previous StarvationHandler
+% handles.PreAssayHandling_StarvationHandler = handles.previous_values.PreAssayHandling_StarvationHandler;
+% 
+% % set possible values, current value, color to default
+% set(handles.popupmenu_PreAssayHandling_StarvationHandler,'String',handles.PreAssayHandling_StarvationHandlers,...
+%   'Value',find(strcmp(handles.PreAssayHandling_StarvationHandler,handles.PreAssayHandling_StarvationHandlers),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Room
 
@@ -772,14 +822,14 @@ set(handles.popupmenu_Assay_Bowl,'String',handles.Assay_Bowls,...
 
 %% Number of dead flies
 
-handles.NDeadFlies_str = cellstr(num2str((0:handles.params.NFlies)'));
+handles.NDeadFlies_str = cellstr(num2str((0:20)'));
 handles.NDeadFlies = 0;
 set(handles.popupmenu_NDeadFlies,'String',handles.NDeadFlies_str,...
   'Value',handles.NDeadFlies+1);
 
 %% Number of damaged flies
 
-handles.NDamagedFlies_str = cellstr(num2str((0:handles.params.NFlies)'));
+handles.NDamagedFlies_str = cellstr(num2str((0:20)'));
 handles.NDamagedFlies = 0;
 set(handles.popupmenu_NDamagedFlies,'String',handles.NDamagedFlies_str,...
   'Value',handles.NDamagedFlies+1);
@@ -857,16 +907,17 @@ if handles.params.DoRecordTemp == 0,
 end
 
 %% Shift Fly Temp
-handles.ShiftFlyTemp_Time_datenum = -1;
-handles.ShiftFlyTemp_bkgdcolor = [.153,.227,.373];
-set(handles.pushbutton_ShiftFlyTemp,'BackgroundColor',handles.ShiftFlyTemp_bkgdcolor,...
-  'String','Shift Fly Temp','Enable','on');
+% NO SHIFT FLY TEMP RECORDED
+% handles.ShiftFlyTemp_Time_datenum = -1;
+% handles.ShiftFlyTemp_bkgdcolor = [.153,.227,.373];
+% set(handles.pushbutton_ShiftFlyTemp,'BackgroundColor',handles.ShiftFlyTemp_bkgdcolor,...
+%   'String','Shift Fly Temp','Enable','on');
 
 %% Flies Loaded
 handles.FliesLoaded_Time_datenum = -1;
 handles.FliesLoaded_bkgdcolor = [.349,.2,.329];
-set(handles.pushbutton_FliesLoaded,'BackgroundColor',handles.grayed_bkgdcolor,...
-  'String','Flies Loaded','Enable','off');
+set(handles.pushbutton_FliesLoaded,...
+  'String','Flies Loaded','Enable','on');
 
 %% Start Recording
 handles.StartRecording_Time_datenum = -1;
