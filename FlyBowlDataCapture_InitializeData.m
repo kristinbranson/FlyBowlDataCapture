@@ -33,7 +33,7 @@ handles.changed_bkgdcolor = 0.314 + zeros(1,3);
 handles.grayed_bkgdcolor = 0.314 + zeros(1,3);
 
 % colors for status box text
-handles.status_colors = [0,1,0;0,0,1;1,0,0;1,0,0;1,0,0];
+handles.status_colors = [0,1,0;0,0,.7;1,0,0;1,0,0;1,0,0];
 handles.status_color_names = {'GREEN','BLUE','RED','RED','RED'};
 
 % NO LINE NAME ENTRY
@@ -284,6 +284,25 @@ s = {
   '--------------------------------------'};
 addToStatus(handles,s,-1);
 addToStatus(handles,{sprintf('GUI instance %d, writing to %s.',handles.GUIi,handles.params.OutputDirectory)});
+
+%% Record time
+
+% whether this has been changed or not
+handles.isdefault.RecordTime = true;
+
+% if record time is not in rc file, set to 1000
+if ~isfield(handles.previous_values,'RecordTime'),
+  handles.previous_values.RecordTime = 1000;
+end
+
+% by default, previous record time
+handles.params.RecordTime = handles.previous_values.RecordTime;
+
+% set possible values, current value, color to default
+set(handles.edit_RecordTime,'String',num2str(handles.params.RecordTime),...
+  'BackgroundColor',handles.shouldchange_bkgdcolor,...
+  'Enable','on');
+
 %% Experimenter
 
 % whether this has been changed or not
@@ -917,6 +936,7 @@ end
 handles.FliesLoaded_Time_datenum = -1;
 handles.FliesLoaded_bkgdcolor = [.349,.2,.329];
 set(handles.pushbutton_FliesLoaded,...
+  'BackgroundColor',handles.FliesLoaded_bkgdcolor,...
   'String','Flies Loaded','Enable','on');
 
 %% Start Recording

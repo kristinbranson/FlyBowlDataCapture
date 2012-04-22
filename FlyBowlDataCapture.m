@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 30-Mar-2012 17:42:38
+% Last Modified by GUIDE v2.5 22-Apr-2012 16:50:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -152,7 +152,7 @@ end
 % 
 % make the line name edit box autocomplete -- must be visible
 set(handles.figure_main,'Visible','on');
-hwait = waitbar(0,'Please wait. Initializing GUI...');
+hwait = waitbar(0,'Please wait. Initializing GUI...'); %#ok<NASGU>
 % 
 % if ~handles.isAutoComplete_edit_Fly_LineName,
 %   handles.AutoCompleteEdit_Fly_LineName = ...
@@ -1005,6 +1005,7 @@ handles.IsRecording = true;
 
 % disable other time buttons
 set(handles.pushbutton_FliesLoaded,'Enable','off');
+set(handles.edit_RecordTime,'Enable','off');
 %set(handles.pushbutton_ShiftFlyTemp,'Enable','off');
 
 % disable start recording button
@@ -2674,6 +2675,39 @@ function popupmenu_Condition_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_RecordTime_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_RecordTime (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_RecordTime as text
+%        str2double(get(hObject,'String')) returns contents of edit_RecordTime as a double
+v = str2double(get(hObject,'String'));
+if isnan(v) || v < 0,
+  set(hObject,'String',num2str(handles.params.RecordTime));
+  return;
+end
+handles.params.RecordTime = v;
+guidata(hObject,handles);
+set(hObject,'BackgroundColor',handles.changed_bkgdcolor);
+
+
+  
+
+% --- Executes during object creation, after setting all properties.
+function edit_RecordTime_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_RecordTime (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');

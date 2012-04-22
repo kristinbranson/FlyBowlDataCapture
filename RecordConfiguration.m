@@ -61,6 +61,12 @@ for i = 1:length(fns),
   
 end
 
+% recordtime in params
+if isfield(handles,'params') && isfield(handles.params,'RecordTime'),
+  rc.RecordTime = handles.params.RecordTime;
+  fns{end+1} = 'RecordTime';
+end
+
 waitbar(.3,hwaitbar,'Put values in struct');
 
 fnsmissing = setdiff(fns,fieldnames(rc));
