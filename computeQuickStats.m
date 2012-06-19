@@ -69,7 +69,8 @@ BackSubCloseRadius = 2;
   NBkgdBins,IntensityHistMu,IntensityHistSig,...
   BackSubNFramesSample,BackSubThreshLow,BackSubThreshHigh,BackSubMinCCArea,...
   SaveFileStr,SaveDataStr,...
-  ScanLineYLim] = ...
+  ScanLineYLim,...
+  outdir] = ...
   myparse(varargin,...
   'GUIInstance',1,...
   'FigHandle',nan,...
@@ -105,7 +106,8 @@ BackSubCloseRadius = 2;
   'BackSubMinCCArea',BackSubMinCCArea,...
   'SaveFileStr',SaveFileStr,...
   'SaveDataStr',SaveDataStr,...
-  'ScanLineYLim',ScanLineYLim); 
+  'ScanLineYLim',ScanLineYLim,...
+  'outdir',0); 
 
 %% Figure positions
 
@@ -721,14 +723,22 @@ linkaxes(ScanAx);
 %% save figure
 
 if ~isempty(SaveFileStr),
-  SaveFileName = fullfile(expdir,SaveFileStr);
+  if ischar(outdir),
+    SaveFileName = fullfile(outdir,SaveFileStr);
+  else
+    SaveFileName = fullfile(expdir,SaveFileStr);
+  end
   export_fig(SaveFileName,fig);
 end
 
 %% save data
 
 if ~isempty(SaveDataStr),
-  SaveDataName = fullfile(expdir,SaveDataStr);
+  if ischar(outdir),
+    SaveDataName = fullfile(outdir,SaveDataStr);
+  else
+    SaveDataName = fullfile(expdir,SaveDataStr);
+  end
   % out.BackSubStats
   datafid = fopen(SaveDataName,'w');
   [success1,errmsg1] = csvwrite(datafid,out.BackSubStats,'BackSubStats');
