@@ -1,6 +1,6 @@
 # Directory to store video to
-OutputDirectory,D:\data,J:\data
-#OutputDirectory,D:\debug_data,J:\debug_data
+#OutputDirectory,D:\data,J:\data
+OutputDirectory,D:\debug_data,J:\debug_data
 #OutputDirectory,D:\special_data,J:\special_data
 # Directory to temporarily store video to
 TmpOutputDirectory,D:\tmpdata,J:\tmpdata
@@ -15,8 +15,6 @@ Imaq_VideoFormat,Format 7, Mode 0
 # Video file type
 #FileType,fmf
 FileType,ufmf
-# Number of seconds to record
-RecordTime,1000
 # whether to display the video preview with the jet colormap
 ColormapPreview,0
 # Shutter period
@@ -28,32 +26,9 @@ Imaq_Brightness,25
 # Prefix of movie file
 MovieFilePrefix,movie
 # List of possible Experimenter values
-Assay_Experimenters,hirokawaj,phillipsm10,robiea,robertss
-# Expected number of flies
-NFlies,20
+Assay_Experimenters,edwardsa,hirokawaj,phillipsm10,robiea
 # List of possible Incubator ID values
 Rearing_IncubatorIDs,1,2,3,4
-# Range of Cross Dates to show -- minimum and maximum number of days 
-# before today
-PreAssayHandling_CrossDate_Range,14,22
-# Range of Sorting Dates to show -- minimum and maximum number of days 
-# before today
-PreAssayHandling_SortingDate_Range,1,8
-# Range of Sorting Times to show -- minimum and maximum in hour of the day, e.g. 8 = 8am, 18=6pm, 8.5=8:30am
-PreAssayHandling_SortingHour_Range,8,19
-# Interval of Sorting Times to show in hours, e.g. 1 corresponds to showing every hour
-PreAssayHandling_SortingHour_Interval,.25
-# List of possible Sorting Handler values
-PreAssayHandling_SortingHandlers,unknown,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,phillipsm10,robertss,robiea,rowellw,ruizd,shustermand,zhengg
-# Range of Starvation Dates to show -- minimum and maximum number of days 
-# before today
-PreAssayHandling_StarvationDate_Range,0,1
-# Range of Starvation Times to show -- minimum and maximum in hour of the day, e.g. 8 = 8am, 18=6pm, 8.5=8:30am
-PreAssayHandling_StarvationHour_Range,8,19
-# Interval of Starvation Times to show in hours, e.g. 1 corresponds to showing every hour
-PreAssayHandling_StarvationHour_Interval,.25
-# List of possible Starvation Handler values
-PreAssayHandling_StarvationHandlers,hirokawaj,phillipsm10,robiea,robertss
 # List of room names
 Assay_Rooms,2C.310.1,2C.310.2,2C.310.3
 # Assay room number
@@ -68,10 +43,6 @@ Assay_VisualSurrounds,1,2,3,4
 Assay_Lids,01,02,03,04,05,06,07
 # List of possible Bowl values
 Assay_Bowls,A,B,C,D
-# List of possible Redo flags
-RedoFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes,See both notes
-# List of possible Review flags
-ReviewFlags,None,Rearing problem,Flies look sick,See behavioral notes,See technical notes,See both notes
 # Device name
 Imaq_DeviceName,A622f
 # Video ROI Position
@@ -90,20 +61,10 @@ MetaDataFileName,Metadata.xml
 LogFileName,Log.txt
 # MetaData: Assay name
 MetaData_AssayName,FlyBowl
-# rearing protocols need 1 per incubator
-MetaData_RearingProtocols,RP_Olympiad_v008p2.xls,RP_Olympiad_v008p2.xls,RP_Olympiad_v008p2.xls,RP_Olympiad_v008p2.xls
-MetaData_HandlingProtocols,HP_flybowl_v004p0.xls
-MetaData_ExpProtocols,EP_flybowl_v010p0.xls
-MetaData_Effector,UAS_dTrpA1_2_0002
-MetaData_Gender,b
-MetaData_RoomTemperatureSetPoint,29
-MetaData_RoomHumiditySetPoint,60
 # limits of y-axis for frame rate plot
 FrameRatePlotYLim,0,35
 # Limits of y-axis for temperature plot
-TempPlotYLim,25,35
-# Whether to try to connect over the network to Sage to query line names
-DoQuerySage,1
+TempPlotYLim,20,35
 # Time in between temperature readings
 TempProbePeriod,5
 # Which channels have temperature probes
@@ -120,8 +81,6 @@ NPreconSamples,5
 # which serial port to connect to -- I have no idea how to figure this out 
 # automatically
 PreconSensorSerialPort,COM1
-# Line Names to add to the list in Sage
-ExtraLineNames,DL-wildtype,pBDPGAL4U
 # Log file for writing ufmf
 UFMFLogFileName,ufmf_log.txt
 # Name of file to write UFMF diagnostic stats
@@ -151,6 +110,7 @@ UFMFNFramesInit,100
 # while ramping up the background model, use the following keyframe periods
 UFMFBGKeyFramePeriodInit,1,10,25,50,75
 # lookup table from rig+bowl to whether to rotate the preview image
+# DoRotatePreviewImage,(1,A,1),(1,B,1),(1,C,0),(1,D,0),(2,A,1),(2,B,1),(2,C,0),(2,D,0)
 DoRotatePreviewImage,(1,A,1),(1,B,1),(1,C,0),(1,D,0),(2,A,1),(2,B,1),(2,C,0),(2,D,0)
 # Name of mat file containing quickstats stats
 QuickStatsStatsFileName,QuickStats_Stats_20110914T022555.mat
@@ -158,24 +118,10 @@ QuickStatsStatsFileName,QuickStats_Stats_20110914T022555.mat
 ScanLineYLim,60,250
 # min, max time between loading flies and starting recording
 MinFliesLoadedTime,25
-MaxFliesLoadedTime,225
-# List of possible Cross Handler values
-PreAssayHandling_CrossHandlers,unknown,cavallaroa,chenn,fetterd,flycore,halld,hayess,hibbardk,hirokawaj,kaoj,lavertyt,lows,mcmahonj,mercerm,nazh,phillipsm10,robertss,robiea,rowellw,ruizd,shustermand,zhengg
-# flip used
-PreAssayHandling_FlipUsed,1
-# wishlist number range
-WishListRange,-1,100
-# whether to connect to FlyF2 to sync barcode with line name, etc.
-DoSyncBarcode,1
-# screen type
-ScreenType,primary
-# screen reason
-ScreenReason,standard
-# control fly line names
-ControlLineNames,pBDPGAL4U
-# days between cross and flip
-flip_days,4
-# whether to check that the barcode >= 0
-CheckBarcode,1
+MaxFliesLoadedTime,300
 # whether to couple camera and temperature probe start
 CoupleCameraTempProbeStart,1
+# where the condition files will be stored
+ConditionDirectory,C:\Users\labadmin\Documents\FlyBowl\conditionfiles
+# Number of seconds to record
+RecordTime,20

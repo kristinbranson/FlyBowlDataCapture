@@ -112,10 +112,18 @@ end
 
 % copy parameters file into the experiment directory if this is the first
 % time an experiment directory is created
-if isempty(OldExperimentDirectory) && exist(handles.ExperimentDirectory,'file'),
+if isempty(OldExperimentDirectory) && exist(handles.ExperimentDirectory,'dir'),
   [success1,msg] = copyfile(handles.params_file,handles.ExperimentDirectory);
   if ~success1,
     addToStatus(handles,{sprintf('Error copying params file %s into directory %s:',...
+      handles.params_file,handles.ExperimentDirectory),msg});
+    success = false;
+  end
+  
+  % copy condition file
+  [success1,msg] = copyfile(handles.ConditionFileName,handles.ExperimentDirectory);
+  if ~success1,
+    addToStatus(handles,{sprintf('Error copying conditions file %s into directory %s:',...
       handles.params_file,handles.ExperimentDirectory),msg});
     success = false;
   end

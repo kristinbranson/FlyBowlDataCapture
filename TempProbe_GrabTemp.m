@@ -17,6 +17,10 @@ end
 try
 
 success = false;
+if ~ishandle(hObject),
+  return;
+end
+
 handles = guidata(hObject);
 
 % check if we are quitting
