@@ -4,12 +4,23 @@ function handles = FlyBowlDataCapture_InitializeData(handles)
 handles.version = '??';
 if exist('version.txt','file'),
   try
-    ver = importdata('version.txt');
-    if isnumeric(ver),
-      ver = num2str(ver);
+    fid = fopen('version.txt','r');
+    while true,
+      s = fgetl(fid);
+      if ~ischar(s),
+        break;
+      end
+      s = strtrim(s);
+      if isempty(s),
+        continue;
+      end
+      handles.version = s;
+      break;
     end
-    handles.version = ver;
   catch
+  end
+  if exist('fid','var') && fid > 1,
+    fclose(fid);
   end
 end
 
