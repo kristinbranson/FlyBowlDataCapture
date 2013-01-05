@@ -141,6 +141,7 @@ BorderY = 10;
 MinTableColumnWidth = 75;
 TableRowLabelWidth = 150;
 TableRowHeight = 20;
+TableColumnExtra = 20;
 
 % fraction of figure the table can take
 MaxTableHeightFrac = .3;
@@ -473,12 +474,12 @@ FigHeightFree = FigHeight - FigBorderTop - FigBorderBottom;
 set(fig,'Units','Pixels','Position',FigPos,'Name',sprintf('Summary Stats %d',GUIi),'ToolBar','figure','NumberTitle','off');
 
 % tables for statistics
-TableColumnWidth = max((FigWidthFree - 2*TableRowLabelWidth - YLabelSpace - BorderX) / (length(colheaders1)+length(colheaders2)),MinTableColumnWidth);
+TableColumnWidth = max((FigWidthFree - 2*TableRowLabelWidth - YLabelSpace - BorderX - 2*TableColumnExtra) / (length(colheaders1)+length(colheaders2)),MinTableColumnWidth);
 TableHeight1 = min(TableRowHeight*(nTableFns1+1),FigHeightFree*MaxTableHeightFrac-XLabelSpace);
 TableHeight2 = min(TableRowHeight*(nTableFns2+1),FigHeightFree*MaxTableHeightFrac-XLabelSpace);
 TableHeight = max([TableHeight1,TableHeight2]);
-TableWidth1 = TableRowLabelWidth + length(colheaders1)*TableColumnWidth;
-TableWidth2 = TableRowLabelWidth + length(colheaders2)*TableColumnWidth;
+TableWidth1 = TableRowLabelWidth + length(colheaders1)*TableColumnWidth + TableColumnExtra;
+TableWidth2 = TableRowLabelWidth + length(colheaders2)*TableColumnWidth + TableColumnExtra;
 TableLeft1 = FigBorderLeft;
 TableTop = FigHeight-FigBorderTop;
 TableBottom = TableTop - TableHeight;
