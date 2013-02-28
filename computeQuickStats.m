@@ -276,7 +276,7 @@ areas = [];
 nccs = zeros(1,BackSubNFramesSample);
 for i = 1:BackSubNFramesSample,
   im = double(readframe(framessample(i)));
-  diffim = abs(im-bkgdim);
+  diffim = abs(im-bkgdim');
   isForeLow = diffim >= BackSubThreshLow;
   isForeLow = imclose(isForeLow,BackSubCloseStrel);
   cc = bwconncomp(isForeLow);

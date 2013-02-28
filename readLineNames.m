@@ -24,7 +24,25 @@ if ~exist(handles.linename_file,'file') || (nargin > 1 && doforce),
   end
 end
 
-handles.Fly_LineNames = importdata(handles.linename_file);
+fid = fopen(handles.linename_file,'r');
+if fid < 0,
+  error('Could not open file %s for reading',handles.linename_file);
+end
+handles.Fly_LineNames = {};
+while true,
+  l = fgetl(fid);
+  if ~ischar(l),
+    break;
+  end
+  l = strtrim(l);
+  if isempty(l),
+    continue;
+  end
+  handles.Fly_LineNames{end+1} = l;
+end
+fclose(fid);
+handles.Fly_LineNames = handles.Fly_LineNames(:);
+%handles.Fly_LineNames = importdata(handles.linename_file);
 addToStatus(handles,{'Read line names from file.'});
 
 if isfield(handles.params,'ExtraLineNames'),
