@@ -8,6 +8,11 @@ if strcmpi(AdaptorName,'gdcam')
   set(obj.Source,'LogFlag',0);
 elseif strcmpi(AdaptorName,'udcam')
   set(obj.Source,'nFramesTarget',0);
+elseif strcmpi(AdaptorName,'bias'),
+  [success,msg] = BIASStop(obj.BIASURL);
+  if ~success,
+    errordlg(sprintf('Error stopping logging: %s',msg),'Error stopping logging');
+  end
 else
   % remove frames acquired function
   obj.framesacquiredfcn = '';
@@ -17,6 +22,42 @@ else
   % obj.stopfcn = '';
 end
 
+if strcmpi(AdaptorName,'bias'),
+
+  hwait = mywaitbar(0,hwait,'Closing video file: waiting for capturing == 0');
+  
+  % wait for capturing to be 0
+  tic;
+  handles = guidata(hObject);
+  MaxTimeWaitStopRunning = 30;
+  while true,
+    
+    try
+      res = loadjson(urlread([obj.BIASURL,'?get-status']));
+      if res.success == 0,
+        addToStatus(handles,sprintf('Could not get status: %s',res.message));
+        return;
+      end
+      biasstatus = res.value;
+      if biasstatus.capturing == 0,
+        break;
+      end
+    catch ME,
+      addToStatus(handles,sprintf('Could not get status: %s',getReport(ME,'basic')));
+    end
+    
+    pause(.5);
+    dt = toc;
+    if dt > MaxTimeWaitStopRunning,
+      s = sprintf('Waited more than %f seconds for recording to stop. Erroring out.',MaxTimeWaitStopRunning);
+      errordlg(s);
+      error(s);
+    end
+    addToStatus(handles,sprintf('Waiting for recording to stop (%f/%f s)',dt,MaxTimeWaitStopRunning));
+  end
+  
+else
+  
 % stop
 if ~strcmpi(AdaptorName,'udcam')
   stop(obj);
@@ -45,7 +86,7 @@ while true,
   if dt > MaxTimeWaitStopRunning,
     s = sprintf('Waited more than %f seconds for recording to stop. Erroring out.',MaxTimeWaitStopRunning);
     errordlg(s);
-    error(s);
+    error(s); %#ok<SPERR>
   end
   addToStatus(handles,sprintf('Waiting for recording to stop (%f/%f s)',dt,MaxTimeWaitStopRunning));
 end
@@ -96,6 +137,9 @@ end
 
 % no longer recording
 %fprintf('No longer recording.\n');
+
+end
+
 handles = guidata(hObject);
 handles.IsRecording = false;
 handles.FinishedRecording = true;
@@ -110,16 +154,18 @@ guidata(hObject,handles);
 addToStatus(handles,{sprintf('Finished recording. Video file moved from %s to %s.',...
   oldname,handles.FileName)});
 
-PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
-PreviewParams.IsRecording = false;
-setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
+if ~strcmpi(AdaptorName,'bias'),
+  PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
+  PreviewParams.IsRecording = false;
+  setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
+end
 
 hwait = mywaitbar(.7,hwait,'Computing quick stats...');
 
 % show some simple statistics
 if strcmpi(handles.params.FileType,'ufmf'),
   
-  try
+  %try
 
     [handles.QuickStats,success,errmsg,warnings] = computeQuickStats(handles.ExperimentDirectory,...
       handles.ComputeQuickStatsParams{:});
@@ -131,10 +177,10 @@ if strcmpi(handles.params.FileType,'ufmf'),
       addToStatus(handles,[{'Warnings computing quick statistics:'},warnings]);
     end
     
-  catch ME,
-    addToStatus(handles,['Error computing quickstats: ',getReport(ME)]);
-    warndlg(getReport(ME),'Error computing quickstats','modal');
-  end
+%   catch ME,
+%     addToStatus(handles,['Error computing quickstats: ',getReport(ME)]);
+%     warndlg(getReport(ME),'Error computing quickstats','modal');
+%   end
 end
 
 hwait = mywaitbar(.899,hwait,'Closing video file: Enabling Save Metadata button...');
@@ -145,10 +191,10 @@ if ~didabort,
   handles = ChangedMetaData(handles);
 end
 
-hwait = mywaitbar(.9,hwait,'Closing video file: Waiting 5 seconds before resaving metadata...');
+hwait = mywaitbar(.9,hwait,'Closing video file: Waiting 1 second before resaving metadata...');
 
 % add a wait period before resaving
-pause(5);
+pause(1);
 
 % save metadata
 hwait = mywaitbar(.98,hwait,'Closing video file: Saving metadata...');
@@ -163,7 +209,17 @@ set(handles.pushbutton_Done,'Enable','on','BackgroundColor',handles.Done_bkgdcol
 set(handles.text_Status_Recording,'String','Finished','BackgroundColor',handles.grayed_bkgdcolor);
 
 % frame rate status
-set(handles.text_Status_FrameRate,'String',sprintf('Ave: %.1f',handles.FrameCount / handles.writeFrame_time));
+% TODO: this is not assigned by BIAS
+if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  
+  AveFrameRate = getappdata(handles.text_Status_FrameRate,'AveFrameRate');
+  set(handles.text_Status_FrameRate,'String',sprintf('Ave: %.1f',AveFrameRate));
+  
+else
+  
+  set(handles.text_Status_FrameRate,'String',sprintf('Ave: %.1f',handles.FrameCount / handles.writeFrame_time));
+  
+end
 
 % disable abort button
 set(handles.pushbutton_Abort,'Enable','off','BackgroundColor',handles.grayed_bkgdcolor);

@@ -93,3 +93,5 @@ end
 if exist('hwaitbar','var') && ishandle(hwaitbar),
   delete(hwaitbar);
 end
+
+CleanLocalSemaphores;

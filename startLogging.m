@@ -50,6 +50,16 @@ guidata(hObject,handles);
 % number of frames written
 handles.FrameCount = 0;
 
+if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  
+  [success,msg] = BIASStartLogging(handles.vid.BIASURL,handles.FileName);
+  if ~success,
+    errordlg(sprintf('Error starting logging in BIAS: %s',msg),'Error starting logging in BIAS');
+  end
+  % TODO: better error handling
+  
+else
+
 % frame rate
 ss = getselectedsource(handles.vid);
 tmp = get(ss);
@@ -84,8 +94,23 @@ end
 % for computing fps
 handles.writeFrame_time = 0;
 
-PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
+end
+
+if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  hpreview = handles.text_Status_Preview;
+else
+  hpreview = handles.hImage_Preview;
+end
+
+PreviewParams = getappdata(hpreview,'PreviewParams');
 PreviewParams.IsRecording = true;
+
+if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  history = get(handles.hLine_Status_FrameRate,'UserData');
+  history(:,1) = [];
+  history(:,end+1) = [nan,nan];
+  set(handles.hLine_Status_FrameRate,'UserData',history);
+end
 
 % create a timer for stopping 
 handles.StopTimer = timer('TimerFcn',{@Stop_RecordTimer,handles.vid,handles.figure_main,handles.params.Imaq_Adaptor},...
@@ -96,7 +121,7 @@ handles.StopTimer = timer('TimerFcn',{@Stop_RecordTimer,handles.vid,handles.figu
 guidata(hObject,handles);
 
 % start recording
-if ~strcmpi(handles.params.Imaq_Adaptor,'udcam'),
+if ~ismember(lower(handles.params.Imaq_Adaptor),{'udcam','bias'}),
   start(handles.vid);
 else
   % nothing to do
@@ -112,7 +137,7 @@ set(handles.text_Status_Recording,'String','On','BackgroundColor',handles.Status
 %guidata(hObject,handles);
 
 PreviewParams.StartRecording_Time_datenum = handles.StartRecording_Time_datenum;
-setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
+setappdata(hpreview,'PreviewParams',PreviewParams);
 
 % start timer
 start(handles.StopTimer);

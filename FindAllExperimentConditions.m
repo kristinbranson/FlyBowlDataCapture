@@ -1,7 +1,7 @@
 function handles = FindAllExperimentConditions(handles)
 
 if ~exist(handles.params.ConditionDirectory,'dir'),
-  s = sprintf('Experiment condition directory %s does not exist',handles.ConditionDirectory);
+  s = sprintf('Experiment condition directory %s does not exist',handles.params.ConditionDirectory);
   errordlg(s);
   error(s);
 end

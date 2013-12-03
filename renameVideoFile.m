@@ -10,6 +10,13 @@ for i = 1:numel(openfids),
 end
 
 oldfilename = handles.FileName;
+if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  % BIAS appends stuff to the file name
+  [p,n,ext] = fileparts(oldfilename);
+  n = [n,'_guid_',handles.vid.biasconfig.camera.guid];
+  oldfilename = fullfile(p,[n,ext]);  
+end
+
 if handles.params.DoRecordTemp ~= 0,
   oldtempfilename = handles.TempFileName;
 end
@@ -89,60 +96,65 @@ if handles.params.DoRecordTemp ~= 0,
 end
 
 if strcmpi(handles.params.FileType,'ufmf'),
-  oldfilename = handles.TmpUFMFLogFileName;
-  newfilename = fullfile(handles.ExperimentDirectory,handles.params.UFMFLogFileName);
-  addToStatus(handles,sprintf('Renaming UFMF log file from %s to %s',oldfilename,newfilename));
-  if ~exist(oldfilename,'file'),
-    addToStatus(handles,sprintf('UFMF log file %s does not exist, could not rename %s',oldfilename,newfilename));
-  else
-    
-    % close the file if nec
-    i = find(strcmp(oldfilename,openfilenames),1);
-    if ~isempty(i),
-      addToStatus(handles,sprintf('Closing %s to rename %s to %s.',oldfilename,oldfilename,newfilename));
-      fclose(openfids(i));
-    end
-    
-    [success,msg] = renamefile(oldfilename,newfilename);
-    if success,
-      %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
-      handles.params.UFMFLogFileName = newfilename;
-      %fprintf('Renamed successfully\n');
+  if isfield(handles,'TmpUFMFLogFileName'),
+    % TODO: no log file created for BIAS
+    oldfilename = handles.TmpUFMFLogFileName;
+    newfilename = fullfile(handles.ExperimentDirectory,handles.params.UFMFLogFileName);
+    addToStatus(handles,sprintf('Renaming UFMF log file from %s to %s',oldfilename,newfilename));
+    if ~exist(oldfilename,'file'),
+      addToStatus(handles,sprintf('UFMF log file %s does not exist, could not rename %s',oldfilename,newfilename));
     else
-      s = {sprintf('UFMF log temporarily stored to %s. ',oldfilename),...
-        sprintf('Could not rename %s to %s. ',oldfilename,newfilename),...
-        msg};
-      uiwait(errordlg(s,'Error renaming UFMF log file'));
-      addToStatus(handles,s);
-      warning(cell2mat(s));
+      
+      % close the file if nec
+      i = find(strcmp(oldfilename,openfilenames),1);
+      if ~isempty(i),
+        addToStatus(handles,sprintf('Closing %s to rename %s to %s.',oldfilename,oldfilename,newfilename));
+        fclose(openfids(i));
+      end
+      
+      [success,msg] = renamefile(oldfilename,newfilename);
+      if success,
+        %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
+        handles.params.UFMFLogFileName = newfilename;
+        %fprintf('Renamed successfully\n');
+      else
+        s = {sprintf('UFMF log temporarily stored to %s. ',oldfilename),...
+          sprintf('Could not rename %s to %s. ',oldfilename,newfilename),...
+          msg};
+        uiwait(errordlg(s,'Error renaming UFMF log file'));
+        addToStatus(handles,s);
+        warning(cell2mat(s));
+      end
     end
   end
-  oldfilename = handles.TmpUFMFStatFileName;
-  newfilename = fullfile(handles.ExperimentDirectory,handles.params.UFMFStatFileName);
-  addToStatus(handles,sprintf('Renaming UFMF stats file from %s to %s',oldfilename,newfilename));
-  if ~exist(oldfilename,'file'),
-    addToStatus(handles,sprintf('UFMF stats file %s does not exist, could not rename %s',oldfilename,newfilename));
-  else
-    
-    % close the file if nec
-    i = find(strcmp(oldfilename,openfilenames),1);
-    if ~isempty(i),
-      addToStatus(handles,sprintf('Closing %s to rename %s to %s.',oldfilename,oldfilename,newfilename));
-      fclose(openfids(i));
-    end
-    
-    [success,msg] = renamefile(oldfilename,newfilename);
-    if success,
-      %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
-      handles.UFMFStatFileName = newfilename;
-      %fprintf('Renamed successfully\n');
+  if isfield(handles,'TmpUFMFStatFileName'),
+    oldfilename = handles.TmpUFMFStatFileName;
+    newfilename = fullfile(handles.ExperimentDirectory,handles.params.UFMFStatFileName);
+    addToStatus(handles,sprintf('Renaming UFMF stats file from %s to %s',oldfilename,newfilename));
+    if ~exist(oldfilename,'file'),
+      addToStatus(handles,sprintf('UFMF stats file %s does not exist, could not rename %s',oldfilename,newfilename));
     else
-      s = {sprintf('UFMF diagnostics temporarily stored to %s. ',oldfilename),...
-        sprintf('Could not rename %s to %s. ',oldfilename,newfilename),...
-        msg};
-      uiwait(errordlg(s,'Error renaming UFMF diagnostics file'));
-      addToStatus(handles,s);
-      warning(cell2mat(s));
+    
+      % close the file if nec
+      i = find(strcmp(oldfilename,openfilenames),1);
+      if ~isempty(i),
+        addToStatus(handles,sprintf('Closing %s to rename %s to %s.',oldfilename,oldfilename,newfilename));
+        fclose(openfids(i));
+      end
+      
+      [success,msg] = renamefile(oldfilename,newfilename);
+      if success,
+        %fprintf('Successfully renamed file from %s to %s\n',oldfilename,newfilename);
+        handles.UFMFStatFileName = newfilename;
+        %fprintf('Renamed successfully\n');
+      else
+        s = {sprintf('UFMF diagnostics temporarily stored to %s. ',oldfilename),...
+          sprintf('Could not rename %s to %s. ',oldfilename,newfilename),...
+          msg};
+        uiwait(errordlg(s,'Error renaming UFMF diagnostics file'));
+        addToStatus(handles,s);
+        warning(cell2mat(s));
+      end
     end
   end
 end

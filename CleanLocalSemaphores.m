@@ -62,7 +62,14 @@ catch ME
   errordlg(s,'Error Cleaning Local Semaphores');
 end
 
-try
+if true
+  
+  global FBDC_GUIInstances;
+  FBDC_GUIInstances = [];
+
+else
+
+try  
 
 global FBDC_GUIInstanceFileName;
 
@@ -79,6 +86,8 @@ end
 catch ME
   s =['Error checking for GUIInstanceFile:\n',getReport(ME)];
   errordlg(s,'Error Cleaning Local Semaphores');
+end
+
 end
 
 try
@@ -110,3 +119,6 @@ end
 if exist('hwaitbar','var') && ishandle(hwaitbar),
   delete(hwaitbar);
 end
+
+global FBDC_BIASCAMERASINUSE;
+FBDC_BIASCAMERASINUSE = [];

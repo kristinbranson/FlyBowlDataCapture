@@ -2,6 +2,15 @@ function success = FBDC_killall(handles)
 
 success = false;
 
+if nargin < 1,
+  hfig = findall(0,'type','figure','Name','FlyBowlDataCapture');
+  if isempty(hfig),
+    handles = struct;
+  else
+    handles = guidata(hfig(1));
+  end
+end
+
 try
   for i = 1:4,
     fprintf('Trying to kill everything, iteration %d\n',i);

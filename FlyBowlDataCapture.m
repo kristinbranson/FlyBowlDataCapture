@@ -87,7 +87,7 @@ handles.output = hObject;
 handles.rcfile = '.FlyBowlDataCapture_rc.mat';
 
 % get GUI instance
-handles.GUIInstanceDir = '.GUIInstances';
+%handles.GUIInstanceDir = '.GUIInstances';
 handles = getGUIInstance(handles);
 
 handles = LoadPreviousValues(handles);
@@ -148,6 +148,9 @@ handles = FlyBowlDataCapture_InitializeData(handles);
 
 if isempty(which('findjobj')) && exist('findjobj','dir'),
   addpath('findjobj');
+end
+if isempty(which('loadjson')) && exist('jsonlab','dir'),
+  addpath('jsonlab');
 end
 % 
 % make the line name edit box autocomplete -- must be visible
@@ -979,6 +982,16 @@ else
 end
 set(params.pushbutton_FliesLoaded,'String',sprintf('Load: %ds ago',rounddt));
 
+function handles = RemovePreviewUpdateTimer(handles)
+
+if isfield(handles,'PreviewTimer') && isvalid(handles.PreviewTimer),
+  if strcmpi(get(handles.PreviewTimer,'Running'),'on'),
+    stop(handles.PreviewTimer);
+  end
+  delete(handles.PreviewTimer);
+  handles = rmfield(handles,'PreviewTimer');
+end
+
 function handles = RemoveFliesLoadedTimer(handles)
 
 % stop, delete the fliesloaded timer
@@ -1345,6 +1358,17 @@ if didcancel,
   %FBDC_NTRIESCLOSE = 0;
   return;
 end
+
+if isfield(handles,'GUIi') && ~isempty(handles.GUIi),
+  global FBDC_GUIInstances; %#ok<TLEV>
+  FBDC_GUIInstances = setdiff(FBDC_GUIInstances,handles.GUIi);
+end
+
+if isfield(handles,'DeviceID') && ~isempty(handles.DeviceID),
+  global FBDC_BIASCAMERASINUSE; %#ok<TLEV>
+  FBDC_BIASCAMERASINUSE = setdiff(FBDC_BIASCAMERASINUSE,handles.DeviceID);
+end
+
 
 if isfield(handles,'GUIInstanceFileName') && ...
     exist(handles.GUIInstanceFileName,'file'),
@@ -1732,18 +1756,29 @@ hwaitbar = waitbar(.1,'Closing experiment');
 % remove flies loaded timer
 handles = RemoveFliesLoadedTimer(handles);
 
+% remove preview update timer
+handles = RemovePreviewUpdateTimer(handles);
+
 % recording stopped in the middle
 if handles.IsRecording,
   addToStatus(handles,sprintf('Video recording canceled after %f seconds',(now-handles.StartRecording_Time_datenum)*86400));
 end
 
 % stop logging
-if handles.IsRecording && isfield(handles,'vid') && isvalid(handles.vid),
+if handles.IsRecording && isfield(handles,'vid') && (strcmpi(handles.params.Imaq_Adaptor,'bias') || isvalid(handles.vid)),
   guidata(hObject,handles);
   % last parameter: we did abort
   wrapUpVideo(handles.vid,'',hObject,handles.params.Imaq_Adaptor,true);
   %stop(handles.vid);
   handles = guidata(hObject);
+elseif isfield(handles,'IsCameraInitialized') && handles.IsCameraInitialized && ...
+    strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  [success,msg] = BIASStop(handles.vid.BIASURL);
+  if ~success,
+    errordlg(sprintf('Error stopping BIAS: %s',msg),'Error stopping BIAS');
+  end
+
+  
 end
 
 s = 'Logging stopped';
@@ -1818,28 +1853,31 @@ end
 
 % delete vid object
 handles = clearVideoInput(handles);
-if isfield(handles,'vid') && isvalid(handles.vid),
-  delete(handles.vid);
-end
+if ~strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  
+  if isfield(handles,'vid') && isvalid(handles.vid),
+    delete(handles.vid);
+  end
 
-s = 'Destroyed vid object';
-if exist('hwaitbar','var') && ishandle(hwaitbar),
-  waitbar(.6,hwaitbar,s);
-else
-  hwaitbar = waitbar(.6,s);
+  s = 'Destroyed vid object';
+  if exist('hwaitbar','var') && ishandle(hwaitbar),
+    waitbar(.6,hwaitbar,s);
+  else
+    hwaitbar = waitbar(.6,s);
+  end
+  
 end
 
 % delete preview image
 if isfield(handles,'hImage_Preview') && ishandle(handles.hImage_Preview),
   delete(handles.hImage_Preview);
-end
 
-
-s = 'Deleted preview image';
-if exist('hwaitbar','var') && ishandle(hwaitbar),
-  waitbar(.7,hwaitbar,s);
-else
-  hwaitbar = waitbar(.7,s);
+  s = 'Deleted preview image';
+  if exist('hwaitbar','var') && ishandle(hwaitbar),
+    waitbar(.7,hwaitbar,s);
+  else
+    hwaitbar = waitbar(.7,s);
+  end
 end
 
 % delete temp recorder timer

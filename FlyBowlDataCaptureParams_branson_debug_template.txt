@@ -122,6 +122,6 @@ MaxFliesLoadedTime,300
 # whether to couple camera and temperature probe start
 CoupleCameraTempProbeStart,1
 # where the condition files will be stored
-ConditionDirectory,C:\Users\labadmin\Documents\FlyBowl\conditionfiles
+ConditionDirectory,D:\Documents\data\FBDC\conditionfiles
 # Number of seconds to record
 RecordTime,20

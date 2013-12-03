@@ -1,6 +1,6 @@
 function FBDC_ClearTimers()
 
-timernames = {'FBDC_RecordTimer','FliesLoaded_Timer','FBDC_USBTC08_Timer'};
+timernames = {'FBDC_RecordTimer','FliesLoaded_Timer','FBDC_USBTC08_Timer','FBDC_CheckPreview_Timer','FBDC_Preview_Timer'};
 
 for j = 1:numel(timernames),
   

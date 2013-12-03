@@ -81,7 +81,7 @@ handles.minhour = rem(datenum('06:00'),1);
 handles.maxhour = rem(datenum('23:00'),1);
 
 handles.SAGECodeDir = '../SAGE/MATLABInterface/Trunk';
-handles.JCtraxCodeDir = '../JCtrax';
+handles.JCtraxCodeDir = '../JAABA';
 
 % max number of times to try to grab temperature and fail
 handles.MaxNTempGrabAttempts = 30;
@@ -146,7 +146,7 @@ if fid < 0,
 end
 
 handles.params = struct;
-try
+%try
   % read each line
   while true,
     s = fgetl(fid);
@@ -179,7 +179,8 @@ try
     'UFMFBGKeyFramePeriod','UFMFMaxBoxLength','UFMFBackSubThresh',...
     'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
     'ScanLineYLim','MinFliesLoadedTime','MaxFliesLoadedTime',...
-    'CoupleCameraTempProbeStart'};
+    'CoupleCameraTempProbeStart',...
+    'BIASServerPortBegin','BIASServerPortStep','BIASCameraNumbers'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -196,9 +197,15 @@ try
     'DoRotatePreviewImage',...
     'QuickStatsStatsFileName',...
     'Assay_Room',...
-    'ConditionDirectory'};
+    'ConditionDirectory',...
+    'BIASURLBase',...
+    'BIASBinary',...
+    'BIASConfigFile'};
   for i = 1:length(notlist_params),
     fn = notlist_params{i};
+    if ~isfield(handles.params,fn),
+      continue;
+    end
     if ischar(handles.params.(fn){1}),
       tmp = handles.params.(fn){1};
       for j = 2:length(handles.params.(fn)),
@@ -222,10 +229,10 @@ try
     end
   end
 
-catch ME
-  uiwait(errordlg({'Error parsing parameter file:',getReport(ME)},'Error reading parameters'));
-  rethrow(ME);
-end
+% catch ME
+%   uiwait(errordlg({'Error parsing parameter file:',getReport(ME)},'Error reading parameters'));
+%   rethrow(ME);
+% end
 
 %% dorotatepreview needs special parsing
 
@@ -902,6 +909,19 @@ handles.advanced_controls = setdiff(findall(handles.uipanel_advanced,'Type','uic
   findall(handles.uipanel_advanced,'Type','uicontrol','Style','text'));
 set(handles.advanced_controls,'Enable','off');
 
+%% BIAS
+
+if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  handles.BIASParams = struct;
+  BIASfns = {'BIASBinary','BIASConfigFile','BIASServerPortBegin','BIASServerPortStep','BIASCameraNumbers','BIASURLBase'};
+  for i = 1:numel(BIASfns),
+    fn = BIASfns{i};
+    if isfield(handles.params,fn),
+      handles.BIASParams.(fn) = handles.params.(fn);
+    end
+  end
+end
+
 %% Detect Cameras
 
 % if DeviceID not stored in rc file, choose first DeviceID
@@ -1037,7 +1057,7 @@ handles.MetaData_RoomHumidity = nan;
 
 %% Plot frame rate
 
-handles.Status_FrameRate_MaxNFramesPlot = 100;
+handles.Status_FrameRate_MaxNFramesPlot = 3000;
 handles.Status_FrameRate_MaxSecondsPlot = handles.Status_FrameRate_MaxNFramesPlot / ...
   handles.params.Imaq_FrameRate;
 handles.Status_FrameRate_History = nan(2,handles.Status_FrameRate_MaxNFramesPlot);
@@ -1054,7 +1074,8 @@ xlabel(handles.axes_Status_FrameRate,'Seconds ago');
 set(handles.axes_Status_FrameRate,'Color',[0,0,0],...
   'XColor','w','YColor','w',...
   'XLim',[-handles.Status_FrameRate_MaxSecondsPlot,0],...
-  'YLim',handles.params.FrameRatePlotYLim);
+  'YLim',handles.params.FrameRatePlotYLim,...
+  'Box','off');
 
 %% Plot temperature
 
@@ -1074,11 +1095,14 @@ xlabel(handles.axes_Status_Temp,'Seconds ago');
 set(handles.axes_Status_Temp,'Color',[0,0,0],...
   'XColor','w','YColor','w',...
   'XLim',[-handles.Status_Temp_MaxSecondsPlot,0],...
-  'YLim',handles.params.TempPlotYLim);
+  'YLim',handles.params.TempPlotYLim,...
+  'Box','off');
 
 %% Preview axes
 
-set(handles.axes_PreviewVideo,'xtick',[],'ytick',[]);
+if isfield(handles,'axes_PreviewVideo'),
+  set(handles.axes_PreviewVideo,'xtick',[],'ytick',[]);
+end
 
 %% computeQuickStats parameters
 

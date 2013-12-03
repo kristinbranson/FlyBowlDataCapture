@@ -9,10 +9,17 @@ handles.IsCameraRunning = ~isempty(handles.IsCameraRunningFiles);
 
 handles = clearVideoInput(handles);
 
+%handles.DeviceIDs = {};
+
+if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  
+  % TODO: detect what cameras are actually attached
+  handles.DeviceIDs = handles.BIASParams.BIASCameraNumbers;
+  
+else
+
 % reset image acquisition
 imaqreset;
-
-%handles.DeviceIDs = {};
 
 % check for adaptor
 if handles.IsCameraRunning,
@@ -52,7 +59,7 @@ if handles.IsCameraRunning,
       end
     end
     load(filename,'adaptorinfo');
-  catch
+  catch %#ok<CTCH>
     s = sprintf('Could not load adaptor info from %s',filename);
     uiwait(errordlg(s,'Error loading imaq adaptor'));
     return;
@@ -131,5 +138,7 @@ handles.DeviceIDs = cell2mat(adaptorinfo.DeviceIDs(devidx));
 % end
 
 handles.adaptorinfo = adaptorinfo;
+
+end
 
 fprintf('Exiting detectCameras\n');

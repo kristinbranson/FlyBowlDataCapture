@@ -3,6 +3,7 @@ function [out,success,errmsg,warnings] = computeQuickStats(expdir,varargin)
 success = false;
 out = struct;
 warnings = {};
+errmsg = '';
 
 % name of diagnostics file within experiment directory
 UFMFDiagnosticsFileStr = 'ufmf_diagnostics.txt';
@@ -163,43 +164,49 @@ ShowUFMFBorderRight = 50;
 
 %% Read files
 
-% read UFMF diagnostics file
-UFMFDiagnosticsFileName = fullfile(expdir,UFMFDiagnosticsFileStr);
-[UFMFStats,success1,errmsg] = readUFMFDiagnostics(UFMFDiagnosticsFileName);
-out.UFMFStats = UFMFStats;
-if ~success1,
-  return;
-end
-
-if ~isfield(UFMFStats,'stream'),
-  errmsg = 'Stream not read from UFMF diagnostics file';
-  return;
-end
-if ~isfield(UFMFStats.stream,'timestamp'),
-  errmsg = 'timestamp field of UFMF stream not found';
-  return;
-end
-if ~isfield(UFMFStats,'summary'),
-  errmsg = 'Summary stats not read from UFMF diagnostics file';
-  return;
-end
-
 % open video file
 MovieFile = fullfile(expdir,MovieFileStr);
 [readframe,nframes,fid,headerinfo] = get_readframe_fcn(MovieFile);
-if nframes ~= UFMFStats.summary.nFrames,
-  warnings{end+1} = sprintf('Number of frames read from movie (%d) does not equal number of frames recorded in UFMF Stats (%d)',nframes,UFMFStats.summary.nFrames);
-end
 
-[UFMFStats,success1,errmsg] = readUFMFDiagnostics(UFMFDiagnosticsFileName);
-out.UFMFStats = UFMFStats;
-if ~success1,
-  return;
-end
+% read UFMF diagnostics file
+UFMFDiagnosticsFileName = fullfile(expdir,UFMFDiagnosticsFileStr);
+if exist(UFMFDiagnosticsFileName,'file'),
+  [UFMFStats,success1,errmsg] = readUFMFDiagnostics(UFMFDiagnosticsFileName);
+  if ~success1,
+    return;
+  end
+  out.UFMFStats = UFMFStats;
 
-UFMFStats.summary.ImageHeight = headerinfo.max_height;
-UFMFStats.summary.ImageWidth = headerinfo.max_width;
+  if ~isfield(UFMFStats,'stream'),
+    errmsg = 'Stream not read from UFMF diagnostics file';
+    return;
+  end
+  if ~isfield(UFMFStats.stream,'timestamp'),
+    errmsg = 'timestamp field of UFMF stream not found';
+    return;
+  end
+  if ~isfield(UFMFStats,'summary'),
+    errmsg = 'Summary stats not read from UFMF diagnostics file';
+    return;
+  end
 
+  if nframes ~= UFMFStats.summary.nFrames,
+    warnings{end+1} = sprintf('Number of frames read from movie (%d) does not equal number of frames recorded in UFMF Stats (%d)',nframes,UFMFStats.summary.nFrames);
+  end
+  
+  [UFMFStats,success1,errmsg] = readUFMFDiagnostics(UFMFDiagnosticsFileName);
+  out.UFMFStats = UFMFStats;
+  if ~success1,
+    return;
+  end
+  
+  UFMFStats.summary.ImageHeight = headerinfo.max_height;
+  UFMFStats.summary.ImageWidth = headerinfo.max_width;
+  
+else
+  UFMFStats = struct;
+  UFMFStats.stream.timestamp = headerinfo.timestamps;
+end  
 
 % read temperature stream
 TemperatureFileName = fullfile(expdir,TemperatureFileStr);
@@ -265,6 +272,8 @@ else
   end
   bkgdim = median(meanims,4);
 end
+% WARNING: THIS WON'T WORK WITH COLOR IMAGES
+bkgdim = bkgdim';
 
 %% do a little bit of background subtraction, connected components
 
@@ -722,8 +731,14 @@ linkaxes(ScanAx);
 %% save figure
 
 if ~isempty(SaveFileStr),
+%   [~,~,ext] = fileparts(SaveFileStr);
+%   if isempty(ext) || ext(1) ~= '.',
+%     ext = 'png';
+%   else
+%     ext = ext(2:end);
+%   end
   SaveFileName = fullfile(expdir,SaveFileStr);
-  export_fig(SaveFileName,fig);
+  export_fig(SaveFileName,hfig);
 end
 
 %% save data

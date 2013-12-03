@@ -1,5 +1,11 @@
 function [DeviceIDsUsed,handles] = getIsCameraRunningDevices(handles)
 
+if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  global FBDC_BIASCAMERASINUSE; %#ok<TLEV>
+  DeviceIDsUsed = FBDC_BIASCAMERASINUSE;
+  
+else
+
 handles.IsCameraRunningFiles = dir(fullfile(handles.DetectCameras_Params.DataDir,'*.mat'));
 DeviceIDsUsed = nan(1,length(handles.IsCameraRunningFiles));
 for i = 1:length(handles.IsCameraRunningFiles),
@@ -10,3 +16,5 @@ end
 badidx = isnan(DeviceIDsUsed);
 handles.IsCameraRunningFiles(badidx) = [];
 DeviceIDsUsed(badidx) = [];
+
+end
