@@ -1,0 +1,147 @@
+# Directory to store video to
+#OutputDirectory,D:\data,D:\data
+OutputDirectory,D:\debug_data,D:\debug_data
+#OutputDirectory,D:\special_data,D:\special_data
+# Directory to temporarily store video to
+TmpOutputDirectory,D:\tmpdata,D:\tmpdata
+# Names of hard drives, corresponding to the ordered OutputDirectory list
+HardDriveName,(branson-dc2:Internal_D),(branson-dc2:Internal_D)
+# Camera adaptor
+#Imaq_Adaptor,udcam
+Imaq_Adaptor,bias
+# Video file type
+#FileType,fmf
+FileType,ufmf
+
+# Prefix of movie file
+MovieFilePrefix,movie
+# Name of file to store metadata to
+MetaDataFileName,Metadata.xml
+# Name of file to store log to
+LogFileName,Log.txt
+# Log file for writing ufmf
+UFMFLogFileName,ufmf_log.txt
+# Name of file to write UFMF diagnostic stats
+UFMFStatFileName,ufmf_diagnostics.txt
+# Name of mat file containing quickstats stats
+QuickStatsStatsFileName,QuickStats_Stats_20110914T022555.mat
+
+# List of possible Experimenter values
+Assay_Experimenters,edwardsa,robiea,bransonk
+# List of possible Incubator ID values
+Rearing_IncubatorIDs,1,2,3,4
+# Assay room number
+Assay_Room,2C.310.1
+# List of possible Rig values
+Assay_Rigs,1,2
+# List of possible Plate values
+Assay_Plates,10,11,12,13,14,15,16,17,18
+# List of possible Visual Surround values
+Assay_VisualSurrounds,1,2,3,4
+# List of possible Lid values
+Assay_Lids,01,02,03,04,05,06,07
+# List of possible Bowl values
+Assay_Bowls,A,B,C,D
+# MetaData: Assay name
+MetaData_AssayName,FlyBowl
+
+# Frame rate we expect
+Imaq_FrameRate,30.4
+# Maximum frame rate we will get
+Imaq_MaxFrameRate,31
+# limits of y-axis for frame rate plot
+FrameRatePlotYLim,0,160
+# Limits of y-axis for temperature plot
+TempPlotYLim,20,35
+# Time in between temperature readings
+TempProbePeriod,5
+# Which channels have temperature probes
+TempProbeChannels,1,2
+# Thermocouple types
+TempProbeTypes,T,T
+# if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
+TempProbeReject60Hz,0
+# whether to read temperature or not
+DoRecordTemp,0
+# number of temperature and humidity samples to read from the Precon probe
+# set to 0 if no Precon sensor
+NPreconSamples,0
+# which serial port to connect to -- I have no idea how to figure this out 
+# automatically
+PreconSensorSerialPort,COM1
+
+# y-axis limits for scan lines
+ScanLineYLim,60,250
+# min, max time between loading flies and starting recording
+MinFliesLoadedTime,25
+MaxFliesLoadedTime,300
+# whether to couple camera and temperature probe start
+CoupleCameraTempProbeStart,1
+# where the condition files will be stored
+ConditionDirectory,D:\Documents\data\FBDC\conditionfiles
+# Number of seconds to record
+RecordTime,20
+
+## new BIAS specific parameters
+
+# BIAS config file
+BIASBinary,D:\Documents\wbd\bias\build\bias_gui.exe
+BIASConfigFile,D:\Documents\code\FlyBowlDataCapture\bias_config_13Y3M_20131126.json
+# Port to look for the camera
+BIASServerPortBegin,5000
+BIASServerPortStep,10
+BIASCameraNumbers,1,2
+# base url for communicating with the camera
+BIASURLBase,http://127.0.0.1
+
+##### obsolete
+
+## all of this is stored in the BIAS config file
+## Video format
+##Imaq_VideoFormat,F7_Y8_1280x1024
+#Imaq_VideoFormat,Format 7, Mode 0
+## whether to display the video preview with the jet colormap
+#ColormapPreview,0
+## Shutter period
+#Imaq_Shutter,100
+## Gain
+#Imaq_Gain,170
+## Brightness
+#Imaq_Brightness,25
+## Device name
+#Imaq_DeviceName,A622f
+## Video ROI Position
+#Imaq_ROIPosition,128,0,1024,1024
+## Minimum time in between preview window updates
+PreviewUpdatePeriod,1
+# Whether to compute UFMF diagnostics
+#UFMFPrintStats,1
+## number of frames between outputting per-frame compression statistics: 0 means don't print, 1 means every frame
+#UFMFStatStreamPrintFreq,30
+## number of frames between computing statistics of compression error. 0 means don't compute, 1 means every frame
+#UFMFStatComputeFrameErrorFreq,30
+## whether to print information about the time each part of the computation takes
+#UFMFStatPrintTimings,1
+## maximum fraction of pixels that can be foreground to try compressing frame
+#UFMFMaxFracFgCompress,.2
+## number of frames the background model should be based on 
+#UFMFMaxBGNFrames,100
+## number of seconds between updates to the background model
+#UFMFBGUpdatePeriod,1
+## number of seconds between spitting out a new background model
+#UFMFBGKeyFramePeriod,100
+## max length of box stored during compression
+#UFMFMaxBoxLength,5
+## threshold for background subtraction
+#UFMFBackSubThresh,15
+## first nFramesInit we always update the background model
+#UFMFNFramesInit,100
+## while ramping up the background model, use the following keyframe periods
+#UFMFBGKeyFramePeriodInit,1,10,25,50,75
+## lookup table from rig+bowl to whether to rotate the preview image
+#DoRotatePreviewImage,(1,A,1),(1,B,1),(1,C,0),(1,D,0),(2,A,1),(2,B,1),(2,C,0),(2,D,0)
+
+## List of room names
+#Assay_Rooms,2C.310.1,2C.310.2,2C.310.3
+## for gdcam, number of frames between updates
+#gdcamPreviewFrameInterval,2

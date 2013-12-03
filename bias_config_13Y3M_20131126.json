@@ -1,0 +1,237 @@
+{
+    "camera" : {
+        "format7Settings" : {
+            "mode" : "0",
+            "pixelFormat" : "RAW8",
+            "roi" : {
+                "height" : 1024,
+                "offsetX" : 0,
+                "offsetY" : 0,
+                "width" : 1280 
+            }
+        },
+        "frameRate" : "Format7",
+        "guid" : "791efb90fbdd3890ab88b083deb43d53",
+        "model" : "Flea3 FL3-U3-13Y3M",
+        "properties" : {
+            "autoExposure" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 1.32196044921875,
+                "autoActive" : true,
+                "on" : true,
+                "onePush" : false,
+                "present" : true,
+                "value" : 480 
+            },
+            "brightness" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : true,
+                "onePush" : false,
+                "present" : true,
+                "value" : 16 
+            },
+            "focus" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : false,
+                "value" : 0 
+            },
+            "frameRate" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 150.0,
+                "autoActive" : true,
+                "on" : true,
+                "onePush" : false,
+                "present" : true,
+                "value" : 480 
+            },
+            "gain" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 16.687091827392578125,
+                "autoActive" : true,
+                "on" : true,
+                "onePush" : false,
+                "present" : true,
+                "value" : 256 
+            },
+            "gamma" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 1.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : true,
+                "value" : 1024 
+            },
+            "hue" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : false,
+                "value" : 0 
+            },
+            "iris" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : false,
+                "value" : 0 
+            },
+            "pan" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : false,
+                "value" : 0 
+            },
+            "saturation" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : false,
+                "value" : 0 
+            },
+            "sharpness" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : true,
+                "value" : 1024 
+            },
+            "shutter" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 6.656646728515625,
+                "autoActive" : true,
+                "on" : true,
+                "onePush" : false,
+                "present" : true,
+                "value" : 1042 
+            },
+            "temperature" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 3.1747250556945800781,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : true,
+                "value" : 3175 
+            },
+            "tilt" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : false,
+                "value" : 0 
+            },
+            "triggerDelay" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : true,
+                "value" : 0 
+            },
+            "triggerMode" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : true,
+                "value" : 0 
+            },
+            "whiteBalance" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : false,
+                "valueBlue" : 0,
+                "valueRed" : 0
+            },
+            "zoom" : {
+                "absoluteControl" : false,
+                "absoluteValue" : 0.0,
+                "autoActive" : false,
+                "on" : false,
+                "onePush" : false,
+                "present" : false,
+                "value" : 0 
+            }
+        },
+        "triggerType" : "Internal",
+        "vendor" : "Point Grey Research",
+        "videoMode" : "Format7" 
+    },
+    "configuration" : {
+        "directory" : "D:/Documents/code/FlyBowlDataCapture",
+        "fileName" : "bias_config_13Y3M_201301126" 
+    },
+    "display" : {
+        "orientation" : {
+            "flipHorizontal" : false,
+            "flipVertical" : false 
+        },
+        "rotation" : 0,
+        "updateFrequency" : 15.0 
+    },
+    "logging" : {
+        "directory" : "D:/Videos",
+        "enabled" : false,
+        "fileName" : "bias_video",
+        "format" : "ufmf",
+        "settings" : {
+            "avi" : {
+                "codec" : "XVID",
+                "frameSkip" : 1 
+            },
+            "bmp" : {
+                "frameSkip" : 1 
+            },
+            "fmf" : {
+                "frameSkip" : 1 
+            },
+            "ufmf" : {
+                "backgroundThreshold" : 15,
+                "boxLength" : 30,
+                "compressionThreads" : 15,
+                "dilate" : {
+                    "on" : false,
+                    "windowSize" : 2 
+                },
+                "frameSkip" : 1,
+                "medianUpdateCount" : 100,
+                "medianUpdateInterval" : 50 
+            }
+        }
+    },
+    "server" : {
+        "enabled" : true,
+        "port" : 5010 
+    },
+    "timer" : {
+        "enabled" : false,
+        "settings" : {
+            "duration" : 300 
+        }
+    }
+}
