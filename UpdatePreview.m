@@ -2,15 +2,15 @@ function UpdatePreview(obj,event,himage)
 
 % stop if we've halted
 global FBDC_DIDHALT;
-if ~isempty(FBDC_DIDHALT) && FBDC_DIDHALT,
-  return;
-end
-
 fprintf('In UpdatePreview at time %s\n',datestr(now,'HH:MM:SS'));
 
 % should we update?
 params = getappdata(himage,'PreviewParams');
 lastupdate = getappdata(himage,'LastPreviewUpdateTime');
+
+if numel(FBDC_DIDHALT)>=params.GUIi && FBDC_DIDHALT(params.GUIi),
+  return;
+end
 
 if strcmpi(params.AdaptorName,'bias'),
   
@@ -26,11 +26,14 @@ if strcmpi(params.AdaptorName,'bias'),
   end
   
   biasstatus = res.value;
-  if biasstatus.capturing == 0,
+  v = get(himage,'String');
+  if biasstatus.capturing == 0 && strcmpi(v,'On'),
     set(himage,'String','Off','BackgroundColor',params.grayed_bkgdcolor);
     % signal that capturing has stopped
-    FBDC_DIDHALT = true;
+    %FBDC_DIDHALT = true;
     return;
+  elseif biasstatus.capturing > 0 && strcmpi(v,'Off'),
+    set(himage,'String','On','BackgroundColor',params.Status_Recording_bkgdcolor);    
   end
   
   v = get(params.text_Status_Recording,'String');

@@ -62,7 +62,7 @@ TempProbeTypes,T,T
 # if 1, temperature probe will reject 60 Hz, otherwise will reject 50 Hz
 TempProbeReject60Hz,0
 # whether to read temperature or not
-DoRecordTemp,0
+DoRecordTemp,1
 # number of temperature and humidity samples to read from the Precon probe
 # set to 0 if no Precon sensor
 NPreconSamples,0
@@ -85,8 +85,8 @@ RecordTime,20
 ## new BIAS specific parameters
 
 # BIAS config file
-BIASBinary,D:\Documents\wbd\bias\build\bias_gui.exe
-BIASConfigFile,D:\Documents\code\FlyBowlDataCapture\bias_config_13Y3M_20131126.json
+BIASBinary,D:\Documents\wbd\bias\build\test_gui.exe
+BIASConfigFile,D:\Documents\code\FlyBowlDataCapture\bias_config_13Y3M_20131209.json
 # Port to look for the camera
 BIASServerPortBegin,5000
 BIASServerPortStep,10

@@ -31,13 +31,14 @@ if strcmpi(handles.params.Imaq_Adaptor,'bias'),
   j = mod(handles.GUIi-1,size(handles.status_colors,1))+1;
   cameraname = sprintf('GUI%d(%s)',handles.GUIi,handles.status_color_names{j});
 
-  [handles.vid,success,msg] = ConnectToBIAS(handles.BIASParams,handles.DeviceID,...
+  [handles.vid,success,msg,warnings] = ConnectToBIAS(handles.BIASParams,handles.DeviceID,...
     'windowgeometry',biaspos,...
     'cameraname',cameraname);
   if ~success,
     errordlg(sprintf('Error connecting to camera: %s',msg));
     error(msg);
   end
+  warning(sprintf('%s\n',warnings{:})); %#ok<SPWRN>
   
   handles.params.Imaq_DeviceName = regexprep(handles.vid.biasconfig.camera.model,'[^a-zA-Z0-9]','');
   handles.params.Imaq_VideoFormat = 'F7';
@@ -73,6 +74,7 @@ if strcmpi(handles.params.Imaq_Adaptor,'bias'),
   PreviewParams.BIASParams = handles.vid.BIASParams;
   PreviewParams.grayed_bkgdcolor = handles.grayed_bkgdcolor;
   PreviewParams.Status_Recording_bkgdcolor = handles.Status_Recording_bkgdcolor;
+  PreviewParams.GUIi = handles.GUIi;
   % PreviewParams.ColormapPreview = handles.params.ColormapPreview;
   % PreviewParams.DoRotatePreviewImage = handles.params.DoRotatePreviewImage;
   %
@@ -80,11 +82,12 @@ if strcmpi(handles.params.Imaq_Adaptor,'bias'),
   setappdata(handles.text_Status_Preview,'LastPreviewUpdateTime',-inf);
   %
   % preview(handles.vid, handles.hImage_Preview);
+  timername = sprintf('FBDC_Preview_Timer%d',handles.GUIi);
   handles.PreviewTimer = timer('ExecutionMode','FixedRate',...
     'Period',1,...
     'TimerFcn',{@UpdatePreview,handles.text_Status_Preview},...
     'StartDelay',1,...
-    'Name','FBDC_Preview_Timer');
+    'Name',timername);
   start(handles.PreviewTimer);
 
   
@@ -290,11 +293,13 @@ else
   CheckPreviewParams.hImage_Preview = handles.hImage_Preview;
   CheckPreviewParams.MaxPreviewUpdatePeriod = 3;
   CheckPreviewParams.figure_main = handles.figure_main;
+  CheckPreviewParams.GUIi = handles.GUIi;
+  timername = sprintf('FBDC_CheckPreview_Timer%d',handles.GUIi);
   handles.CheckPreviewTimer = timer('ExecutionMode','FixedRate',...
     'Period',1,...
     'TimerFcn',{@CheckPreview,CheckPreviewParams},...
     'StartDelay',1,...
-    'Name','FBDC_CheckPreview_Timer');
+    'Name',timername);
   start(handles.CheckPreviewTimer);
   
   % add to status log

@@ -1,8 +1,18 @@
 function success = TempProbe_GrabTemp(obj,event,hObject) %#ok<INUSL>
 
-% stop if we've halted
 global FBDC_DIDHALT;
-if ~isempty(FBDC_DIDHALT) && FBDC_DIDHALT,
+
+try
+
+success = false;
+if ~ishandle(hObject),
+  return;
+end
+
+handles = guidata(hObject);
+
+% stop if we've halted
+if numel(FBDC_DIDHALT) >= handles.GUIi && FBDC_DIDHALT(handles.GUIi),
   try
     if strcmpi(get(obj,'Running'),'on'),
       stop(obj);
@@ -14,14 +24,6 @@ end
 
 %global FBDC_TempFid;
 
-try
-
-success = false;
-if ~ishandle(hObject),
-  return;
-end
-
-handles = guidata(hObject);
 
 % check if we are quitting
 if ~isfield(handles,'figure_main') || ~ishandle(handles.figure_main),

@@ -2,7 +2,7 @@ function CheckPreview(obj,event,params)
 
 % stop if we've halted
 global FBDC_DIDHALT;
-if ~isempty(FBDC_DIDHALT) && FBDC_DIDHALT,
+if numel(FBDC_DIDHALT) >= params.GUIi && FBDC_DIDHALT(params.GUIi),
   try
     if strcmpi(get(obj,'Running'),'on'),
       stop(obj);

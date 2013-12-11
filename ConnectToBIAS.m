@@ -41,15 +41,34 @@ vid.biasstatus = res.value;
 if ~isempty(windowgeometry),
   
   screensz = get(0,'ScreenSize');
-  windowgeometry_bias = [windowgeometry(1),...
-    -windowgeometry(2)-windowgeometry(4)+screensz(4)-25,...
+  windowgeometry_bias = [max(1,windowgeometry(1)),...
+    max(1,-windowgeometry(2)-windowgeometry(4)+screensz(4)-25),...
     windowgeometry(3),windowgeometry(4)+25];
+  
+  r = windowgeometry_bias(1) + windowgeometry_bias(3);
+  if r > screensz(3),
+    l = windowgeometry_bias(1) - (r-screensz(3)+1);
+    if l < 1,
+      windowgeometry_bias(3) = windowgeometry_bias(3) + l - 2;
+      l = 1;
+    end
+    windowgeometry_bias(1) = l;
+  end
+  
+  t = windowgeometry_bias(2) + windowgeometry_bias(4);
+  if t > screensz(4),
+    b = windowgeometry_bias(2) - (r-screensz(4)+1);
+    if b < 1,
+      windowgeometry_bias(4) = windowgeometry_bias(4) + b - 2;
+      b = 1;
+    end
+    windowgeometry_bias(2) = b;
+  end    
   
   res = loadjson(urlread(sprintf('%s?set-window-geometry={"x":"%d","y":"%d","width":"%d","height":"%d"}',...
     vid.BIASURL,windowgeometry_bias)));
   if res.success == 0,
-    msg = sprintf('Could not set window geometry: %s',res.message);
-    retrun;
+    warnings{end+1} = sprintf('Could not set window geometry to %s: %s',mat2str(windowgeometry_bias),res.message);
   end
   
 end
@@ -59,8 +78,8 @@ if ~isempty(cameraname),
   
   res = loadjson(urlread([vid.BIASURL,'?set-camera-name=',cameraname]));
   if res.success == 0,
-    msg = sprintf('Could not set camera name: %s',res.message);
-    retrun;
+    warnings{end+1} = sprintf('Could not set camera name to %s: %s',cameraname,res.message);
+    return;
   end
   
 end

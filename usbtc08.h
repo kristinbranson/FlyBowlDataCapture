@@ -12,10 +12,11 @@
  *  
  *********************************************************************/
 
+#ifndef __USBTC08_H__
+#define __USBTC08_H__
+
 /* Preprocessor Directives *******************************************/
-#ifndef WIN32
-  #error Operating system not defined / supported
-#endif
+
 
 #ifdef PREF0
   #undef PREF0
@@ -31,23 +32,58 @@
 #endif
 
 #ifdef __cplusplus
-  #define PREF0 extern "C" 
+  #define PREF0 extern "C"
+  #define TYPE_ENUM
 #else
   #define PREF0
+  #define TYPE_ENUM enum
 #endif
 
-#ifdef DYNLINK
-  #define PREF1 typedef
-  #define PREF2
-  #define PREF3(x) (__stdcall *x)
+#ifdef WIN32
+	typedef unsigned __int64 u_int64_t;
+	#ifdef PREF1
+	  #undef PREF1
+	#endif
+	#ifdef PREF2
+	  #undef PREF2
+	#endif
+	#ifdef PREF3
+	  #undef PREF3
+	#endif
+	/*	If you are dynamically linking USBTC08.DLL into your project #define DYNLINK here
+	 */
+	#ifdef DYNLINK
+	  #define PREF1 typedef
+		#define PREF2
+		#define PREF3(x) (__stdcall *x)
+	#else
+	  #define PREF1
+		#ifdef _USRDLL
+			#define PREF2 __declspec(dllexport) __stdcall
+		#else
+			#define PREF2 __declspec(dllimport) __stdcall
+		#endif
+	  #define PREF3(x) x
+	#endif
 #else
-  #define PREF1
-  #ifdef _USRDLL
-    #define PREF2 __declspec (dllexport) __stdcall
-  #else
-    #define PREF2 __declspec (dllimport) __stdcall  
-  #endif
-  #define PREF3(x) x
+	/* Define a 64-bit integer type */
+	#include <stdint.h>
+	//typedef int64_t __int64;
+
+	#ifdef DYNLINK
+		#define PREF1 typedef
+		#define PREF2
+		#define PREF3(x) (*x)
+	#else
+		#ifdef _USRDLL
+			#define PREF1 __attribute__((visibility("default")))
+		#else
+			#define PREF1
+		#endif
+		#define PREF2
+		#define PREF3(x) x
+	#endif
+	#define __stdcall
 #endif
 
 
@@ -289,3 +325,5 @@ PREF0 PREF1 short PREF2 PREF3(usb_tc08_legacy_get_driver_version) (void);
 PREF0 PREF1 short PREF2 PREF3(usb_tc08_legacy_get_version) (short *version, short handle);
 
 PREF0 PREF1 short PREF2 PREF3(usb_tc08_legacy_get_cycle) (long *cycle, short handle);
+
+#endif

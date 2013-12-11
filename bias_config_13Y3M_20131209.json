@@ -7,16 +7,17 @@
                 "height" : 1024,
                 "offsetX" : 0,
                 "offsetY" : 0,
-                "width" : 1280 
+                "width" : 1024 
             }
         },
         "frameRate" : "Format7",
+        "guid" : "be450f6debcc101513b150936c0f6273",
         "model" : "Flea3 FL3-U3-13Y3M",
         "properties" : {
             "autoExposure" : {
                 "absoluteControl" : false,
                 "absoluteValue" : 1.32196044921875,
-                "autoActive" : true,
+                "autoActive" : false,
                 "on" : true,
                 "onePush" : false,
                 "present" : true,
@@ -43,7 +44,7 @@
             "frameRate" : {
                 "absoluteControl" : false,
                 "absoluteValue" : 150.0,
-                "autoActive" : true,
+                "autoActive" : false,
                 "on" : true,
                 "onePush" : false,
                 "present" : true,
@@ -51,12 +52,12 @@
             },
             "gain" : {
                 "absoluteControl" : false,
-                "absoluteValue" : 16.687091827392578125,
-                "autoActive" : true,
+                "absoluteValue" : 12.631346702575683594,
+                "autoActive" : false,
                 "on" : true,
                 "onePush" : false,
                 "present" : true,
-                "value" : 256 
+                "value" : 196 
             },
             "gamma" : {
                 "absoluteControl" : false,
@@ -115,7 +116,7 @@
             "shutter" : {
                 "absoluteControl" : false,
                 "absoluteValue" : 6.656646728515625,
-                "autoActive" : true,
+                "autoActive" : false,
                 "on" : true,
                 "onePush" : false,
                 "present" : true,
@@ -123,12 +124,12 @@
             },
             "temperature" : {
                 "absoluteControl" : false,
-                "absoluteValue" : 3.1747250556945800781,
+                "absoluteValue" : 3.1440999507904052734,
                 "autoActive" : false,
                 "on" : false,
                 "onePush" : false,
                 "present" : true,
-                "value" : 3175 
+                "value" : 3144 
             },
             "tilt" : {
                 "absoluteControl" : false,
@@ -165,7 +166,7 @@
                 "onePush" : false,
                 "present" : false,
                 "valueBlue" : 0,
-                "valueRed" : 0
+                "valueRed" : 0 
             },
             "zoom" : {
                 "absoluteControl" : false,
@@ -183,7 +184,7 @@
     },
     "configuration" : {
         "directory" : "D:/Documents/code/FlyBowlDataCapture",
-        "fileName" : "bias_config_13Y3M_201301126" 
+        "fileName" : "bias_config_13Y3M_201301209" 
     },
     "display" : {
         "orientation" : {

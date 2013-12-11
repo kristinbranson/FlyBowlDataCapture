@@ -1,6 +1,7 @@
 function wrapUpVideo(obj,event,hObject,AdaptorName,didabort) %#ok<INUSL>
 
 %global FBDC_TempFid;
+global FBDC_BIASCAMERASRUNNING;
 
 hwait = waitbar(0,'Closing video file: stopping recording');
 
@@ -54,6 +55,19 @@ if strcmpi(AdaptorName,'bias'),
       error(s);
     end
     addToStatus(handles,sprintf('Waiting for recording to stop (%f/%f s)',dt,MaxTimeWaitStopRunning));
+  end
+  
+  % remove from list of cameras running
+  FBDC_BIASCAMERASRUNNING = setdiff(FBDC_BIASCAMERASRUNNING,handles.DeviceID);
+  
+  % stop preview update
+  try
+    if isfield(handles,'PreviewTimer') && isvalid(handles.PreviewTimer),
+      stop(handles.PreviewTimer);
+      delete(handles.PreviewTimer);
+    end
+  catch ME,
+    warning('Error stopping preview timer: %s',getReport(ME));
   end
   
 else
@@ -141,6 +155,10 @@ end
 end
 
 handles = guidata(hObject);
+
+% stop recording temperature
+handles = resetTempProbe2(handles);
+
 handles.IsRecording = false;
 handles.FinishedRecording = true;
 

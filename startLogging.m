@@ -113,10 +113,11 @@ if strcmpi(handles.params.Imaq_Adaptor,'bias'),
 end
 
 % create a timer for stopping 
+timername = sprintf('FBDC_RecordTimer%d',handles.GUIi);
 handles.StopTimer = timer('TimerFcn',{@Stop_RecordTimer,handles.vid,handles.figure_main,handles.params.Imaq_Adaptor},...
   'StartDelay',handles.params.RecordTime,...
   'TasksToExecute',1,...
-  'Name','FBDC_RecordTimer');
+  'Name',timername);
 
 guidata(hObject,handles);
 

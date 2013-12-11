@@ -22,10 +22,10 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 22-Apr-2012 16:50:51
+% Last Modified by GUIDE v2.5 09-Dec-2013 18:01:27
 
 % Begin initialization code - DO NOT EDIT
-gui_Singleton = 1;
+gui_Singleton = 0;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
                    'gui_OpeningFcn', @FlyBowlDataCapture_OpeningFcn, ...
@@ -72,8 +72,12 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 % con = drv.connect(url,'');
 % handles.FlyBoy_stm = con.createStatement;
 
+% get GUI instance
+%handles.GUIInstanceDir = '.GUIInstances';
+handles = getGUIInstance(handles);
+
 global FBDC_DIDHALT;
-FBDC_DIDHALT = false;
+FBDC_DIDHALT(handles.GUIi) = false;
 
 handles.DEBUG = false;
 handles.IsProcessingError = false;
@@ -85,10 +89,6 @@ handles.output = hObject;
 
 % name of rc file
 handles.rcfile = '.FlyBowlDataCapture_rc.mat';
-
-% get GUI instance
-%handles.GUIInstanceDir = '.GUIInstances';
-handles = getGUIInstance(handles);
 
 handles = LoadPreviousValues(handles);
 
@@ -182,7 +182,9 @@ if ishandle(hwait),
 end
 
 % UIWAIT makes FlyBowlDataCapture wait for user response (see UIRESUME)
-uiwait(handles.figure_main);
+%uiwait(handles.figure_main);
+
+handles.output = handles.figure_main;
 
 % catch ME,
 %   
@@ -240,29 +242,31 @@ end
 
 
 % --- Outputs from this function are returned to the command line.
-function FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles) 
+function varargout = FlyBowlDataCapture_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-try
 
-  if ishandle(hObject),    
-    guidata(hObject,handles);
-  end
-  if ishandle(handles.figure_main),
-    delete(handles.figure_main);
-  end
-
-catch ME
-  s = sprintf('Error while closing GUI: %s\n',getReport(ME));
-  uiwait(errordlg(s,'Error while closing GUI'));
-  if exist('handles','var') && isfield(handles,'figure_main') && ...
-      ishandle(handles.figure_main),
-    delete(handles.figure_main);
-  end
-end
+varargout{1} = handles.output;
+% try
+% 
+%   if ishandle(hObject),    
+%     guidata(hObject,handles);
+%   end
+%   if ishandle(handles.figure_main),
+%     delete(handles.figure_main);
+%   end
+% 
+% catch ME
+%   s = sprintf('Error while closing GUI: %s\n',getReport(ME));
+%   uiwait(errordlg(s,'Error while closing GUI'));
+%   if exist('handles','var') && isfield(handles,'figure_main') && ...
+%       ishandle(handles.figure_main),
+%     delete(handles.figure_main);
+%   end
+% end
 
 % --- Executes on selection change in popupmenu_Assay_Experimenter.
 function popupmenu_Assay_Experimenter_Callback(hObject, eventdata, handles) %#ok<*DEFNU>
@@ -915,11 +919,13 @@ FliesLoaded_Timer_Params = ...
  'pushbutton_FliesLoaded',handles.pushbutton_FliesLoaded,...
  'pushbutton_StartRecording',handles.pushbutton_StartRecording,...
  'MinFliesLoadedTime',handles.params.MinFliesLoadedTime,...
- 'MaxFliesLoadedTime',handles.params.MaxFliesLoadedTime);
+ 'MaxFliesLoadedTime',handles.params.MaxFliesLoadedTime,...
+ 'GUIi',handles.GUIi);
 
+timername = sprintf('FliesLoaded_Timer%d',handles.GUIi);
 handles.FliesLoaded_Timer = timer('Period',1,...
   'ExecutionMode','fixedRate',...
-  'Name','FliesLoaded_Timer','tag','FliesLoaded_Timer',...
+  'Name',timername,'tag','FliesLoaded_Timer',...
   'TimerFcn',{@FliesLoaded_Timer_Callback,FliesLoaded_Timer_Params},...
   'StopFcn',{@FliesLoaded_Timer_Stop,FliesLoaded_Timer_Params},...
   'BusyMode','drop');
@@ -957,7 +963,7 @@ function FliesLoaded_Timer_Callback(obj,event,params)
 
 % stop if we've halted
 global FBDC_DIDHALT;
-if ~isempty(FBDC_DIDHALT) && FBDC_DIDHALT,
+if numel(FBDC_DIDHALT) >= params.GUIi && FBDC_DIDHALT(params.GUIi),
   try
     if strcmpi(get(obj,'Running'),'on'),
       stop(obj);
@@ -1175,7 +1181,7 @@ if ~strcmp(oldname,handles.FileName),
   addToStatus(handles,{sprintf('Renamed %s -> %s.',oldname,handles.FileName)});
 end
 
-handles = resetTempProbe(handles);
+handles = resetTempProbe2(handles);
 handles = unsetCamera(handles);
 
 % save metadata
@@ -1387,7 +1393,8 @@ if exist('hwaitbar','var') && ishandle(hwaitbar),
 end
 
 %clear FBDC_NTRIESCLOSE;
-uiresume(handles.figure_main);
+%uiresume(handles.figure_main);
+delete(handles.figure_main);
 
 % --------------------------------------------------------------------
 function menu_Edit_DetectCameras_Callback(hObject, eventdata, handles)
@@ -1732,7 +1739,7 @@ end
 if isclosefig,
   % store that we are trying to close
   global FBDC_DIDHALT; %#ok<TLEV>
-  FBDC_DIDHALT = true;
+  FBDC_DIDHALT(handles.GUIi) = true;
 end
 
 hObject = handles.figure_main;
@@ -1881,7 +1888,7 @@ if isfield(handles,'hImage_Preview') && ishandle(handles.hImage_Preview),
 end
 
 % delete temp recorder timer
-handles = resetTempProbe(handles);
+handles = resetTempProbe2(handles);
 
 s = 'Reset temperature probe';
 if exist('hwaitbar','var') && ishandle(hwaitbar),
@@ -2009,7 +2016,7 @@ function pushbutton_InitializeTempProbe_Callback(hObject, eventdata, handles)
 if handles.params.DoRecordTemp == 0,
   return;
 end
-success = initializeTempProbe(hObject);
+success = initializeTempProbe2(hObject);
 if success,
   set(hObject,'Visible','off');
   set(handles.popupmenu_TempProbeID,'Enable','off');

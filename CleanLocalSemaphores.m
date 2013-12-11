@@ -122,3 +122,5 @@ end
 
 global FBDC_BIASCAMERASINUSE;
 FBDC_BIASCAMERASINUSE = [];
+
+set(0,'UserData',[]);

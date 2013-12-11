@@ -738,7 +738,7 @@ if ~isempty(SaveFileStr),
 %     ext = ext(2:end);
 %   end
   SaveFileName = fullfile(expdir,SaveFileStr);
-  export_fig(SaveFileName,hfig);
+  export_fig(SaveFileName,fig);
 end
 
 %% save data
