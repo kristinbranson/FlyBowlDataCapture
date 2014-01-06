@@ -272,8 +272,11 @@ else
   end
   bkgdim = median(meanims,4);
 end
+im = double(readframe(1));
 % WARNING: THIS WON'T WORK WITH COLOR IMAGES
-bkgdim = bkgdim';
+if ndims(bkgdim) == ndims(im) && ~all(size(bkgdim) == size(im)),
+  bkgdim = bkgdim';
+end
 
 %% do a little bit of background subtraction, connected components
 

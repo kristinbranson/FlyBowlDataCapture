@@ -86,7 +86,7 @@ RecordTime,20
 
 # BIAS config file
 BIASBinary,D:\Documents\wbd\bias\build\test_gui.exe
-BIASConfigFile,D:\Documents\code\FlyBowlDataCapture\bias_config_13Y3M_20131209.json
+BIASConfigFile,D:\Documents\code\FlyBowlDataCapture\bias_config_13Y3M_20131213_alice.json
 # Port to look for the camera
 BIASServerPortBegin,5000
 BIASServerPortStep,10

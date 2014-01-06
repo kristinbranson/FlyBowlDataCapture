@@ -183,7 +183,7 @@ hwait = mywaitbar(.7,hwait,'Computing quick stats...');
 % show some simple statistics
 if strcmpi(handles.params.FileType,'ufmf'),
   
-  %try
+  try
 
     [handles.QuickStats,success,errmsg,warnings] = computeQuickStats(handles.ExperimentDirectory,...
       handles.ComputeQuickStatsParams{:});
@@ -195,10 +195,10 @@ if strcmpi(handles.params.FileType,'ufmf'),
       addToStatus(handles,[{'Warnings computing quick statistics:'},warnings]);
     end
     
-%   catch ME,
-%     addToStatus(handles,['Error computing quickstats: ',getReport(ME)]);
-%     warndlg(getReport(ME),'Error computing quickstats','modal');
-%   end
+   catch ME,
+     addToStatus(handles,['Error computing quickstats: ',getReport(ME)]);
+     warndlg(getReport(ME),'Error computing quickstats','modal');
+   end
 end
 
 hwait = mywaitbar(.899,hwait,'Closing video file: Enabling Save Metadata button...');
