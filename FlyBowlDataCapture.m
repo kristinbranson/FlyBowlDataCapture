@@ -152,6 +152,9 @@ end
 if isempty(which('loadjson')) && exist('jsonlab','dir'),
   addpath('jsonlab');
 end
+if isempty(which('export_fig')) && exist('export_fig','dir'),
+  addpath('export_fig');
+end
 % 
 % make the line name edit box autocomplete -- must be visible
 set(handles.figure_main,'Visible','on');

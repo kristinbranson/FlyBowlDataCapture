@@ -15,7 +15,7 @@ end
 if strcmpi(params.AdaptorName,'bias'),
   
   try
-    res = loadjson(urlread([params.BIASParams.BIASURL,'?get-status']));
+    res = loadjson1(urlread([params.BIASParams.BIASURL,'?get-status']));
   catch ME,
     warning(getReport(ME));
     return;

@@ -5,7 +5,7 @@ msg = '';
 
 %% get status
 try
-  res = loadjson(urlread([biasurl,'?get-status']));
+  res = loadjson1(urlread([biasurl,'?get-status']));
 catch ME,
   msg = getReport(ME,'basic');
   return;
@@ -27,7 +27,7 @@ end
 
 %% stop capture
 if biasstatus.capturing > 0,
-  res = loadjson(urlread([biasurl,'?stop-capture']));
+  res = loadjson1(urlread([biasurl,'?stop-capture']));
   if ~res.success,
     msg = sprintf('Error stopping capture: %s',res.message);
     return;
@@ -36,14 +36,14 @@ end
 
 %% set movie file name
 
-res = loadjson(urlread([biasurl,'?set-video-file=',moviefilename]));
+res = loadjson1(urlread([biasurl,'?set-video-file=',moviefilename]));
 if ~res.success,
   msg = sprintf('Error setting video file name: %s',res.message);
   return;
 end
 
 %% start logging
-res = loadjson(urlread([biasurl,'?enable-logging']));
+res = loadjson1(urlread([biasurl,'?enable-logging']));
 if ~res.success,
   msg = sprintf('Error enabling logging: %s',res.message);
   return;
@@ -51,7 +51,7 @@ end
 
 %% start capture
 
-res = loadjson(urlread([biasurl,'?start-capture']));
+res = loadjson1(urlread([biasurl,'?start-capture']));
 if ~res.success,
   msg = sprintf('Error starting capture: %s',res.message);
   return;

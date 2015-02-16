@@ -4,7 +4,7 @@ success = false;
 msg = '';
 
 try
-  res = loadjson(urlread([biasparams.BIASURL,'?get-status']));
+  res = loadjson1(urlread([biasparams.BIASURL,'?get-status']));
   if res.success == 1,
     success = true;
     return
@@ -21,7 +21,7 @@ if status ~= 0,
 end
 
 try %#ok<TRYNC>
-  res = loadjson(urlread([biasparams.BIASURL,'?get-status']));
+  res = loadjson1(urlread([biasparams.BIASURL,'?get-status']));
   if res.success == 1,
     success = true;
     return

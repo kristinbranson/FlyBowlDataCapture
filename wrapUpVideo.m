@@ -34,7 +34,7 @@ if strcmpi(AdaptorName,'bias'),
   while true,
     
     try
-      res = loadjson(urlread([obj.BIASURL,'?get-status']));
+      res = loadjson1(urlread([obj.BIASURL,'?get-status']));
       if res.success == 0,
         addToStatus(handles,sprintf('Could not get status: %s',res.message));
         return;
@@ -164,6 +164,15 @@ handles.FinishedRecording = true;
 
 hwait = mywaitbar(.65,hwait,'Closing video file: renaming experiment...');
 oldname = handles.FileName;
+if ~exist(oldname,'file'),
+  [p,n,e] = fileparts(oldname);
+  newoldname = fullfile(p,[n,'_v001',e]);
+  if exist(newoldname,'file'),
+    oldname = newoldname;
+    handles.FileName = oldname;
+    warning('Adding _v001 to file name.');
+  end
+end
 %fprintf('Renaming file.\n');
 handles = renameVideoFile(handles);
 guidata(hObject,handles);

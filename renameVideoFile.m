@@ -10,12 +10,12 @@ for i = 1:numel(openfids),
 end
 
 oldfilename = handles.FileName;
-if strcmpi(handles.params.Imaq_Adaptor,'bias'),
-  % BIAS appends stuff to the file name
-  [p,n,ext] = fileparts(oldfilename);
-  n = [n,'_guid_',handles.vid.biasconfig.camera.guid];
-  oldfilename = fullfile(p,[n,ext]);  
-end
+% if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+%   % BIAS appends stuff to the file name
+%   [p,n,ext] = fileparts(oldfilename);
+%   n = [n,'_guid_',handles.vid.biasconfig.camera.guid];
+%   oldfilename = fullfile(p,[n,ext]);  
+% end
 
 if handles.params.DoRecordTemp ~= 0,
   oldtempfilename = handles.TempFileName;
