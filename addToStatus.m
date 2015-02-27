@@ -2,7 +2,7 @@ function addToStatus(handles,s,datenum)
 
 try
 
-ColsWrap = 90;
+ColsWrap = 100;
 
 if nargin <=1,
   return;

@@ -70,7 +70,7 @@ BackSubCloseRadius = 2;
   NBkgdBins,IntensityHistMu,IntensityHistSig,...
   BackSubNFramesSample,BackSubThreshLow,BackSubThreshHigh,BackSubMinCCArea,...
   SaveFileStr,SaveDataStr,...
-  ScanLineYLim] = ...
+  ScanLineYLim,DoRecordTemp] = ...
   myparse(varargin,...
   'GUIInstance',1,...
   'FigHandle',nan,...
@@ -106,7 +106,8 @@ BackSubCloseRadius = 2;
   'BackSubMinCCArea',BackSubMinCCArea,...
   'SaveFileStr',SaveFileStr,...
   'SaveDataStr',SaveDataStr,...
-  'ScanLineYLim',ScanLineYLim); 
+  'ScanLineYLim',ScanLineYLim,...
+  'DoRecordTemp',true); 
 
 %% Figure positions
 
@@ -117,10 +118,10 @@ else
 end
 
 % we set the figure to be inset from the parent by the following amounts
-OutBorderTop = 50;
-OutBorderLeft = 25;
-OutBorderBottom = 50;
-OutBorderRight = 25;
+OutBorderTop = 5;
+OutBorderLeft = 5;
+OutBorderBottom = 5;
+OutBorderRight = 5;
 
 % we set axes to be inset from the figure by the following amounts
 FigBorderLeft = 10;
@@ -139,8 +140,8 @@ BorderX = 10;
 BorderY = 10;
 
 % for computing width, height of table
-MinTableColumnWidth = 75;
-TableRowLabelWidth = 150;
+MinTableColumnWidth = 60;
+TableRowLabelWidth = 120;
 TableRowHeight = 20;
 TableColumnExtra = 20;
 
@@ -151,10 +152,10 @@ MaxTableHeightFrac = .3;
 StreamHeightFrac = .37;
 
 % fraction of width the background axes should take
-BkgdAxesWidthFrac = .225;
+BkgdAxesWidthFrac = .2;
 
 % fraction of width the intensity histogram should take
-HistWidthFrac = .225;
+HistWidthFrac = .2;
 
 % showufmf figure
 ShowUFMFBorderTop = 50;
@@ -170,7 +171,8 @@ MovieFile = fullfile(expdir,MovieFileStr);
 
 % read UFMF diagnostics file
 UFMFDiagnosticsFileName = fullfile(expdir,UFMFDiagnosticsFileStr);
-if exist(UFMFDiagnosticsFileName,'file'),
+DoUFMFDiagnostics = exist(UFMFDiagnosticsFileName,'file');
+if DoUFMFDiagnostics,
   [UFMFStats,success1,errmsg] = readUFMFDiagnostics(UFMFDiagnosticsFileName);
   if ~success1,
     return;
@@ -209,29 +211,32 @@ else
 end  
 
 % read temperature stream
-TemperatureFileName = fullfile(expdir,TemperatureFileStr);
-data = [];
-if ~exist(TemperatureFileName,'file'),
-  warnings{end+1} = sprintf('Temperature stream file %s does not exist',TemperatureFileName);
-else
-  try
-    data = importdata(TemperatureFileName,',');
-  catch ME,
-    warnings{end+1} = sprintf('Error importing temperature stream: %s',getReport(ME,'basic','hyperlinks','off'));
+tempTimestamp = [];
+temp = [];
+if DoRecordTemp,
+  TemperatureFileName = fullfile(expdir,TemperatureFileStr);
+  data = [];
+  if ~exist(TemperatureFileName,'file'),
+    warnings{end+1} = sprintf('Temperature stream file %s does not exist',TemperatureFileName);
+  else
+    try
+      data = importdata(TemperatureFileName,',');
+    catch ME,
+      warnings{end+1} = sprintf('Error importing temperature stream: %s',getReport(ME,'basic','hyperlinks','off'));
+    end
+  end
+  if isempty(data),
+    tempTimestamp = [];
+    temp = [];
+  elseif size(data,2) < 2,
+    warnings{end+1} = 'Temperature data could not be read';
+    tempTimestamp = [];
+    temp = [];
+  else
+    tempTimestamp = data(:,1);
+    temp = data(:,2);
   end
 end
-if isempty(data),
-  tempTimestamp = [];
-  temp = [];
-elseif size(data,2) < 2,
-  warnings{end+1} = 'Temperature data could not be read';
-  tempTimestamp = [];
-  temp = [];
-else
-  tempTimestamp = data(:,1);
-  temp = data(:,2);
-end
-
 % read room temperature, humidity from metadata
 RoomTemperature = nan;
 RoomHumidity = nan;
@@ -336,11 +341,13 @@ fclose(fid);
 
 %% add temperature to existing structs
 
-UFMFStats.summary.nTemperatureReadings = length(temp);
+if DoRecordTemp,
+  UFMFStats.summary.nTemperatureReadings = length(temp);
+end
 UFMFStats.summary.RoomTemperature = RoomTemperature;
 UFMFStats.summary.RoomHumidity = RoomHumidity;
 
-if isempty(temp),
+if ~DoRecordTemp || isempty(temp),
   BackSubStats.meanTemperature = nan;
   BackSubStats.minTemperature = nan;
   BackSubStats.maxTemperature = nan;
@@ -361,15 +368,25 @@ else
   BackSubStats.stdTemperaturePeriod = std(dt,1);
 end
 
-UFMFStats.stream.Temperature = [temp';tempTimestamp'];
-BackSubStatFns(end+1:end+2) = {'Temperature','TemperaturePeriod'};
+if DoRecordTemp,
+  UFMFStats.stream.Temperature = [temp';tempTimestamp'];
+  BackSubStatFns(end+1:end+2) = {'Temperature','TemperaturePeriod'};
+else
+  UFMFStreamFns = setdiff(UFMFStreamFns,'Temperature');
+end
+
+badidx = ~ismember(UFMFStreamFns,fieldnames(UFMFStats.stream));
+if DoUFMFDiagnostics && any(badidx),
+  warnings{end+1} = cat(2,'UFMF streams missing: ',sprintf('%s ',UFMFStreamFns{badidx}));
+end
+UFMFStreamFns(badidx) = [];
 
 %% Statistics table: collect data
 % make a table for now
 % in the future, maybe show where these stats are relative to normal data
 
 badidx = ~ismember(UFMFSummaryFns,fieldnames(UFMFStats.summary));
-if any(badidx),
+if DoUFMFDiagnostics && any(badidx),
   warnings{end+1} = cat(2,'UFMF Summary Stats missing: ',sprintf('%s ',UFMFSummaryFns{badidx}));
 end
 UFMFSummaryFns(badidx) = [];
@@ -380,7 +397,7 @@ for i = 1:length(UFMFSummaryStatFns),
     badidx(i) = true;
   end
 end
-if any(badidx),
+if DoUFMFDiagnostics && any(badidx),
   warnings{end+1} = cat(2,'UFMF Summary Mean Stats missing: ',sprintf('%s ',UFMFSummaryStatFns{badidx}));
 end
 UFMFSummaryStatFns(badidx) = [];
@@ -391,7 +408,7 @@ for i = 1:length(BackSubStatFns),
     badidx(i) = true;
   end
 end
-if any(badidx),
+if DoUFMFDiagnostics && any(badidx),
   warnings{end+1} = cat(2,'BackSub Stats missing: ',BackSubStatFns{badidx});
 end
 BackSubStatFns(badidx) = [];
@@ -502,6 +519,9 @@ TablePos2 = [TableLeft2,TableBottom,TableWidth2,TableHeight];
 
 % axes for UFMF stream data
 nUFMFStreamFns = length(UFMFStreamFns);
+
+if nUFMFStreamFns > 0,
+
 UFMFStream_nr = ceil(nUFMFStreamFns/UFMFStream_nc);
 %StreamAxHeight = (TableHeight-XLabelSpace-XTickSpace-BorderY*(UFMFStream_nr-1))/UFMFStream_nr;
 StreamAxHeightTotal = FigHeightFree*StreamHeightFrac;
@@ -526,9 +546,15 @@ if UFMFStream_nc*UFMFStream_nr > nUFMFStreamFns,
   delete(StreamAx(nUFMFStreamFns+1:end));
   StreamAx = StreamAx(1:nUFMFStreamFns);
 end
-  
+end
+
+if nUFMFStreamFns > 0,
+  BkgdAxesTop = StreamAxBottomTotal - BorderY;
+else
+  BkgdAxesTop = TableBottom - BorderY;
+end
+
 % axes for background model
-BkgdAxesTop = StreamAxBottomTotal - BorderY;
 BkgdAxesBottom = FigBorderBottom + XLabelSpace;
 BkgdAxesHeight = BkgdAxesTop - BkgdAxesBottom;
 BkgdAxesWidth = FigWidthFree * BkgdAxesWidthFrac - BorderX/2;
@@ -577,6 +603,7 @@ htable2 = uitable(fig,'Units','Pixels','Position',TablePos2,...
 
 %% UFMF Diagnostics Stream plots
 
+if nUFMFStreamFns > 0,
 isbot = false(UFMFStream_nr,UFMFStream_nc);
 isbot(end,:) = true;
 x0 = UFMFStats.stream.timestamp(1);
@@ -642,6 +669,7 @@ for i = 1:nUFMFStreamFns,
   ylabel(StreamAx(i),fn);  
 end
 linkaxes(StreamAx,'x');
+end
 
 %% Show background image
 

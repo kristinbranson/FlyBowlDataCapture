@@ -123,4 +123,16 @@ end
 global FBDC_BIASCAMERASINUSE;
 FBDC_BIASCAMERASINUSE = [];
 
+global FBDC_CHR_LED_CONTROLLER_FID;
+if ~isempty(FBDC_CHR_LED_CONTROLLER_FID),
+  try
+    for i = 1:numel(FBDC_CHR_LED_CONTROLLER_FID),
+      fclose(FBDC_CHR_LED_CONTROLLER_FID(i));
+    end
+    FBDC_CHR_LED_CONTROLLER_FID = [];
+  catch ME
+    warning('Error closing LED controller: %s',getReport(ME));
+  end
+end
+
 set(0,'UserData',[]);

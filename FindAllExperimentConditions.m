@@ -17,6 +17,7 @@ conditionfiles = {conditionfiles.name};
 % parse the condition files
 handles.ExperimentTypes = {};
 handles.Experiment2Conditions = {};
+handles.Experiment2IsBarcode = false(1,0);
 for i = 1:numel(conditionfiles),
   m = regexp(conditionfiles{i},'^(?<experiment>.+)__(?<condition>.+)\.csv$','names','once');
   if isempty(m),
@@ -26,7 +27,9 @@ for i = 1:numel(conditionfiles),
   if isempty(j),
     handles.ExperimentTypes{end+1} = m.experiment;
     handles.Experiment2Conditions{end+1} = {m.condition;fullfile(handles.params.ConditionDirectory,conditionfiles{i})};
+    handles.Experiment2IsBarcode(end+1) = strcmp(m.condition,'BARCODE');
   else
     handles.Experiment2Conditions{j}(:,end+1) = {m.condition;fullfile(handles.params.ConditionDirectory,conditionfiles{i})};
+    handles.Experiment2IsBarcode(j) = false;
   end
 end

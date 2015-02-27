@@ -2,7 +2,7 @@ function UpdatePreview(obj,event,himage)
 
 % stop if we've halted
 global FBDC_DIDHALT;
-fprintf('In UpdatePreview at time %s\n',datestr(now,'HH:MM:SS'));
+%fprintf('In UpdatePreview at time %s\n',datestr(now,'HH:MM:SS'));
 
 % should we update?
 params = getappdata(himage,'PreviewParams');

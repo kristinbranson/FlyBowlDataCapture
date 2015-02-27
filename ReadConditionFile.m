@@ -20,6 +20,8 @@ metadata.CrossHandler = 'unknown';
 metadata.SortingHandler = 'unknown';
 metadata.StarvationHandler = 'unknown';
 metadata.RearingProtocol = '?';
+metadata.LabName = 'unknown';
+metadata.ScreenReason = handles.ConditionName;
 
 fns_required = fieldnames(metadata);
 fns_numeric = fns_required(structfun(@isnumeric,metadata));
@@ -27,8 +29,7 @@ fns_numeric = fns_required(structfun(@isnumeric,metadata));
 % read from conditions file
 metadata = ReadParams(handles.ConditionFileName,'params',metadata,'fns_required',fns_required,'fns_numeric',fns_numeric);
 
-metadata.ScreenType = sprintf('non_olympiad_heberlein_%s',handles.ExperimentType);
-metadata.ScreenReason = handles.ConditionName;
+metadata.ScreenType = sprintf('non_olympiad_%s_%s',metadata.LabName,handles.ExperimentType);
 
 if metadata.DaysSinceCross < 0,
   metadata.CrossDate = '????????';
@@ -37,7 +38,7 @@ else
   metadata.CrossDate = datestr(cross_datenum,handles.datetimeformat);
 end
 
-if metadata.DaysSinceCross < 0 || metadata.FlyDays < 0,
+if metadata.DaysSinceCross < 0 || metadata.FlipDays < 0,
   metadata.FlipDate = '????????';
 else
   flip_datenum = cross_datenum + metadata.FlipDays;

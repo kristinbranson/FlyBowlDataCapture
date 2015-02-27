@@ -1,7 +1,8 @@
-function [success,msg] = BIASStop(biasurl,varargin)
+function [success,msg,stoptime] = BIASStop(biasurl,varargin)
 
 success = false;
 msg = '';
+stoptime = nan;
 
 [disablelogging,disconnect] = myparse(varargin,'disablelogging',true,'disconnect',true);
 
@@ -21,6 +22,7 @@ biasstatus = res.value;
 
 %% stop capture
 if biasstatus.capturing > 0,
+  stoptime = now;
   res = loadjson1(urlread([biasurl,'?stop-capture']));
   if ~res.success,
     msg = sprintf('Error stopping capture: %s',res.message);

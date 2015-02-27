@@ -1,16 +1,18 @@
-function wrapUpVideo(obj,event,hObject,AdaptorName,didabort) %#ok<INUSL>
+function stoptime = wrapUpVideo(obj,event,hObject,AdaptorName,didabort) %#ok<INUSL>
 
 %global FBDC_TempFid;
 global FBDC_BIASCAMERASRUNNING;
 
 hwait = waitbar(0,'Closing video file: stopping recording');
 
+stoptime = now;
+
 if strcmpi(AdaptorName,'gdcam')
   set(obj.Source,'LogFlag',0);
 elseif strcmpi(AdaptorName,'udcam')
   set(obj.Source,'nFramesTarget',0);
 elseif strcmpi(AdaptorName,'bias'),
-  [success,msg] = BIASStop(obj.BIASURL);
+  [success,msg,stoptime] = BIASStop(obj.BIASURL);
   if ~success,
     errordlg(sprintf('Error stopping logging: %s',msg),'Error stopping logging');
   end
@@ -23,13 +25,23 @@ else
   % obj.stopfcn = '';
 end
 
+handles = guidata(hObject);
+
+% close LED controller
+if handles.params.doChR,
+  
+  handles = CloseLEDControllerConnection(handles);
+  
+  guidata(hObject,handles);
+  
+end
+  
 if strcmpi(AdaptorName,'bias'),
 
   hwait = mywaitbar(0,hwait,'Closing video file: waiting for capturing == 0');
   
   % wait for capturing to be 0
   tic;
-  handles = guidata(hObject);
   MaxTimeWaitStopRunning = 30;
   while true,
     
@@ -185,6 +197,16 @@ if ~strcmpi(AdaptorName,'bias'),
   PreviewParams = getappdata(handles.hImage_Preview,'PreviewParams');
   PreviewParams.IsRecording = false;
   setappdata(handles.hImage_Preview,'PreviewParams',PreviewParams);
+end
+
+if handles.params.doChR,
+  protocol = handles.ChRStuff.protocol;
+  handles.protocolfile = fullfile(handles.ExperimentDirectory,'protocol.mat');
+  try
+    save(handles.protocolfile,'protocol');
+  catch ME,
+    warning('Error saving protocol to file %s: %s',handles.protocolfile,getReport(ME));
+  end
 end
 
 hwait = mywaitbar(.7,hwait,'Computing quick stats...');

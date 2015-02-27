@@ -158,3 +158,18 @@ if strcmpi(handles.params.FileType,'ufmf'),
     end
   end
 end
+
+if handles.params.doChR,
+
+  % move the time log file
+  oldfilename = handles.StimulusTimingLogFileName;
+  newfilename = fullfile(handles.ExperimentDirectory,handles.params.StimulusTimingLogFileName);
+  
+  if handles.IsTmpStimulusTimingLogFile && exist(oldfilename,'file'),
+    addToStatus(handles,sprintf('Renaming stimulus timing log file from %s to %s\n',oldfilename,newfilename));
+    renamefile(oldfilename,newfilename);
+    handles.IsTmpStimulusTimingLogFile = false;
+    handles.StimulusTimingLogFileName = newfilename;
+  end
+  
+end

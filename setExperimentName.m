@@ -58,7 +58,11 @@ if ~isempty(OldExperimentDirectory) && ...
     end
     addToStatus(handles,s);
     if ~isempty(openfids),
-      fclose(openfids);
+      for filei = 1:numel(openfids),
+        try %#ok<TRYNC>
+          fclose(openfids(filei));
+        end
+      end
     end
     pause(3);
   end

@@ -1,4 +1,4 @@
-function [success,msg] = BIASStartLogging(biasurl,moviefilename)
+function [success,msg,starttime] = BIASStartLogging(biasurl,moviefilename)
 
 success = false;
 msg = '';
@@ -51,6 +51,7 @@ end
 
 %% start capture
 
+starttime = now;
 res = loadjson1(urlread([biasurl,'?start-capture']));
 if ~res.success,
   msg = sprintf('Error starting capture: %s',res.message);

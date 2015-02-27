@@ -47,13 +47,12 @@ handles.grayed_bkgdcolor = 0.314 + zeros(1,3);
 handles.status_colors = [0,1,0;0,0,.7;1,0,0;1,0,0;1,0,0];
 handles.status_color_names = {'GREEN','BLUE','RED','RED','RED'};
 
-% NO LINE NAME ENTRY
-% % list of fly lines read frame Sage
-% if ~isfield(handles.previous_values,'linename_file'),
-%   handles.linename_file = 'SageLineNames.txt';
-% else
-%   handles.linename_file = handles.previous_values.linename_file;
-% end
+% list of fly lines read frame Sage
+if ~isfield(handles.previous_values,'linename_file'),
+  handles.linename_file = 'SageLineNames.txt';
+else
+  handles.linename_file = handles.previous_values.linename_file;
+end
 
 %[filestr,pathstr] = uigetfile('*.txt','Choose Line Name File');
 %handles.linename_file = fullfile(pathstr,filestr);
@@ -169,18 +168,20 @@ handles.params = struct;
   fclose(fid);
   
   % some values are numbers
-  numeric_params = {'Imaq_ROIPosition','RecordTime','PreviewUpdatePeriod',...
+  numeric_params = {'RecordTime','PreviewUpdatePeriod',...
     'FrameRatePlotYLim','TempPlotYLim','Imaq_FrameRate',...
-    'Imaq_Shutter','Imaq_Gain','Imaq_Brightness','TempProbePeriod','TempProbeChannels',...
-    'TempProbeReject60Hz','DoRecordTemp','NPreconSamples','gdcamPreviewFrameInterval',...
-    'Imaq_MaxFrameRate','UFMFPrintStats','UFMFStatStreamPrintFreq',...
-    'UFMFStatComputeFrameErrorFreq','UFMFStatPrintTimings',...
-    'UFMFMaxFracFgCompress','UFMFMaxBGNFrames','UFMFBGUpdatePeriod',...
-    'UFMFBGKeyFramePeriod','UFMFMaxBoxLength','UFMFBackSubThresh',...
-    'UFMFNFramesInit','UFMFBGKeyFramePeriodInit','ColormapPreview',...
+    'TempProbePeriod','TempProbeChannels',...
+    'TempProbeReject60Hz','DoRecordTemp','NPreconSamples',...
+    'Imaq_MaxFrameRate','ColormapPreview',...
+    'PreAssayHandling_SortingHour_Range',...
     'ScanLineYLim','MinFliesLoadedTime','MaxFliesLoadedTime',...
     'CoupleCameraTempProbeStart',...
-    'BIASServerPortBegin','BIASServerPortStep','BIASCameraNumbers'};
+    'BIASServerPortBegin','BIASServerPortStep','BIASCameraNumbers',...
+    'DoQuerySage','doChR',...
+    'ChR_THUpdateP',...
+    'ChR_IrInt',...
+    'ChR_isDaqCard',...
+    'ChR_LEDpattern'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -200,7 +201,13 @@ handles.params = struct;
     'ConditionDirectory',...
     'BIASURLBase',...
     'BIASBinary',...
-    'BIASConfigFile'};
+    'BIASConfigFile',...
+    'ChR_serial_port_for_LED_Controller',...
+    'serial_port_for_precon_sensor',...
+    'ChR_rigName',...
+    'ChR_expProtocolFile',...
+    'StimulusTimingLogFileName',...
+    'ExperimentNameComponents'};
   for i = 1:length(notlist_params),
     fn = notlist_params{i};
     if ~isfield(handles.params,fn),
@@ -292,6 +299,8 @@ handles.IsTmpLogFile = true;
 handles.TmpDateStrFormat = 'yyyymmddTHHMMSSFFF';
 handles.TmpDateStr = datestr(now,handles.TmpDateStrFormat);
 handles.LogFileName = fullfile(handles.params.TmpOutputDirectory,sprintf('TmpLog_%s.txt',handles.TmpDateStr));
+handles.IsTmpStimulusTimingLogFile = true;
+handles.StimulusTimingLogFileName = fullfile(handles.params.TmpOutputDirectory,sprintf('TmpStimulusTimingLog_%s.txt',handles.TmpDateStr));
 set(handles.edit_Status,'String',{});
 j = mod(handles.GUIi-1,size(handles.status_colors,1))+1;
 handles.status_color = handles.status_colors(j,:);
@@ -302,6 +311,8 @@ s = {
   '--------------------------------------'};
 addToStatus(handles,s,-1);
 addToStatus(handles,{sprintf('GUI instance %d, writing to %s.',handles.GUIi,handles.params.OutputDirectory)});
+[p,n,e] = fileparts(handles.params_file);
+addToStatus(handles,sprintf('Reading FBDC parameters from %s (in %s)',[n,e],p));
 
 %% Record time
 
@@ -316,10 +327,27 @@ end
 % by default, previous record time
 handles.params.RecordTime = handles.previous_values.RecordTime;
 
-% set possible values, current value, color to default
-set(handles.edit_RecordTime,'String',num2str(handles.params.RecordTime),...
-  'BackgroundColor',handles.shouldchange_bkgdcolor,...
-  'Enable','on');
+if isfield(handles.params,'doChR') && handles.params.doChR,
+  
+  % repurpose the record time to show protocol
+  [~,n,e] = fileparts(handles.params.ChR_expProtocolFile);
+  pos1 = get(handles.popupmenu_Assay_Experimenter,'Position');
+  pos2 = get(handles.edit_RecordTime,'Position');
+  pos2(3) = pos1(3);
+  set(handles.text_RecordTime,'String','Protocol:');
+  set(handles.edit_RecordTime,'String',[n,e],...
+    'Position',pos2,'FontWeight','normal',...
+    'BackgroundColor',handles.changed_bkgdcolor);
+  %set([handles.edit_RecordTime,handles.text_RecordTime],'Visible','off');
+  
+else
+
+  % set possible values, current value, color to default
+  set(handles.edit_RecordTime,'String',num2str(handles.params.RecordTime),...
+    'BackgroundColor',handles.shouldchange_bkgdcolor,...
+    'Enable','on');
+  
+end
 
 %% Experimenter
 
@@ -358,9 +386,8 @@ end
 
 % by default, previous experiment type
 handles.ExperimentType = handles.previous_values.ExperimentType;
-i = find(strcmp(handles.ExperimentType,handles.ExperimentTypes),1);
-handles.ConditionNames = handles.Experiment2Conditions{i}(1,:);
-handles.ConditionFileNames = handles.Experiment2Conditions{i}(2,:);
+% set possible values for condition
+handles = UpdateConditionNames(handles);
 
 % set possible values, current value, color to default value
 set(handles.popupmenu_ExperimentType,'String',handles.ExperimentTypes,...
@@ -380,6 +407,11 @@ end
 % by default, previous condition type
 handles.ConditionName = handles.previous_values.ConditionName;
 i = find(strcmp(handles.ConditionName,handles.ConditionNames),1);
+
+if isempty(i),
+  i = 1;
+  handles.ConditionName = handles.ConditionNames{1};
+end
 handles.ConditionFileName = handles.ConditionFileNames{i};
 
 % set possible values, current value, color to shouldchange
@@ -388,11 +420,10 @@ set(handles.popupmenu_Condition,'String',handles.ConditionNames,...
 
 %% Fly Line
 
-% NO LINE NAME ENTRY
-
-% 
 % % whether this has been changed or not
 % handles.isdefault.Fly_LineName = true;
+
+% * moved this to UpdateConditionNames * 
 % if ~isdeployed,
 %   handles.IsSage = exist(handles.SAGECodeDir,'file');
 %   try
@@ -427,24 +458,49 @@ set(handles.popupmenu_Condition,'String',handles.ConditionNames,...
 % % we have not created the autofill version yet
 % handles.isAutoComplete_edit_Fly_LineName = false;
 
+%% effector abbreviations
+effectorfile = fullfile(fileparts(mfilename('fullpath')),'EffectorAbbrs.txt');
+handles.effector_abbrs = cell(0,2);
+if exist(effectorfile,'file'),
+  try
+    fid = fopen(effectorfile,'r');
+    while true,
+      s = fgetl(fid);
+      if ~ischar(s), break; end
+      s = strtrim(s);
+      if isempty(s),
+        continue;
+      end
+      handles.effector_abbrs(end+1,:) = regexp(s,',','split');
+    end
+    fclose(fid);
+  catch ME,
+    s = sprintf('Error reading effector abbr file %s: %s',effectorfile,getReport(ME));
+    warning(s); %#ok<SPWRN>
+    warndlg(s);
+  end
+end
+
+handles = setEffector(handles,'Unknown');
+
 %% barcode
-%
-% NO BARCODE ENTRY
-% 
-% handles.isdefault.barcode = true;
-% 
-% % by default, -1 to indicate unkown
-% handles.barcode = -1;
-% 
-% % code for FlyBowl for FlyBoyQuery
-% handles.FlyBoyAssayCode = 'FB';
-% 
-% % set current value, color to shouldchange
-% s = num2str(handles.barcode);
-% set(handles.edit_Barcode,'String',s,...
-%   'BackgroundColor',handles.shouldchange_bkgdcolor);
+
+handles.isdefault.barcode = true;
+
+% by default, -1 to indicate unkown
+handles.barcode = -1;
+
+% code for FlyBowl for FlyBoyQuery
+handles.FlyBoyAssayCode = 'FB';
+
+% set current value, color to shouldchange
+s = num2str(handles.barcode);
+set(handles.edit_Barcode,'String',s,...
+  'BackgroundColor',handles.shouldchange_bkgdcolor);
 
 %% wishlist
+
+%handles.WishList = -1;
 
 % NO WISHLIST ENTRY
 % 
@@ -497,6 +553,9 @@ set(handles.popupmenu_Rearing_IncubatorID,'String',handles.Rearing_IncubatorIDs,
 
 %% Cross Date
 
+% handles.PreAssayHandling_CrossDate = datestr(0,handles.dateformat);
+% handles.PreAssayHandling_CrossDate_datenum = 0;
+
 % NO CROSS DATE ENTRY
 % 
 % % whether this has been changed or not
@@ -525,6 +584,9 @@ set(handles.popupmenu_Rearing_IncubatorID,'String',handles.Rearing_IncubatorIDs,
 %   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Cross Handler
+
+% handles.PreAssayHandling_CrossHandler = 'unknown';
+
 % NO ENTRY
 % % whether this has been changed or not
 % handles.isdefault.PreAssayHandling_CrossHandler = true;
@@ -547,6 +609,10 @@ set(handles.popupmenu_Rearing_IncubatorID,'String',handles.Rearing_IncubatorIDs,
 %   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Sorting Date
+
+% handles.PreAssayHandling_SortingDate_datenum = 0;
+% handles.PreAssayHandling_SortingDate = datestr(handles.PreAssayHandling_SortingDate_datenum,handles.dateformat);
+
 % NO ENTRY
 % 
 % % whether this has been changed or not
@@ -575,6 +641,11 @@ set(handles.popupmenu_Rearing_IncubatorID,'String',handles.Rearing_IncubatorIDs,
 %   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Sorting Hour
+
+% handles.PreAssayHandling_SortingHour_datenum = nan;
+% handles.PreAssayHandling_SortingHour = '??:??';
+
+
 % NO ENTRY
 % % allowed sorting hours
 % handles.PreAssayHandling_SortingHour_datenums = ...
@@ -612,6 +683,9 @@ set(handles.popupmenu_Rearing_IncubatorID,'String',handles.Rearing_IncubatorIDs,
 %   handles.PreAssayHandling_SortingHour_datenum;
 
 %% Sorting Handler
+
+% handles.PreAssayHandling_SortingHandler = 'unknown';
+
 % NO ENTRY
 % % whether this has been changed or not
 % handles.isdefault.PreAssayHandling_SortingHandler = true;
@@ -857,6 +931,22 @@ set(handles.popupmenu_Assay_Bowl,'String',handles.Assay_Bowls,...
   'Value',find(strcmp(handles.Assay_Bowl,handles.Assay_Bowls),1),...
   'BackgroundColor',handles.isdefault_bkgdcolor);
 
+% %% read parameters from condition file
+% 
+% handles = SetMetadataFromConditionFile(handles);
+
+%% advanced metadata parameters
+
+handles.AdvancedMetadataFields = ...
+  {'Set','WishList',@(x) ~isnan(isnumeric(x)),'<number>'
+  'Cross Date','PreAssayHandling_CrossDate',@(x) isdate(x,'mm/dd/yy'),'mm/dd/yy'
+  'Crosser','PreAssayHandling_CrossHandler',@(x) true,'<string>'
+  'Sorting Time','PreAssayHandling_SortingHour',@(x) isdate(x,'HH:MM'),'HH:MM'
+  'Sorting Date','PreAssayHandling_SortingDate',@(x) isdate(x,'mm/dd/yy'),'mm/dd/yy'
+  'Sorter','PreAssayHandling_SortingHandler',@(x) true,'<string>'
+  'RobotID','RobotID',@(x) true,'<string>'
+  'Effector','Metadata_Effector',@(x) true,'<string>'};
+
 %% Number of dead flies
 
 handles.NDeadFlies_str = cellstr(num2str((0:20)'));
@@ -898,7 +988,7 @@ handles.BehaviorNotes = 'None';
 set(handles.edit_BehaviorNotes,'String',handles.BehaviorNotes);
 
 %% robot stock copy
-handles.RobotID = 'unknown';
+%handles.RobotID = 'unknown';
 
 %% Advanced editing mode
 
@@ -1117,6 +1207,7 @@ handles.ComputeQuickStatsParams = {...
   'SaveFileStr','QuickStats.png',...
   'SaveDataStr','QuickStats.txt'...
   'ScanLineYLim',handles.params.ScanLineYLim...
+  'DoRecordTemp',handles.params.DoRecordTemp...
   };
 
 if isfield(handles.params,'QuickStatsStatsFileName'),
@@ -1139,6 +1230,31 @@ end
 
 %% figure title
 set(handles.figure_main,'Name',sprintf('FlyBowlDataCapture v.%s',handles.version));
+
+%% ChR activation parameters
+
+if ~isfield(handles.params,'doChR'),
+  handles.params.doChR = false;
+end
+
+if handles.params.doChR,
+  
+  chrparamnames = {'ChR_serial_port_for_LED_Controller',...
+    'ChR_rigName',...
+    'ChR_THUpdateP',...
+    'ChR_IrInt',...
+    'ChR_expProtocolFile',...
+    'ChR_LEDpattern'};
+  
+  % check that all params set
+  ismissing = ~isfield(handles.params,chrparamnames);
+  if any(ismissing),
+    s = ['Missing ChR parameters:',sprintf(' %s',chrparamnames{ismissing})];
+    errordlg(s);
+    error(s);
+  end
+  
+end
 
 %% Initialization complete
 handles.GUIInitialization_Time_datenum = now;

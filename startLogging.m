@@ -52,7 +52,7 @@ handles.FrameCount = 0;
 
 if strcmpi(handles.params.Imaq_Adaptor,'bias'),
   
-  [success,msg] = BIASStartLogging(handles.vid.BIASURL,handles.FileName);
+  [success,msg,handles.StartRecording_Time_datenum] = BIASStartLogging(handles.vid.BIASURL,handles.FileName);
   if ~success,
     errordlg(sprintf('Error starting logging in BIAS: %s',msg),'Error starting logging in BIAS');
   end
@@ -112,13 +112,17 @@ if strcmpi(handles.params.Imaq_Adaptor,'bias'),
   set(handles.hLine_Status_FrameRate,'UserData',history);
 end
 
-% create a timer for stopping 
-timername = sprintf('FBDC_RecordTimer%d',handles.GUIi);
-handles.StopTimer = timer('TimerFcn',{@Stop_RecordTimer,handles.vid,handles.figure_main,handles.params.Imaq_Adaptor},...
-  'StartDelay',handles.params.RecordTime,...
-  'TasksToExecute',1,...
-  'Name',timername);
+if ~handles.params.doChR,
 
+  % create a timer for stopping
+  timername = sprintf('FBDC_RecordTimer%d',handles.GUIi);
+  handles.StopTimer = timer('TimerFcn',{@Stop_RecordTimer,handles.vid,handles.figure_main,handles.params.Imaq_Adaptor},...
+    'StartDelay',handles.params.RecordTime,...
+    'TasksToExecute',1,...
+    'Name',timername);
+  
+end
+  
 guidata(hObject,handles);
 
 % start recording
@@ -140,5 +144,29 @@ set(handles.text_Status_Recording,'String','On','BackgroundColor',handles.Status
 PreviewParams.StartRecording_Time_datenum = handles.StartRecording_Time_datenum;
 setappdata(hpreview,'PreviewParams',PreviewParams);
 
-% start timer
-start(handles.StopTimer);
+% store record start time in button string
+set(handles.pushbutton_StartRecording,'BackgroundColor',handles.grayed_bkgdcolor,...
+  'String',sprintf('Rec: %s',datestr(handles.StartRecording_Time_datenum,13)));
+
+if handles.params.doChR,
+  
+  expTimeFileID = fopen(handles.StimulusTimingLogFileName,'w');
+  fprintf(expTimeFileID,'%.10f,start_camera,%d\n', handles.StartRecording_Time_datenum, -1 );
+  success = RunStimulusProtocol(handles,expTimeFileID);
+  fclose(expTimeFileID);
+  
+  % close experiment
+  stoptime = wrapUpVideo(handles.vid,[],handles.figure_main,handles.params.Imaq_Adaptor,~success);
+  
+  handles = guidata(hObject);
+  
+  expTimeFileID = fopen(handles.StimulusTimingLogFileName,'a+');
+  fprintf(expTimeFileID,'%.10f,stop_camera,%d\n', stoptime, -1 );
+  fclose(expTimeFileID);
+  
+else
+
+  % start timer
+  start(handles.StopTimer);
+  
+end

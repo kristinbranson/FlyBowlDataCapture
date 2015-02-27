@@ -77,7 +77,8 @@ function output = FlyBoyQuery( barcode, exp, deferrck, stm)
 
 %%     
 
-    bc = int2str(barcode);
+    bc = num2str(barcode);
+    bc(bc=='.') = [];
 
     if nargin==2    %if only two input arguments, will return only what is in flyboy
         deferrck=0;
@@ -146,7 +147,8 @@ function output = FlyBoyQuery( barcode, exp, deferrck, stm)
              'Handler_Sorting',char(res.getString(strcat('handler_sorting_',exp))),...
              'Sorting_DateTime',date_sorted,...
              'Handler_Starvation',char(res.getString(strcat('handler_starvation_',exp))),...
-             'Starvation_DateTime',date_starved);
+             'Starvation_DateTime',date_starved,...
+             'RobotID',char(res.getString('RobotID')));
              
      end
           
