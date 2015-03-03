@@ -203,7 +203,6 @@ handles.params = struct;
     'BIASBinary',...
     'BIASConfigFile',...
     'ChR_serial_port_for_LED_Controller',...
-    'serial_port_for_precon_sensor',...
     'ChR_rigName',...
     'ChR_expProtocolFile',...
     'StimulusTimingLogFileName',...
@@ -388,6 +387,7 @@ end
 handles.ExperimentType = handles.previous_values.ExperimentType;
 % set possible values for condition
 handles = UpdateConditionNames(handles);
+i = find(strcmp(handles.ExperimentType,handles.ExperimentTypes));
 
 % set possible values, current value, color to default value
 set(handles.popupmenu_ExperimentType,'String',handles.ExperimentTypes,...
@@ -497,6 +497,12 @@ handles.FlyBoyAssayCode = 'FB';
 s = num2str(handles.barcode);
 set(handles.edit_Barcode,'String',s,...
   'BackgroundColor',handles.shouldchange_bkgdcolor);
+
+%% precon port
+
+if isfield(handles.params,'PreconSensorSerialPort'),
+  handles.params.PreconSensorSerialPort = ParseComputerSpecificParam(handles.params.PreconSensorSerialPort,handles);
+end
 
 %% wishlist
 
@@ -1252,6 +1258,10 @@ if handles.params.doChR,
     s = ['Missing ChR parameters:',sprintf(' %s',chrparamnames{ismissing})];
     errordlg(s);
     error(s);
+  end
+  
+  if isfield(handles.params,'ChR_serial_port_for_LED_Controller'),
+    handles.params.ChR_serial_port_for_LED_Controller = ParseComputerSpecificParam(handles.params.ChR_serial_port_for_LED_Controller,handles);
   end
   
 end
