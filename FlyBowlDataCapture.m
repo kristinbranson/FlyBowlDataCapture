@@ -1559,7 +1559,9 @@ end
 % record configuration
 handles = RecordConfiguration(handles);
 
-guidata(hObject,handles);
+if ishandle(hObject),
+  guidata(hObject,handles);
+end
 
 function CloseQuickStatsFigures(handles)
 
