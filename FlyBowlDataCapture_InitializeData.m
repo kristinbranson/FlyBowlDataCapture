@@ -952,7 +952,7 @@ handles.AdvancedMetadataFields = ...
   'Sorting Date','PreAssayHandling_SortingDate',@(x) isdate(x,'mm/dd/yy'),'mm/dd/yy'
   'Sorter','PreAssayHandling_SortingHandler',@(x) true,'<string>'
   'RobotID','RobotID',@(x) true,'<string>'
-  'Effector','Metadata_Effector',@(x) true,'<string>'};
+  'Effector','MetaData_Effector',@(x) true,'<string>'};
 
 %% Number of dead flies
 
