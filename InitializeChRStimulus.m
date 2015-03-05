@@ -56,6 +56,9 @@ if ~success,
   return;
 end
 
+% compute total stimulus time
+hComm.TotalDuration_Seconds = sum(hComm.protocol.duration)/1000;
+
 % reset LED controller
 flyBowl_LED_control(hComm.hLEDController,'RESET',[],false);
 

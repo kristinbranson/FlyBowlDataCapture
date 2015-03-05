@@ -1396,7 +1396,11 @@ set(handles.menu_Quit,'Enable','off');
 guidata(hObject,handles);
 
 % start recording
-startLogging(handles.figure_main);
+success = startLogging(handles.figure_main);
+
+if ~success,
+  return;
+end
 
 handles = guidata(hObject);
 
@@ -1668,20 +1672,25 @@ function pushbutton_InitializeCamera_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles = setCamera(handles);
-set(hObject,'Visible','off');
-
-if handles.FliesLoaded_Time_datenum > 0 && (handles.TempProbe_IsInitialized || (handles.params.DoRecordTemp == 0)),
-  set(handles.pushbutton_StartRecording,'Enable','on','BackgroundColor',handles.StartRecording_bkgdcolor);
-end
-
 if handles.params.doChR,
   [success,handles.ChRStuff,errmsg] = InitializeChRStimulus(handles.params);
+  if isfield(handles.params,'ExperimentStartDelay'),
+    handles.params.RecordTime = handles.ChRStuff.TotalDuration_Seconds + handles.params.ExperimentStartDelay;
+  else
+    handles.params.RecordTime = handles.ChRStuff.TotalDuration_Seconds;
+  end
   if ~success,
     s = errmsg;
     errordlg(s);
     error(s);
   end
+end
+
+handles = setCamera(handles);
+set(hObject,'Visible','off');
+
+if handles.FliesLoaded_Time_datenum > 0 && (handles.TempProbe_IsInitialized || (handles.params.DoRecordTemp == 0)),
+  set(handles.pushbutton_StartRecording,'Enable','on','BackgroundColor',handles.StartRecording_bkgdcolor);
 end
 
 figure(handles.figure_main);
@@ -2144,7 +2153,7 @@ if handles.IsRecording,
 end
 
 % stop logging
-if handles.IsRecording && isfield(handles,'vid') && (strcmpi(handles.params.Imaq_Adaptor,'bias') || isvalid(handles.vid)),
+if isfield(handles,'StartedRecordingVideo') && handles.StartedRecordingVideo && handles.IsRecording && isfield(handles,'vid') && (strcmpi(handles.params.Imaq_Adaptor,'bias') || isvalid(handles.vid)),
   guidata(hObject,handles);
   % last parameter: we did abort
   wrapUpVideo(handles.vid,'',hObject,handles.params.Imaq_Adaptor,true);

@@ -181,7 +181,8 @@ handles.params = struct;
     'ChR_THUpdateP',...
     'ChR_IrInt',...
     'ChR_isDaqCard',...
-    'ChR_LEDpattern'};
+    'ChR_LEDpattern',...
+    'ExperimentStartDelay'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -1267,6 +1268,9 @@ if handles.params.doChR,
 end
 
 %% Initialization complete
+
+handles.StartedRecordingVideo = false;
+
 handles.GUIInitialization_Time_datenum = now;
 handles.GUIIsInitialized = true;
 addToStatus(handles,{'GUI initialization finished.'},handles.GUIInitialization_Time_datenum);

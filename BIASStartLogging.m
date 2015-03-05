@@ -1,5 +1,7 @@
 function [success,msg,starttime] = BIASStartLogging(biasurl,moviefilename)
 
+starttime = nan;
+
 success = false;
 msg = '';
 

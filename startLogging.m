@@ -1,6 +1,8 @@
-function startLogging(hObject)
+function success = startLogging(hObject)
 
 %global FBDC_TempFid;
+
+success = false;
 
 handles = guidata(hObject);
 
@@ -45,20 +47,70 @@ handles.NTempGrabAttempts = 0;
 %   end
 %   addToStatus(handles,sprintf('Opened temperature file %s for writing',handles.TempFileName));
 % end
+
 guidata(hObject,handles);
+
+
+if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+  hpreview = handles.text_Status_Preview;
+else
+  hpreview = handles.hImage_Preview;
+end
+
+PreviewParams = getappdata(hpreview,'PreviewParams');
+PreviewParams.IsRecording = true;
+
+% set recording status
+set(handles.text_Status_Recording,'String','On','BackgroundColor',handles.Status_Recording_bkgdcolor);
+
+%guidata(hObject,handles);
+
+PreviewParams.StartRecording_Time_datenum = handles.StartRecording_Time_datenum;
+setappdata(hpreview,'PreviewParams',PreviewParams);
+
+% store record start time in button string
+set(handles.pushbutton_StartRecording,'BackgroundColor',handles.grayed_bkgdcolor,...
+  'String',sprintf('Rec: %s',datestr(handles.StartRecording_Time_datenum,13)));
+
+global FBDC_DIDHALT;
+GUIi = handles.GUIi;
+if numel(FBDC_DIDHALT) < GUIi,
+  FBDC_DIDHALT(GUIi) = false;
+end
+if isfield(handles.params,'ExperimentStartDelay') && ...
+    handles.params.ExperimentStartDelay > 0,
+  
+  addToStatus(handles,sprintf('Waiting %f seconds to start experiment...',handles.params.ExperimentStartDelay));
+  
+  delaystart = tic;
+  while toc(delaystart) < handles.params.ExperimentStartDelay > 0,
+    pause(0.01);
+    if FBDC_DIDHALT(GUIi),
+      return;
+    end
+  end
+  
+  addToStatus(handles,'Done waiting!');
+
+end
 
 % number of frames written
 handles.FrameCount = 0;
 
+handles.StartedRecordingVideo = true;
+guidata(hObject,handles);
+
 if strcmpi(handles.params.Imaq_Adaptor,'bias'),
   
-  [success,msg,handles.StartRecording_Time_datenum] = BIASStartLogging(handles.vid.BIASURL,handles.FileName);
+  [success,msg,handles.StartVideoTime_datenum] = BIASStartLogging(handles.vid.BIASURL,handles.FileName);
   if ~success,
     errordlg(sprintf('Error starting logging in BIAS: %s',msg),'Error starting logging in BIAS');
   end
   % TODO: better error handling
   
 else
+  
+handles.StartVideoTime_datenum = now;
 
 % frame rate
 ss = getselectedsource(handles.vid);
@@ -97,15 +149,6 @@ handles.writeFrame_time = 0;
 end
 
 if strcmpi(handles.params.Imaq_Adaptor,'bias'),
-  hpreview = handles.text_Status_Preview;
-else
-  hpreview = handles.hImage_Preview;
-end
-
-PreviewParams = getappdata(hpreview,'PreviewParams');
-PreviewParams.IsRecording = true;
-
-if strcmpi(handles.params.Imaq_Adaptor,'bias'),
   history = get(handles.hLine_Status_FrameRate,'UserData');
   history(:,1) = [];
   history(:,end+1) = [nan,nan];
@@ -134,24 +177,12 @@ end
 
 % add to status log
 addToStatus(handles,{sprintf('Started recording to file %s.',handles.FileName)},...
-  handles.StartRecording_Time_datenum);
-
-% set recording status
-set(handles.text_Status_Recording,'String','On','BackgroundColor',handles.Status_Recording_bkgdcolor);
-
-%guidata(hObject,handles);
-
-PreviewParams.StartRecording_Time_datenum = handles.StartRecording_Time_datenum;
-setappdata(hpreview,'PreviewParams',PreviewParams);
-
-% store record start time in button string
-set(handles.pushbutton_StartRecording,'BackgroundColor',handles.grayed_bkgdcolor,...
-  'String',sprintf('Rec: %s',datestr(handles.StartRecording_Time_datenum,13)));
+  handles.StartVideoTime_datenum);
 
 if handles.params.doChR,
   
   expTimeFileID = fopen(handles.StimulusTimingLogFileName,'w');
-  fprintf(expTimeFileID,'%.10f,start_camera,%d\n', handles.StartRecording_Time_datenum, -1 );
+  fprintf(expTimeFileID,'%.10f,start_camera,%d\n', handles.StartVideoTime_datenum, -1 );
   success = RunStimulusProtocol(handles,expTimeFileID);
   fclose(expTimeFileID);
   
@@ -170,3 +201,5 @@ else
   start(handles.StopTimer);
   
 end
+
+success = true;
