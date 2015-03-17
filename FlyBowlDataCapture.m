@@ -72,6 +72,8 @@ function FlyBowlDataCapture_OpeningFcn(hObject, eventdata, handles, varargin) %#
 % con = drv.connect(url,'');
 % handles.FlyBoy_stm = con.createStatement;
 
+hwait = waitbar(0,'Please wait. Initializing GUI...'); 
+
 % set up path
 if isempty(which('findjobj')) && exist('findjobj','dir'),
   addpath('findjobj');
@@ -163,7 +165,6 @@ handles = FlyBowlDataCapture_InitializeData(handles);
 % 
 % make the line name edit box autocomplete -- must be visible
 set(handles.figure_main,'Visible','on');
-hwait = waitbar(0,'Please wait. Initializing GUI...'); %#ok<NASGU>
 % 
 % if ~handles.isAutoComplete_edit_Fly_LineName,
 %   handles.AutoCompleteEdit_Fly_LineName = ...
@@ -186,7 +187,6 @@ end
 
 guidata(hObject,handles);
 
-hwait = waitbar(1);
 if ishandle(hwait),
   delete(hwait);
 end
@@ -2070,6 +2070,8 @@ function menu_File_New_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+hwait = waitbar(0,'Please wait. Reinitializing GUI...'); 
+
 if handles.GUIIsInitialized,
   [handles,didcancel] = CloseExperiment(handles);
   if didcancel,
@@ -2080,8 +2082,6 @@ CloseQuickStatsFigures(handles);
 
 guidata(hObject,handles);
 
-handles = EnableGUI(handles);
-
 % reload previous values
 handles = LoadPreviousValues(handles);
 
@@ -2091,7 +2091,13 @@ handles = FlyBowlDataCapture_InitializeData(handles);
 % % reset line name choices
 % AutoCompleteEdit(handles.AutoCompleteEdit_Fly_LineName,handles.Fly_LineNames);
 
+handles = EnableGUI(handles);
+
 guidata(hObject,handles);
+ 
+if ishandle(hwait),
+  delete(hwait);
+end
 
 
 % --------------------------------------------------------------------
