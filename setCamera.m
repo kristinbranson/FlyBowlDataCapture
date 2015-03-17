@@ -63,7 +63,11 @@ if strcmpi(handles.params.Imaq_Adaptor,'bias'),
   PreviewParams.AdaptorName = handles.params.Imaq_Adaptor;
   PreviewParams.PreviewUpdatePeriod = handles.params.PreviewUpdatePeriod/86400;
   PreviewParams.pushbutton_Done = handles.pushbutton_Done;
-  PreviewParams.RecordTimeDays = handles.params.RecordTime/86400;
+  totalrecordtime = handles.params.RecordTime;
+  if isfield(handles.params,'ExperimentStartDelay'),
+    totalrecordtime = totalrecordtime + handles.params.ExperimentStartDelay;
+  end
+  PreviewParams.RecordTimeDays = totalrecordtime/86400;
   PreviewParams.StartRecording_Time_datenum = handles.StartRecording_Time_datenum;
   PreviewParams.IsRecording = handles.IsRecording;
   PreviewParams.text_Status_Recording = handles.text_Status_Recording;

@@ -1674,11 +1674,7 @@ function pushbutton_InitializeCamera_Callback(hObject, eventdata, handles)
 
 if handles.params.doChR,
   [success,handles.ChRStuff,errmsg] = InitializeChRStimulus(handles.params);
-  if isfield(handles.params,'ExperimentStartDelay'),
-    handles.params.RecordTime = handles.ChRStuff.TotalDuration_Seconds + handles.params.ExperimentStartDelay;
-  else
-    handles.params.RecordTime = handles.ChRStuff.TotalDuration_Seconds;
-  end
+  handles.params.RecordTime = handles.ChRStuff.TotalDuration_Seconds;
   if ~success,
     s = errmsg;
     errordlg(s);

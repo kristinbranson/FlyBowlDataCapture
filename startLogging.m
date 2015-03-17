@@ -60,13 +60,13 @@ end
 PreviewParams = getappdata(hpreview,'PreviewParams');
 PreviewParams.IsRecording = true;
 
-% set recording status
-set(handles.text_Status_Recording,'String','On','BackgroundColor',handles.Status_Recording_bkgdcolor);
-
 %guidata(hObject,handles);
 
 PreviewParams.StartRecording_Time_datenum = handles.StartRecording_Time_datenum;
 setappdata(hpreview,'PreviewParams',PreviewParams);
+
+% set recording status
+set(handles.text_Status_Recording,'String','Waiting');
 
 % store record start time in button string
 set(handles.pushbutton_StartRecording,'BackgroundColor',handles.grayed_bkgdcolor,...
@@ -93,6 +93,9 @@ if isfield(handles.params,'ExperimentStartDelay') && ...
   addToStatus(handles,'Done waiting!');
 
 end
+
+% set recording status
+set(handles.text_Status_Recording,'String','On','BackgroundColor',handles.Status_Recording_bkgdcolor);
 
 % number of frames written
 handles.FrameCount = 0;
@@ -148,7 +151,9 @@ handles.writeFrame_time = 0;
 
 end
 
-if strcmpi(handles.params.Imaq_Adaptor,'bias'),
+if strcmpi(handles.params.Imaq_Adaptor,'bias') && ...
+    isfield(handles,'hLine_Status_FrameRate') && ...
+    ishandle(handles.hLine_Status_FrameRate),
   history = get(handles.hLine_Status_FrameRate,'UserData');
   history(:,1) = [];
   history(:,end+1) = [nan,nan];

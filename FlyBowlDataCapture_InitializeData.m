@@ -324,8 +324,17 @@ if ~isfield(handles.previous_values,'RecordTime'),
   handles.previous_values.RecordTime = 1000;
 end
 
-% by default, previous record time
-handles.params.RecordTime = handles.previous_values.RecordTime;
+if ~isfield(handles.params,'RecordTime'),
+
+  % by default, previous record time
+  handles.params.RecordTime = handles.previous_values.RecordTime;
+  
+else
+  
+  handles.isdefault.RecordTime = false;
+  set(handles.edit_RecordTime,'BackgroundColor',handles.changed_bkgdcolor);
+
+end
 
 if isfield(handles.params,'doChR') && handles.params.doChR,
   
