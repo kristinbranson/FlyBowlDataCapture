@@ -105,7 +105,7 @@ guidata(hObject,handles);
 
 if strcmpi(handles.params.Imaq_Adaptor,'bias'),
   
-  [success,msg,handles.StartVideoTime_datenum] = BIASStartLogging(handles.vid.BIASURL,handles.FileName);
+  [success,msg,handles.StartVideoTime_datenum] = BIASStartLogging(handles.vid.BIASURL,handles.FileName,handles);
   if ~success,
     errordlg(sprintf('Error starting logging in BIAS: %s',msg),'Error starting logging in BIAS');
   end

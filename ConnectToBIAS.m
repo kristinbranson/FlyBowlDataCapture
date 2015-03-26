@@ -25,7 +25,7 @@ if ~success1,
 end
 
 try
-  res = loadjson1(urlread([vid.BIASURL,'?get-status']));
+  res = BIASCommand(([vid.BIASURL,'?get-status']));
 catch ME,
   msg = getReport(ME,'basic');
   return;
@@ -65,7 +65,7 @@ if ~isempty(windowgeometry),
     windowgeometry_bias(2) = b;
   end    
   
-  res = loadjson1(urlread(sprintf('%s?set-window-geometry={"x":"%d","y":"%d","width":"%d","height":"%d"}',...
+  res = BIASCommand((sprintf('%s?set-window-geometry={"x":"%d","y":"%d","width":"%d","height":"%d"}',...
     vid.BIASURL,windowgeometry_bias)));
   if res.success == 0,
     warnings{end+1} = sprintf('Could not set window geometry to %s: %s',mat2str(windowgeometry_bias),res.message);
@@ -76,7 +76,7 @@ end
 %% set camera name
 if ~isempty(cameraname),
   
-  res = loadjson1(urlread([vid.BIASURL,'?set-camera-name=',cameraname]));
+  res = BIASCommand(([vid.BIASURL,'?set-camera-name=',cameraname]));
   if res.success == 0,
     warnings{end+1} = sprintf('Could not set camera name to %s: %s',cameraname,res.message);
     return;
@@ -87,7 +87,7 @@ end
 %% connect to camera
 
 if vid.biasstatus.connected == 0,
-  res = loadjson1(urlread([vid.BIASURL,'?connect']));
+  res = BIASCommand(([vid.BIASURL,'?connect']));
   if ~res.success,
     msg = sprintf('Error connecting: %s',res.message);
     return;
@@ -100,7 +100,7 @@ end
 
 if vid.biasstatus.capturing == 1,
   warnings{end+1} = 'Already capturing from camera';
-  res = loadjson1(urlread([vid.BIASURL,'?stop-capture']));
+  res = BIASCommand(([vid.BIASURL,'?stop-capture']));
   if ~res.success,
     msg = sprintf('Error stopping capture: %s',res.message);
     return;
@@ -110,7 +110,7 @@ end
 %% set configuration
 
 if dosetconfig,
-  res = loadjson1(urlread([vid.BIASURL,'?load-configuration=',biasparams.BIASConfigFile]));
+  res = BIASCommand(([vid.BIASURL,'?load-configuration=',biasparams.BIASConfigFile]));
   if ~res.success,
     msg = sprintf('Error setting configuration: %s',res.message);
     return;
@@ -119,7 +119,7 @@ end
 
 %% get configuration for error checking
 
-res = loadjson1(urlread([vid.BIASURL,'?get-configuration']));
+res = BIASCommand(([vid.BIASURL,'?get-configuration']));
 if ~res.success,
   msg = sprintf('Error getting configuration: %s',res.message);
   return;
@@ -129,7 +129,7 @@ vid.biasconfig = res.value;
 %% set logging
 
 if dodisablelogging && vid.biasstatus.logging > 0,
-  res = loadjson1(urlread([vid.BIASURL,'?disable-logging']));
+  res = BIASCommand(([vid.BIASURL,'?disable-logging']));
   if ~res.success,
     msg = sprintf('Error disabling logging: %s',res.message);
     return;
@@ -139,7 +139,7 @@ end
 %% start capture
 
 if docapture && vid.biasstatus.capturing == 0,
-  res = loadjson1(urlread([vid.BIASURL,'?start-capture']));
+  res = BIASCommand(([vid.BIASURL,'?start-capture']));
   if ~res.success,
     msg = sprintf('Error starting capture: %s',res.message);
     return;

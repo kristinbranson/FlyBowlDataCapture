@@ -72,7 +72,8 @@ if handles.IsBarcode,
     handles = setEffector(handles,handles.metadata.Effector);
   end
   if isfield(handles,'PreAssayHandling_CrossDate_datenum') && handles.PreAssayHandling_CrossDate_datenum > 0,
-    handles.metadata.CrossDate = handles.PreAssayHandling_CrossDate;
+    handles.metadata.CrossDate = datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyymmddTHHMMSS');
+    %handles.metadata.CrossDate = handles.PreAssayHandling_CrossDate;
   end
 
   if isfield(handles,'PreAssayHandling_CrossDate_datenum') && ...

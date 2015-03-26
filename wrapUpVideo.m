@@ -46,7 +46,7 @@ if strcmpi(AdaptorName,'bias'),
   while true,
     
     try
-      res = loadjson1(urlread([obj.BIASURL,'?get-status']));
+      res = BIASCommand(([obj.BIASURL,'?get-status']));
       if res.success == 0,
         addToStatus(handles,sprintf('Could not get status: %s',res.message));
         return;

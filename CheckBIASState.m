@@ -9,7 +9,7 @@ msg = '';
 
 if isempty(biasstatus),
   try
-    res = loadjson1(urlread([biasurl,'?get-status']));
+    res = BIASCommand([biasurl,'?get-status']);
   catch ME,
     msg = getReport(ME,'basic');
     return;

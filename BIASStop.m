@@ -9,7 +9,9 @@ stoptime = nan;
 %% check BIAS state
 
 try
-  res = loadjson1(urlread([biasurl,'?get-status']));
+  
+  res = BIASCommand([biasurl,'?get-status']);
+
 catch ME,
   msg = getReport(ME,'basic');
   return;
@@ -23,7 +25,7 @@ biasstatus = res.value;
 %% stop capture
 if biasstatus.capturing > 0,
   stoptime = now;
-  res = loadjson1(urlread([biasurl,'?stop-capture']));
+  res = BIASCommand([biasurl,'?stop-capture']);
   if ~res.success,
     msg = sprintf('Error stopping capture: %s',res.message);
     return;
@@ -32,7 +34,7 @@ end
 
 %% disable logging
 if disablelogging && biasstatus.logging > 0,
-  res = loadjson1(urlread([biasurl,'?disable-logging']));
+  res = BIASCommand([biasurl,'?disable-logging']);
   if ~res.success,
     msg = sprintf('Error disabling logging: %s',res.message);
     return;
@@ -41,7 +43,7 @@ end
 
 %% disconnect
 if disconnect,
-  res = loadjson1(urlread([biasurl,'?disconnect']));
+  res = BIASCommand([biasurl,'?disconnect']);
   if ~res.success,
     msg = sprintf('Error disconnecting: %s',res.message);
     return;

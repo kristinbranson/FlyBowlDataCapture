@@ -7,7 +7,7 @@ if nargin < 3,
 end
 
 try
-  res = loadjson1(urlread([biasparams.BIASURL,'?get-status']));
+  res = BIASCommand(([biasparams.BIASURL,'?get-status']),[],1);
 catch %#ok<CTCH>
   % camera not connected
   success = true;
@@ -22,7 +22,7 @@ end
 
 if res.capturing > 0,
   try
-    res1 = loadjson1(urlread([biasparams.BIASURL,'?stop-capture']));
+    res1 = BIASCommand(([biasparams.BIASURL,'?stop-capture']),[],1);
     if res1.success == 0,
       msg = 'Could not stop capturing';
       return;
@@ -35,7 +35,7 @@ end
 
 if res.connected > 0,
   try
-    res1 = loadjson1(urlread([biasparams.BIASURL,'?disconnect']));
+    res1 = BIASCommand(([biasparams.BIASURL,'?disconnect']));
     if res1.success == 0,
       msg = 'Could not disconnect camera';
       return;

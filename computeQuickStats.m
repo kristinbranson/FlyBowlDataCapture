@@ -206,8 +206,21 @@ if DoUFMFDiagnostics,
   UFMFStats.summary.ImageWidth = headerinfo.max_width;
   
 else
+  
   UFMFStats = struct;
   UFMFStats.stream.timestamp = headerinfo.timestamps;
+  UFMFStats.summary.meannFrames = nframes;
+  dt = diff(headerinfo.timestamps);
+  fps = 1./dt;
+  UFMFStats.summary.meanFPS = 1/nanmean(dt);
+  UFMFStats.summary.stdFPS = std(fps);
+  UFMFStats.summary.minFPS = min(fps);
+  UFMFStats.summary.maxFPS = max(fps);
+  
+  tmp = dir(MovieFile);
+  uncompressed_bytes = headerinfo.nr*headerinfo.nc*nframes;
+  UFMFStats.summary.meanCompressionRate = tmp.bytes / uncompressed_bytes;
+  
 end  
 
 % read temperature stream

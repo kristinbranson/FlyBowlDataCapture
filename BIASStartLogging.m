@@ -1,4 +1,4 @@
-function [success,msg,starttime] = BIASStartLogging(biasurl,moviefilename)
+function [success,msg,starttime] = BIASStartLogging(biasurl,moviefilename,handles)
 
 starttime = nan;
 
@@ -7,7 +7,7 @@ msg = '';
 
 %% get status
 try
-  res = loadjson1(urlread([biasurl,'?get-status']));
+  res = BIASCommand([biasurl,'?get-status']);
 catch ME,
   msg = getReport(ME,'basic');
   return;
@@ -22,6 +22,35 @@ biasstatus = res.value;
 
 [success1,msg1] = CheckBIASState(biasurl,'biasstatus',biasstatus,...
   'connected',1,'logging',0);
+
+if ~success1,
+    
+  if nargin >= 3,
+    warnmsg = 'THIS SHOULD NOT HAPPEN! Camera not connected when starting logging! Trying to reconnect, but this could fail!';
+    warning(warnmsg);
+    addToStatus(handles,warnmsg);
+
+    try
+      [handles.vid,success1,msg2,warnings2] = ConnectToBIAS(handles.BIASParams,handles.DeviceID);
+      res = BIASCommand([biasurl,'?get-status']);
+      if res.success == 0,
+        msg = sprintf('Could not get status: %s',res.message);
+        return;
+      end
+      biasstatus = res.value;
+      
+    catch ME,
+      warnmsg = sprintf('Tried to reconnect to BIAS but failed:\n%s',getReport(ME));
+      warning(warnmsg);
+      addToStatus(handles,warning);
+    end
+    if ~success1,
+      warnmsg = sprintf('Tried to reconnect to BIAS but failed:\n%s',msg2);
+      warning(warnmsg);
+      addToStatus(handles,warning);
+    end
+  end
+end
 if ~success1,
   msg = sprintf('BIAS GUI not in correct state: %s',msg1);
   return;
@@ -29,7 +58,7 @@ end
 
 %% stop capture
 if biasstatus.capturing > 0,
-  res = loadjson1(urlread([biasurl,'?stop-capture']));
+  res = BIASCommand([biasurl,'?stop-capture']);
   if ~res.success,
     msg = sprintf('Error stopping capture: %s',res.message);
     return;
@@ -38,14 +67,14 @@ end
 
 %% set movie file name
 
-res = loadjson1(urlread([biasurl,'?set-video-file=',moviefilename]));
+res = BIASCommand([biasurl,'?set-video-file=',moviefilename]);
 if ~res.success,
   msg = sprintf('Error setting video file name: %s',res.message);
   return;
 end
 
 %% start logging
-res = loadjson1(urlread([biasurl,'?enable-logging']));
+res = BIASCommand([biasurl,'?enable-logging']);
 if ~res.success,
   msg = sprintf('Error enabling logging: %s',res.message);
   return;
@@ -54,7 +83,7 @@ end
 %% start capture
 
 starttime = now;
-res = loadjson1(urlread([biasurl,'?start-capture']));
+res = BIASCommand([biasurl,'?start-capture']);
 if ~res.success,
   msg = sprintf('Error starting capture: %s',res.message);
   return;
