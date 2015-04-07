@@ -90,6 +90,8 @@ if isfield(handles.params,'ExperimentStartDelay') && ...
     end
   end
   
+  handles = guidata(hObject);
+  
   addToStatus(handles,'Done waiting!');
 
 end

@@ -1,9 +1,10 @@
 function params = ReadParams(filename,varargin)
 
-[params,fns_required,fns_numeric] = ...
+[params,fns_required,fns_numeric,fns_list] = ...
   myparse(varargin,'params',struct,...
   'fns_required',{},...
-  'fns_numeric',{});
+  'fns_numeric',{},...
+  'fns_list',{});
 
 comment_char = '#';
 
@@ -39,6 +40,8 @@ while true,
   % first value is the parameter name, rest are parameter values
   if ismember(v{1},fns_numeric),
     params.(v{1}) = str2double(v{2});
+  elseif ismember(v{1},fns_list),
+    params.(v{1}) = regexp(v{2},',','split');
   else
     params.(v{1}) = v{2};
   end
