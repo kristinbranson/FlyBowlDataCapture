@@ -105,7 +105,13 @@ else
   handles.metadata.WishList = -1;
   
 end
-  
+
+if handles.params.doChR  && isfield(handles.params,'ChR_expProtocolFile'),
+  [~,ledprotocolname,~] = fileparts(handles.params.ChR_expProtocolFile);
+  handles.metadata.led_protocol = ledprotocolname;
+else
+  handles.metadata.led_protocol = 'none';
+end
 % in seconds
 %shift_time = (handles.StartRecording_Time_datenum - handles.ShiftFlyTemp_Time_datenum)*24*60*60;
 load_time = (handles.StartRecording_Time_datenum - handles.FliesLoaded_Time_datenum)*24*60*60;
@@ -128,6 +134,8 @@ ScreenReason = handles.metadata.ScreenReason;
 fprintf(fid,'screen_reason="%s" ',ScreenReason);
 % data capture code version
 fprintf(fid,'data_capture_version="%s" ',handles.version);
+% optogenetic activation LED protocol name
+fprintf(fid,'led_protocol="%s" ',handles.metadata.led_protocol);
 
 fprintf(fid,'>\n');
 
