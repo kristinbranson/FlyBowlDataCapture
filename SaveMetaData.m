@@ -165,7 +165,11 @@ fprintf(fid,'cross_date="%s" ', handles.metadata.CrossDate);
 fprintf(fid,'flip_date="%s" ',handles.metadata.FlipDate);
 
 % hours starved
-fprintf(fid,'hours_starved="%f" ',handles.metadata.starvation_time);
+if isfield(handles.metadata,'starvation_time'),
+  fprintf(fid,'hours_starved="%f" ',handles.metadata.starvation_time);
+else
+  fprintf(fid,'hours_starved="%f" ',handles.metadata.StarvationTime);
+end
 % barcode
 fprintf(fid,'cross_barcode="%d" ',handles.metadata.Barcode);
 % flip
@@ -194,7 +198,11 @@ fprintf(fid,'handler_cross="%s" ',handles.metadata.CrossHandler);
 % person who sorted flies
 fprintf(fid,'handler_sorting="%s" ',handles.metadata.SortingHandler);
 % time since sorting, in hours
-fprintf(fid,'hours_sorted="%f" ',handles.metadata.sorting_time);
+if isfield(handles.metadata,'sorting_time'),
+  fprintf(fid,'hours_sorted="%f" ',handles.metadata.sorting_time);
+else
+  fprintf(fid,'hours_sorted="%f" ',handles.metadata.SortingTime);
+end
 % absolute datetime the flies were sorted at
 % handle missing sorting time
 % if isnan(handles.PreAssayHandling_SortingTime_datenum),

@@ -23,10 +23,12 @@ if handles.IsBarcode,
       % find SAGE
       if ~isdeployed,
         handles.IsSage = exist(handles.SAGECodeDir,'file');
-        try
-          addpath(handles.SAGECodeDir);
-        catch
-          handles.IsSage = false;
+        if handles.IsSage,
+          try
+            addpath(handles.SAGECodeDir);
+          catch
+            handles.IsSage = false;
+          end
         end
       else
         handles.IsSage = exist('SAGE.Line','class');

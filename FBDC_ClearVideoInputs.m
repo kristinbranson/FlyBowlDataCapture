@@ -1,5 +1,7 @@
 function FBDC_ClearVideoInputs()
 
-for tmp = imaqfind('Name','FBDC_VideoInput'),
-  delete(tmp{1});
+if exist('imaqfind') > 0, %#ok<EXIST>
+  for tmp = imaqfind('Name','FBDC_VideoInput'),
+    delete(tmp{1});
+  end
 end
