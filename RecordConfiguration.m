@@ -17,7 +17,9 @@ waitbar(.1,hwaitbar,'Loaded rc file');
 % handles.PreAssayHandling_StarvationDateOff = floor(handles.now) - handles.PreAssayHandling_StarvationDate_datenum;
 
 % get current figure position
-handles.FigurePosition = get(handles.figure_main,'Position');
+if ishandle(handles.figure_main),
+  handles.FigurePosition = get(handles.figure_main,'Position');
+end
 
 waitbar(.2,hwaitbar,'Computed offsets, figure position');
 
