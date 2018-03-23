@@ -1275,7 +1275,7 @@ if handles.params.doChR,
   end
   % makes IrInt computer specific AR 3/14/2018
   if isfield(handles.params,'ChR_IrInt')
-      handles.params.ChR_IrInt = str2double(ParseComputerSpecificParam(string(handles.params.ChR_IrInt),handles));
+      handles.params.ChR_IrInt = str2double(ParseComputerSpecificParam(handles.params.ChR_IrInt,handles));
   end
   
 end

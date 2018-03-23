@@ -34,7 +34,7 @@ metadata.ScreenType = sprintf('non_olympiad_%s_%s',metadata.LabName,handles.Expe
 if metadata.DaysSinceCross < 0,
   metadata.CrossDate = '????????';
 else
-  cross_datenum = handles.StartRecording_Time_datenum - handles.DaysSinceCross;
+  cross_datenum = handles.StartRecording_Time_datenum - metadata.DaysSinceCross;
   metadata.CrossDate = datestr(cross_datenum,handles.datetimeformat);
 end
 
