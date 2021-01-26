@@ -89,7 +89,7 @@ end
 
 set(hax,'XLim',[0,X(end)+1]);
 xlabel(hax,'Time (s)');
-ylabel(hax,'LED %');
+ylabel(hax,'LED');
 % legend('red light','green light','blue light','location','best');
 
 % %The animatedline was created after the cla statement
