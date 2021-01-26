@@ -1681,8 +1681,12 @@ if handles.params.doChR,
     errordlg(s);
     error(s);
   end
-  DisplayStimulusProtocol(handles.ChRStuff.protocol,handles.axes_Status_Temp);
-  handles.ChRStuff.hCurrTimeLine = plot(handles.axes_Status_Temp,[0,0],get(handles.axes_Status_Temp,'YLim'),'m');
+  handles.ChRStuff.hCurrTimeLine = nan;
+  if handles.params.CoupleCameraTempProbeStart ~= 0,
+    set(handles.axes_Status_Temp,'Visible','on');
+    DisplayStimulusProtocol(handles.ChRStuff.protocol,'hax',handles.axes_Status_Temp);
+    handles.ChRStuff.hCurrTimeLine = plot(handles.axes_Status_Temp,[0,0],get(handles.axes_Status_Temp,'YLim'),'m');
+  end
 end
 
 handles = setCamera(handles);

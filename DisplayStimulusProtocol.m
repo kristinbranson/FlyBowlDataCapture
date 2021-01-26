@@ -17,6 +17,7 @@ totalDuration = sum(protocol.duration); %in seconds - change from old protocol f
 X = (0:0.001:totalDuration)';
 %xticks('auto');
 xlim([0 totalDuration+5]);
+ylim([0,3]);
 Yr = zeros(totalDuration*1000+1,1);
 Yg = zeros(totalDuration*1000+1,1);
 Yb = zeros(totalDuration*1000+1,1);
@@ -87,8 +88,8 @@ for stepIndex = 1:length(protocol.stepNum)
 end
 
 set(hax,'XLim',[0,X(end)+1]);
-
-legend off;
+xlabel(hax,'Time (s)');
+ylabel(hax,'LED %');
 % legend('red light','green light','blue light','location','best');
 
 % %The animatedline was created after the cla statement

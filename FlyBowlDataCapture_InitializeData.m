@@ -1205,6 +1205,10 @@ set(handles.axes_Status_Temp,'Color',[0,0,0],...
   'YLim',handles.params.TempPlotYLim,...
   'Box','off');
 
+if handles.params.CoupleCameraTempProbeStart ~= 0,
+  set(handles.axes_Status_Temp,'Visible','off');
+end
+
 %% Preview axes
 
 if isfield(handles,'axes_PreviewVideo'),
