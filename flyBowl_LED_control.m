@@ -1,8 +1,13 @@
-function status = flyBowl_LED_control(s1,token, param, docheckstatus)
+function status = flyBowl_LED_control(s1,token, param, docheckstatus, COMPort)
+
+error('Obsolete. Use LEDController');
 
 dispstatus = nargout == 0;
-if nargin < 4,
+if nargin < 4 || isempty(docheckstatus),
   docheckstatus = true;
+end
+if nargin < 5,
+  COMPort = 'COM3';
 end
 
 switch upper(strtrim(token))

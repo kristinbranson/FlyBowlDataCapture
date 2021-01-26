@@ -127,7 +127,13 @@ global FBDC_CHR_LED_CONTROLLER_FID;
 if ~isempty(FBDC_CHR_LED_CONTROLLER_FID),
   try
     for i = 1:numel(FBDC_CHR_LED_CONTROLLER_FID),
-      fclose(FBDC_CHR_LED_CONTROLLER_FID(i));
+      %fclose(FBDC_CHR_LED_CONTROLLER_FID(i));
+      try %#ok<TRYNC>
+        FBDC_CHR_LED_CONTROLLER_FID{i}.docheckstatus = 0;
+        FBDC_CHR_LED_CONTROLLER_FID{i}.setIrBacklightsOff();
+        FBDC_CHR_LED_CONTROLLER_FID{i}.turnOffLED();
+      end
+      FBDC_CHR_LED_CONTROLLER_FID{i}.close();        
     end
     FBDC_CHR_LED_CONTROLLER_FID = [];
   catch ME

@@ -6,13 +6,19 @@ if ~isfield(handles,'ChRStuff') || ...
   return;
 end
 
-global FBDC_CHR_LED_CONTROLLER_FID;
+%global FBDC_CHR_LED_CONTROLLER_FID;
 try
   
-  flyBowl_LED_control(handles.ChRStuff.hLEDController, 'STOP',[],false);
-  flyBowl_LED_control(handles.ChRStuff.hLEDController, 'OFF',[],false);
-  fclose(handles.ChRStuff.hLEDController);
-  FBDC_CHR_LED_CONTROLLER_FID = setdiff(FBDC_CHR_LED_CONTROLLER_FID,handles.ChRStuff.hLEDController);
+  handles.ChRStuff.hLEDController.stopPulse();
+  handles.ChRStuff.hLEDController.stopExperiment();
+  handles.ChRStuff.hLEDController.setIrBacklightsOff();
+  %flyBowl_LED_control(handles.ChRStuff.hLEDController, 'STOP',[],false);
+  handles.ChRStuff.hLEDController.turnOffLED();
+  %flyBowl_LED_control(handles.ChRStuff.hLEDController, 'OFF',[],false);
+  handles.ChRStuff.hLEDController.close();
+  %fclose(handles.ChRStuff.hLEDController);
+  RemoveLEDController(handles.ChRStuff.hLEDController);
+  %FBDC_CHR_LED_CONTROLLER_FID = setdiff(FBDC_CHR_LED_CONTROLLER_FID,handles.ChRStuff.hLEDController);
   handles.ChRStuff.hLEDController = [];
   addToStatus(handles,'Closed LED controller connection.');
 catch ME,

@@ -182,7 +182,7 @@ if ~exist(oldname,'file'),
   if exist(newoldname,'file'),
     oldname = newoldname;
     handles.FileName = oldname;
-    warning('Adding _v001 to file name.');
+    fprintf('Adding _v001 to file name %s -> %s.\n',oldname,newoldname);
   end
 end
 %fprintf('Renaming file.\n');

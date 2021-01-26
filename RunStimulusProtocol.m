@@ -58,105 +58,149 @@ success = false;
 %   fprintf(expTimeFileID, '%.10f , start camera recording.\n', now);
 % end
 
-for step=1:numel(handles.ChRStuff.protocol.stepNum),
+addToStatus(handles,'Running stimulus experiment:' );
+addToStatus(handles,handles.ChRStuff.expData);
+fprintf(expTimeFileID, '%.10f,run_experiment\n', now);
+handles.ChRStuff.hLEDController.runExperiment();
 
-  %fprintf(expTimeFileID, '%.10f , start step %d.\n', now, step);
-  % display current step
-  allOn = 0;
-  allOff = 0;
-  currentStep = sprintf('ST: %d, IT: %d, PW: %d, PP: %d, PN: %d, OT: %d, DT: %d, DU: %f, IR: %d',...
-    handles.ChRStuff.protocol.stepNum(step),handles.ChRStuff.protocol.intensity(step), ...
-    handles.ChRStuff.protocol.pulseWidthSP(step), handles.ChRStuff.protocol.pulsePeriodSP(step),...
-    handles.ChRStuff.protocol.pulseNum(step), handles.ChRStuff.protocol.offTime(step),...
-    handles.ChRStuff.protocol.delayTime(step), handles.ChRStuff.protocol.duration(step),...
-    handles.ChRStuff.protocol.iteration(step));
-  
-  addToStatus(handles,currentStep);
+duration = handles.ChRStuff.TotalDuration_Seconds;
+curTime = tic;
 
-  % if intensity = 0, off this step
-  if handles.ChRStuff.protocol.intensity(step)==0
-    allOff = 1;
-    % if pulse period = 0, always on this step
-  elseif handles.ChRStuff.protocol.pulseWidthSP(step) == 0
-    allOn = 1;
+didhalt = false;
+while toc(curTime) < duration,
+  pause(0.1);
+  if FBDC_DIDHALT(GUIi),
+    fprintf('Experiment aborted.\n');
+    didhalt = true;
+    break;
   end
-  
-  % set intensity
-  flyBowl_LED_control(handles.ChRStuff.hLEDController, 'CHR',handles.ChRStuff.protocol.intensity(step),false);
-  pauseT = double(handles.ChRStuff.protocol.duration(step))/1000;
-        
-  % blink LED (calculate the iteration number)
-  if allOff == 1;
-    % if intensity is 0, then turn things off and wait
-    
-    warning('Using allOff condition in RunStimulusProtocol -- this should not happen in FBDC!\n');
-    
-    %pause(double(handles.ChRStuff.protocol.duration(step))/1000);
-    curTime = tic;
-    while toc(curTime) < pauseT,
-      pause(0.01);
-      if FBDC_DIDHALT(GUIi),
-        return;
-      end
-    end
-    
-  elseif allOn == 1
-    % if pulsewidth is 0, control this through MATLAB!
-    
-    warning('Using allOn condition in RunStimulusProtocol -- this should not happen in FBDC!\n');
-        
-    flyBowl_LED_control(handles.ChRStuff.hLEDController, 'ON',[],false);
-    %pause(double(handles.ChRStuff.protocol.duration(step))/1000);
-    curTime = tic;
-    while toc(curTime) < pauseT
-      pause(0.01);
-      if FBDC_DIDHALT(GUIi),
-        return;
-      end
-    end
-    
-  else
-    
-    % THIS SHOULD ALWAYS BE THE CASE IN FBDC -- DO NOT USE MATLAB TIMING
-    
-    % set parameters for this step
-    param.pulse_width = handles.ChRStuff.protocol.pulseWidthSP(step);
-    param.pulse_period = handles.ChRStuff.protocol.pulsePeriodSP(step);
-    param.number_of_pulses = handles.ChRStuff.protocol.pulseNum(step);
-    param.pulse_train_interval = handles.ChRStuff.protocol.offTime(step);
-    param.delay_time = handles.ChRStuff.protocol.delayTime(step);
-    param.iteration = handles.ChRStuff.protocol.iteration(step);
-        
-    % run this plan
-    flyBowl_LED_control(handles.ChRStuff.hLEDController, 'PULSE', param,false);
-    delay(0.01);
-            
-    fprintf(expTimeFileID, '%.10f,start_pulse,%d\n', now, step );
-    flyBowl_LED_control(handles.ChRStuff.hLEDController, 'RUN',[],false);
-            
-    %stop timer cannot stop the callback function, so we need to
-    %poll the state of the expRun
-    %pause(double(handles.ChRStuff.protocol.duration(step))/1000);
-    curTime = tic;
-    
-    % TODO: I think here is where we can pause for slightly less time, and
-    % then pause again after 
-    
-    while toc(curTime) < pauseT,
-      pause(0.01);
-      if FBDC_DIDHALT(GUIi),
-        return;
-      end
-    end
-            
-    fprintf(expTimeFileID, '%.10f,stop_pulse,%d\n', now, step );
-    flyBowl_LED_control(handles.ChRStuff.hLEDController, 'STOP',[],false);
+  if ishandle(handles.ChRStuff.hCurrTimeLine),
+    set(handles.ChRStuff.hCurrTimeLine,'XData',toc(curTime)+[0,0]);
   end
-  
 end
 
+fprintf(expTimeFileID, '%.10f,stop_experiment,%d\n', now);
+stopstatus = handles.ChRStuff.hLEDController.getExperimentStatus();
+handles.ChRStuff.hLEDController.stopExperiment();
+addToStatus(handles,'Experiment status when stopped:');
+if isempty(stopstatus),
+  addToStatus(handles,'NULL');
+else
+  try %#ok<TRYNC>
+    addToStatus(handles,['>> ',stopstatus]);
+  end
+end
+% fprintf(expTimeFileID, '%.10f,stop_pulse,%d\n', now, step );
+% handles.ChRStuff.hLEDController.stopPulse();
+% 
+% for step=1:numel(handles.ChRStuff.protocol.stepNum),
+% 
+%   %fprintf(expTimeFileID, '%.10f , start step %d.\n', now, step);
+%   % display current step
+%   allOn = 0;
+%   allOff = 0;
+%   currentStep = sprintf('ST: %d, IT: %d, PW: %d, PP: %d, PN: %d, OT: %d, DT: %d, DU: %f, IR: %d',...
+%     handles.ChRStuff.protocol.stepNum(step),handles.ChRStuff.protocol.intensity(step), ...
+%     handles.ChRStuff.protocol.pulseWidthSP(step), handles.ChRStuff.protocol.pulsePeriodSP(step),...
+%     handles.ChRStuff.protocol.pulseNum(step), handles.ChRStuff.protocol.offTime(step),...
+%     handles.ChRStuff.protocol.delayTime(step), handles.ChRStuff.protocol.duration(step),...
+%     handles.ChRStuff.protocol.iteration(step));
+%   
+%   addToStatus(handles,currentStep);
+% 
+%   % if intensity = 0, off this step
+%   if handles.ChRStuff.protocol.intensity(step)==0
+%     allOff = 1;
+%     % if pulse period = 0, always on this step
+%   elseif handles.ChRStuff.protocol.pulseWidthSP(step) == 0
+%     allOn = 1;
+%   end
+%   
+%   % set intensity
+%   handles.ChRStuff.hLEDController.setRedLEDPower(power,handles.ChRStuff.protocol.intensity(step));
+%   %flyBowl_LED_control(handles.ChRStuff.hLEDController, 'CHR',handles.ChRStuff.protocol.intensity(step),false);
+%   pauseT = double(handles.ChRStuff.protocol.duration(step))/1000;
+%         
+%   % blink LED (calculate the iteration number)
+%   if allOff == 1;
+%     % if intensity is 0, then turn things off and wait
+%     
+%     error('Using allOff condition in RunStimulusProtocol -- this should not happen in FBDC!\n');
+%     handles.ChRStuff.hLEDController.turnOffLED();
+%     
+%     %pause(double(handles.ChRStuff.protocol.duration(step))/1000);
+%     curTime = tic;
+%     while toc(curTime) < pauseT,
+%       pause(0.01);
+%       if FBDC_DIDHALT(GUIi),
+%         return;
+%       end
+%     end
+%     
+%   elseif allOn == 1
+%     % if pulsewidth is 0, control this through MATLAB!
+%     
+%     error('Using allOn condition in RunStimulusProtocol -- this should not happen in FBDC!\n');
+%         
+%     handles.ChRStuff.hLEDController.turnOnLED();
+%     %flyBowl_LED_control(handles.ChRStuff.hLEDController, 'ON',[],false);
+%     %pause(double(handles.ChRStuff.protocol.duration(step))/1000);
+%     curTime = tic;
+%     while toc(curTime) < pauseT
+%       pause(0.01);
+%       if FBDC_DIDHALT(GUIi),
+%         return;
+%       end
+%     end
+%     
+%   else
+%     
+%     % THIS SHOULD ALWAYS BE THE CASE IN FBDC -- DO NOT USE MATLAB TIMING
+%     
+%     % set parameters for this step
+%     param.pulse_width = handles.ChRStuff.protocol.pulseWidthSP(step);
+%     param.pulse_period = handles.ChRStuff.protocol.pulsePeriodSP(step);
+%     param.number_of_pulses = handles.ChRStuff.protocol.pulseNum(step);
+%     param.pulse_train_interval = handles.ChRStuff.protocol.offTime(step);
+%     param.delay_time = handles.ChRStuff.protocol.delayTime(step);
+%     param.LED_delay = handles.ChRStuff.protocol.delayTime(step);
+%     param.iteration = handles.ChRStuff.protocol.iteration(step);
+%     param.color = 'RED'; % currently only supporting red LEDs
+%         
+%     % run this plan
+%     handles.ChRStuff.hLEDController.setPulseParam(param);
+%     %flyBowl_LED_control(handles.ChRStuff.hLEDController, 'PULSE', param,false);
+%     delay(0.01);
+%             
+%     fprintf(expTimeFileID, '%.10f,start_pulse,%d\n', now, step );
+%     handles.ChRStuff.hLEDController.startPulse();
+%     %flyBowl_LED_control(handles.ChRStuff.hLEDController, 'RUN',[],false);
+%             
+%     %stop timer cannot stop the callback function, so we need to
+%     %poll the state of the expRun
+%     %pause(double(handles.ChRStuff.protocol.duration(step))/1000);
+%     curTime = tic;
+%     
+%     % TODO: I think here is where we can pause for slightly less time, and
+%     % then pause again after 
+%     
+%     while toc(curTime) < pauseT,
+%       pause(0.01);
+%       if FBDC_DIDHALT(GUIi),
+%         return;
+%       end
+%     end
+%             
+%     fprintf(expTimeFileID, '%.10f,stop_pulse,%d\n', now, step );
+%     handles.ChRStuff.hLEDController.stopPulse();
+%     %flyBowl_LED_control(handles.ChRStuff.hLEDController, 'STOP',[],false);
+%   end
+%   
+% end
+
 %to guaranttee the leds are off at the end
-flyBowl_LED_control(handles.ChRStuff.hLEDController, 'OFF',[],false);
+handles.ChRStuff.hLEDController.turnOffLED();
+%flyBowl_LED_control(handles.ChRStuff.hLEDController, 'OFF',[],false);
 %setappdata(handles.figure_main,'ChRExpRunning',false);
 
 % TODO: put this back?
@@ -169,7 +213,12 @@ flyBowl_LED_control(handles.ChRStuff.hLEDController, 'OFF',[],false);
 
 % TODO: move this elsewhere
 %fclose(expTimeFileID);
-addToStatus(handles,'Done running protocol!!');
+if didhalt,
+  addToStatus(handles,'Experiment aborted before protocol complete');
+else
+  addToStatus(handles,'Done running protocol!!');
+  success = true;
+end
 
 % TODO: move this elsewhere
 %   %start update temp and humidity value
@@ -177,5 +226,3 @@ addToStatus(handles,'Done running protocol!!');
 % %         handles.tTemp = timer('StartDelay', 3, 'Period', handles.THUpdateP, 'ExecutionMode', 'fixedRate', 'TimerFcn',{@displayTempHumd, handles.figure1} );
 %     start(handles.tTemp);
 %   end
-
-success = true;

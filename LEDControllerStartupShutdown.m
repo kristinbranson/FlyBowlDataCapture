@@ -1,9 +1,10 @@
 function paramsfile = LEDControllerStartupShutdown(mode,paramsfile)
 
 % set up path
-if isempty(which('flyBowl_LED_control')) && exist('../flyBowl','dir'),
-  addpath('../flyBowl');
-end
+% obsolete
+% if isempty(which('flyBowl_LED_control')) && exist('../flyBowl','dir'),
+%   addpath('../flyBowl');
+% end
 
 if ~ismember(mode,{'startup','shutdown'}),
   error('mode should be either startup or shutdown');
@@ -45,28 +46,35 @@ params.ChR_serial_port_for_LED_Controller = m{i,2};
 
 global FBDC_CHR_LED_CONTROLLER_FID;
 
-hLEDController = serial(params.ChR_serial_port_for_LED_Controller,...
-  'BaudRate', 115200, 'Terminator', 'CR');
-fopen(hLEDController);
+hLEDController = LEDController(params.ChR_serial_port_for_LED_Controller);
+% hLEDController = serial(params.ChR_serial_port_for_LED_Controller,...
+%   'BaudRate', 115200, 'Terminator', 'CR');
+% fopen(hLEDController);
 
 if isempty(FBDC_CHR_LED_CONTROLLER_FID)
-  FBDC_CHR_LED_CONTROLLER_FID = hLEDController;
-else
-  FBDC_CHR_LED_CONTROLLER_FID(end+1) = hLEDController;
+  FBDC_CHR_LED_CONTROLLER_FID = {};
 end
+FBDC_CHR_LED_CONTROLLER_FID{end+1} = hLEDController;
 
 % reset LED controller
-flyBowl_LED_control(hLEDController,'RESET',[],false);
+hLEDController.resetController();
+% flyBowl_LED_control(hLEDController,'RESET',[],false);
 
 % set IR LED intensity
 switch mode,
   case 'startup'
-    flyBowl_LED_control(hLEDController,'IR',params.ChR_IrInt,false);
+    hLEDController.setIRLEDPower(params.ChR_IrInt);
+    %flyBowl_LED_control(hLEDController,'IR',params.ChR_IrInt,false);
   case 'shutdown'
-    flyBowl_LED_control(hLEDController,'IR',0,false);
+    hLEDController.setIrBacklightsOff();
+    %flyBowl_LED_control(hLEDController,'IR',0,false);
 end
 
-flyBowl_LED_control(hLEDController, 'STOP',[],false);
-flyBowl_LED_control(hLEDController, 'OFF',[],false);
-fclose(hLEDController);
-FBDC_CHR_LED_CONTROLLER_FID = setdiff(FBDC_CHR_LED_CONTROLLER_FID,hLEDController);
+hLEDController.stopPulse();
+%flyBowl_LED_control(hLEDController, 'STOP',[],false);
+hLEDController.turnOffLED();
+%flyBowl_LED_control(hLEDController, 'OFF',[],false);
+hLEDController.close();
+%fclose(hLEDController);
+RemoveLEDController(handles.ChRStuff.hLEDController);
+%FBDC_CHR_LED_CONTROLLER_FID = setdiff(FBDC_CHR_LED_CONTROLLER_FID,hLEDController);

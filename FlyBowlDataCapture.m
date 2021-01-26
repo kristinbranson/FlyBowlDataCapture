@@ -84,9 +84,10 @@ end
 if isempty(which('export_fig')) && exist('export_fig','dir'),
   addpath('export_fig');
 end
-if isempty(which('flyBowl_LED_control')) && exist('../flyBowl','dir'),
-  addpath('../flyBowl');
-end
+% KB 20210124 obsolete
+% if isempty(which('flyBowl_LED_control')) && exist('../flyBowl','dir'),
+%   addpath('../flyBowl');
+% end
 
 % get GUI instance
 %handles.GUIInstanceDir = '.GUIInstances';
@@ -1680,6 +1681,8 @@ if handles.params.doChR,
     errordlg(s);
     error(s);
   end
+  DisplayStimulusProtocol(handles.ChRStuff.protocol,handles.axes_Status_Temp);
+  handles.ChRStuff.hCurrTimeLine = plot(handles.axes_Status_Temp,[0,0],get(handles.axes_Status_Temp,'YLim'),'m');
 end
 
 handles = setCamera(handles);
@@ -2119,11 +2122,11 @@ if nargin < 2,
   isclosefig = false;
 end
 
-if isclosefig,
-  % store that we are trying to close
-  global FBDC_DIDHALT; %#ok<TLEV>
-  FBDC_DIDHALT(handles.GUIi) = true;
-end
+% if isclosefig,
+%   % store that we are trying to close
+%   global FBDC_DIDHALT; %#ok<TLEV>
+%   FBDC_DIDHALT(handles.GUIi) = true; %#ok<NASGU>
+% end
 
 hObject = handles.figure_main;
 didabort = false;
@@ -2140,6 +2143,10 @@ if isfield(handles,'FinishedRecording') && ~handles.FinishedRecording && handles
   addToStatus(handles,{'Experiment aborted.'});
   didabort = true;
 end
+
+% store that we are trying to close
+global FBDC_DIDHALT; 
+FBDC_DIDHALT(handles.GUIi) = true; 
 
 hwaitbar = waitbar(.1,'Closing experiment');
 
