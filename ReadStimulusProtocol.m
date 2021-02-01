@@ -42,7 +42,7 @@ end
 
 % new code copied from Jin's flyBowl_RGB.m and modified
 res.stepNum = indata(:,1);
-res.duration = indata(:,2);
+res.duration = indata(:,2)/1000; % specify in ms but firmware expects seconds
 res.delayTime = indata(:,3);
 %red light
 res.Rintensity = indata(:,4);
