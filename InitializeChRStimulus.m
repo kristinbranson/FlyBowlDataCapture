@@ -93,7 +93,10 @@ hComm.hLEDController.removeAllExperimentSteps();
 %add new experiment
 try
   for stepIndex = 1:length(hComm.protocol.stepNum)
-    totalSteps = hComm.hLEDController.addOneStep(hComm.ExperimentSteps(stepIndex)); %#ok<NASGU>
+    totalSteps = hComm.hLEDController.addOneStep(hComm.ExperimentSteps(stepIndex));
+    if isempty(totalSteps) || (totalSteps ~= stepIndex),
+      error('totalSteps returned from LED Controller -> addOneStep does not match');
+    end
   end
   
   hComm.expData = hComm.hLEDController.getExperimentSteps();

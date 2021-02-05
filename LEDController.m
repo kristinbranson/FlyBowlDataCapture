@@ -138,12 +138,21 @@ classdef LEDController < handle
         %% functions to set up experiment protocols
         function totalSteps = addOneStep(obj,oneStep)
             if  ~(obj.serialPort == 0)
-                fprintf(obj.serialPort, ['addOneStep ',num2str([oneStep.NumStep, oneStep.RedIntensity, oneStep.RedPulsePeriod,...
-                    oneStep.RedPulseWidth, oneStep.RedPulseNum, oneStep.RedOffTime, oneStep.RedIteration, oneStep.GrnIntensity,...
-                    oneStep.GrnPulsePeriod, oneStep.GrnPulseWidth, oneStep.GrnPulseNum, oneStep.GrnOffTime, oneStep.GrnIteration,...
-                    oneStep.BluIntensity, oneStep.BluPulsePeriod, oneStep.BluPulseWidth, oneStep.BluPulseNum, oneStep.BluOffTime,...
-                    oneStep.BluIteration,oneStep.DelayTime, oneStep.Duration])]);
-                if obj.docheckstatus, [~,status] = checkControllerStatus(obj); end
+              x = [oneStep.NumStep, oneStep.RedIntensity, oneStep.RedPulsePeriod,...
+                oneStep.RedPulseWidth, oneStep.RedPulseNum, oneStep.RedOffTime, oneStep.RedIteration, oneStep.GrnIntensity,...
+                oneStep.GrnPulsePeriod, oneStep.GrnPulseWidth, oneStep.GrnPulseNum, oneStep.GrnOffTime, oneStep.GrnIteration,...
+                oneStep.BluIntensity, oneStep.BluPulsePeriod, oneStep.BluPulseWidth, oneStep.BluPulseNum, oneStep.BluOffTime,...
+                oneStep.BluIteration,oneStep.DelayTime, oneStep.Duration];
+              s = 'addOneStep ';
+              for i = 1:numel(x),
+                if isequaln(x(i),fix(x(i))),
+                  s = [s,sprintf('%d ',x(i))];
+                else
+                  s = [s,sprintf('%f ',x(i))];
+                end
+              end
+                fprintf(obj.serialPort,s);
+                [~,status] = checkControllerStatus(obj);
                 totalSteps = str2double(status);
             end
         end
