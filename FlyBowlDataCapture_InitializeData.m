@@ -862,9 +862,9 @@ end
 handles.Assay_Rig = handles.previous_values.Assay_Rig;
 
 % set possible values, current value, color to default
-set(handles.popupmenu_Assay_Rig,'String',handles.Assay_Rigs,...
-  'Value',find(strcmp(handles.Assay_Rig,handles.Assay_Rigs),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% set(handles.popupmenu_Assay_Rig,'String',handles.Assay_Rigs,...
+%   'Value',find(strcmp(handles.Assay_Rig,handles.Assay_Rigs),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Plate
 
@@ -906,9 +906,9 @@ end
 handles.Assay_Lid = handles.previous_values.Assay_Lid;
 
 % set possible values, current value, color to default
-set(handles.popupmenu_Assay_Lid,'String',handles.Assay_Lids,...
-  'Value',find(strcmp(handles.Assay_Lid,handles.Assay_Lids),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% set(handles.popupmenu_Assay_Lid,'String',handles.Assay_Lids,...
+%   'Value',find(strcmp(handles.Assay_Lid,handles.Assay_Lids),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% VisualSurround
 
@@ -928,9 +928,9 @@ end
 handles.Assay_VisualSurround = handles.previous_values.Assay_VisualSurround;
 
 % set possible values, current value, color to default
-set(handles.popupmenu_Assay_VisualSurround,'String',handles.Assay_VisualSurrounds,...
-  'Value',find(strcmp(handles.Assay_VisualSurround,handles.Assay_VisualSurrounds),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% set(handles.popupmenu_Assay_VisualSurround,'String',handles.Assay_VisualSurrounds,...
+%   'Value',find(strcmp(handles.Assay_VisualSurround,handles.Assay_VisualSurrounds),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Bowl
 
@@ -950,9 +950,9 @@ end
 handles.Assay_Bowl = handles.previous_values.Assay_Bowl;
 
 % set possible values, current value, color to default
-set(handles.popupmenu_Assay_Bowl,'String',handles.Assay_Bowls,...
-  'Value',find(strcmp(handles.Assay_Bowl,handles.Assay_Bowls),1),...
-  'BackgroundColor',handles.isdefault_bkgdcolor);
+% set(handles.popupmenu_Assay_Bowl,'String',handles.Assay_Bowls,...
+%   'Value',find(strcmp(handles.Assay_Bowl,handles.Assay_Bowls),1),...
+%   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 % %% read parameters from condition file
 % 
@@ -1017,10 +1017,11 @@ set(handles.edit_BehaviorNotes,'String',handles.BehaviorNotes);
 
 % disable advanced editing mode
 handles.IsAdvancedMode = false;
-set(handles.menu_advanced_mode,'Checked','off');
-handles.advanced_controls = setdiff(findall(handles.uipanel_advanced,'Type','uicontrol'),...
-  findall(handles.uipanel_advanced,'Type','uicontrol','Style','text'));
-set(handles.advanced_controls,'Enable','off');
+handles.advanced_controls = [];
+%set(handles.menu_advanced_mode,'Checked','off');
+% handles.advanced_controls = setdiff(findall(handles.uipanel_advanced,'Type','uicontrol'),...
+%   findall(handles.uipanel_advanced,'Type','uicontrol','Style','text'));
+%set(handles.advanced_controls,'Enable','off');
 
 %% BIAS
 
@@ -1060,14 +1061,14 @@ end
 % by default, previous TempProbeID
 handles.TempProbeID = handles.previous_values.TempProbeID;
 
-set(handles.popupmenu_TempProbeID,'String',cellstr(num2str(handles.TempProbeIDs(:))),...
-  'value',find(handles.TempProbeID==handles.TempProbeIDs,1));
+% set(handles.popupmenu_TempProbeID,'String',cellstr(num2str(handles.TempProbeIDs(:))),...
+%   'value',find(handles.TempProbeID==handles.TempProbeIDs,1));
 
 handles.TempProbe_IsInitialized = false;
 
-if handles.params.DoRecordTemp == 0,
-  set(handles.popupmenu_TempProbeID,'Enable','off');
-end
+% if handles.params.DoRecordTemp == 0,
+%   set(handles.popupmenu_TempProbeID,'Enable','off');
+% end
 
 %% Shift Fly Temp
 % NO SHIFT FLY TEMP RECORDED

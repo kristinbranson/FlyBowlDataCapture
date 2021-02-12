@@ -2915,17 +2915,19 @@ function menu_advanced_mode_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-v = get(hObject,'Checked');
-if strcmp(v,'on'),
-  handles.IsAdvancedMode = false;
-  set(handles.advanced_controls,'Enable','off');
-  set(hObject,'Checked','off');
-else
-  handles.IsAdvancedMode = true;
-  set(handles.advanced_controls,'Enable','on');
-  set(hObject,'Checked','on');
-end  
-guidata(hObject,handles);
+FBDC_advanced(handles.figure_main);
+
+% v = get(hObject,'Checked');
+% if strcmp(v,'on'),
+%   handles.IsAdvancedMode = false;
+%   set(handles.advanced_controls,'Enable','off');
+%   set(hObject,'Checked','off');
+% else
+%   handles.IsAdvancedMode = true;
+%   set(handles.advanced_controls,'Enable','on');
+%   set(hObject,'Checked','on');
+% end  
+% guidata(hObject,handles);
 
 % --------------------------------------------------------------------
 function menu_HardEnableButtons_Callback(hObject, eventdata, handles)
