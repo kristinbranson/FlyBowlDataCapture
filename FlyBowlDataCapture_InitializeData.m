@@ -207,7 +207,8 @@ handles.params = struct;
     'ChR_rigName',...
     'ChR_expProtocolFile',...
     'StimulusTimingLogFileName',...
-    'ExperimentNameComponents'};
+    'ExperimentNameComponents',...
+    'Lab'};
   for i = 1:length(notlist_params),
     fn = notlist_params{i};
     if ~isfield(handles.params,fn),
@@ -251,10 +252,10 @@ if isfield(handles.params,'DoRotatePreviewImage'),
     handles.params.DoRotatePreviewImage(:,3) = num2cell(cellfun(@str2double,handles.params.DoRotatePreviewImage(:,3)));
   catch ME,
     errordlg(['Error parsing DoRotatePreviewImage config params\n',getReport(ME)]);
-    handles.Params.DoRotatePreviewImage = cell(0,3);
+    handles.params.DoRotatePreviewImage = cell(0,3);
   end
 else
-  handles.Params.DoRotatePreviewImage = cell(0,3);
+  handles.params.DoRotatePreviewImage = cell(0,3);
 end
 
 %% temporary output directory
@@ -291,6 +292,12 @@ if isfield(handles.params,'HardDriveName'),
     errordlg(s);
     error(s);
   end
+end
+
+%% new metadata: lab name
+if ~isfield(handles.params,'Lab'),
+  warning('Lab not set in parameters file. Using default value branson');
+  handles.params.Lab = 'branson';
 end
 
 %% Status window
