@@ -12,6 +12,25 @@ handles.IsBarcode = handles.Experiment2IsBarcode(i);
 if handles.IsBarcode,
 
   set([handles.edit_Barcode,handles.pushbutton_ScanBarcode,handles.text_Barcode,handles.menu_Edit_RefreshLineNames],'Visible','on');
+
+  % try to read line names
+  conditions = handles.Experiment2Conditions{i};
+  metadata = ReadParams(conditions{2},'fns_list',{'LineName'});
+  
+  doreadlinenames = true;
+  if isfield(metadata,'LineName'),
+    s = metadata.LineName;
+    if numel(s) > 1,
+      s = cellfun(@strtrim,s,'Uni',0);
+      handles.Fly_LineNames = s(:);
+      addToStatus(handles,{'Read line names from condition file.'});
+      if isfield(handles.params,'ExtraLineNames'),
+        handles.Fly_LineNames = cat(1,handles.Fly_LineNames,handles.params.ExtraLineNames(:));
+      end
+      handles.Fly_LineNames = unique(handles.Fly_LineNames);
+      doreadlinenames = false;
+    end
+  end
   
   if ~oldIsBarcode,
     
@@ -21,26 +40,27 @@ if handles.IsBarcode,
       handles.FlyBoy_stm = InitializeFlyBoy();
       
       % find SAGE
-      if ~isdeployed,
-        handles.IsSage = exist(handles.SAGECodeDir,'file');
-        if handles.IsSage,
-          try
-            addpath(handles.SAGECodeDir);
-          catch
-            handles.IsSage = false;
+      if doreadlinenames,
+        if ~isdeployed,
+          handles.IsSage = exist(handles.SAGECodeDir,'file');
+          if handles.IsSage,
+            try
+              addpath(handles.SAGECodeDir);
+            catch
+              handles.IsSage = false;
+            end
           end
+        else
+          handles.IsSage = exist('SAGE.Line','class');
         end
-      else
-        handles.IsSage = exist('SAGE.Line','class');
+        if ~handles.IsSage,
+          addToStatus(handles,{sprintf('SAGE code directory %s could not be added to the path.',handles.SAGECodeDir)});
+        end
+        
+        % read line names
+        addToStatus(handles,'Reading line names...');
+        handles = readLineNames(handles,false);
       end
-      if ~handles.IsSage,
-        addToStatus(handles,{sprintf('SAGE code directory %s could not be added to the path.',handles.SAGECodeDir)});
-      end
-      
-      % read line names
-      addToStatus(handles,'Reading line names...');
-      handles = readLineNames(handles,false);
-      
     end
 
     if ~isfield(handles,'jhedit_Barcode') && strcmpi(get(handles.figure_main,'Visible'),'on'),

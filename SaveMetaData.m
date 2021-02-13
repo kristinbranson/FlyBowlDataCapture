@@ -103,6 +103,9 @@ if handles.IsBarcode,
   if isfield(handles,'PreAssayHandling_SortingHandler'),
     handles.metadata.SortingHandler = handles.PreAssayHandling_SortingHandler;
   end
+  if isfield(handles,'PreAssayHandling_StarvationHandler'),
+    handles.metadata.StarvationHandler = handles.PreAssayHandling_StarvationHandler;
+  end
   
 else
   
@@ -118,8 +121,6 @@ else
   handles.metadata.led_protocol = 'none';
 end
 
-handles.metadata.Lab = handles.params.Lab;
-
 % in seconds
 %shift_time = (handles.StartRecording_Time_datenum - handles.ShiftFlyTemp_Time_datenum)*24*60*60;
 load_time = (handles.StartRecording_Time_datenum - handles.FliesLoaded_Time_datenum)*24*60*60;
@@ -133,7 +134,7 @@ fprintf(fid,'exp_datetime="%s" ',datestr(handles.StartRecording_Time_datenum,han
 % name of experimenter
 fprintf(fid,'experimenter="%s" ',handles.Assay_Experimenter);
 % lab
-fprintf(fid,'lab="%s" ',handles.metadata.Lab);
+fprintf(fid,'lab="%s" ',handles.metadata.LabName);
 % always same experiment protocol
 fprintf(fid,'protocol="%s" ',handles.metadata.ExperimentProtocol);
 % screen type

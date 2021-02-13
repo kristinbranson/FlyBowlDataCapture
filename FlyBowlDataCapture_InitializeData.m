@@ -297,12 +297,6 @@ if isfield(handles.params,'HardDriveName'),
   end
 end
 
-%% new metadata: lab name
-if ~isfield(handles.params,'Lab'),
-  warning('Lab not set in parameters file. Using default value branson');
-  handles.params.Lab = 'branson';
-end
-
 %% Status window
 %handles.Status_MaxNLines = 50;
 handles.IsTmpLogFile = true;

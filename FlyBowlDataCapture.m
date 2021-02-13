@@ -1895,20 +1895,20 @@ function [handles,success] = setSortingHour(handles,newhourstr)
 success = false; 
 
 newhourstr = strtrim(newhourstr);
-newhournum = datenum(newhourstr,'HH:MM');
+newhournum = rem(datenum(newhourstr,'HH:MM'),1);
 if isempty(newhournum),
   return;
 end
-set(handles.edit_PreAssayHandling_SortingHour,'String',newhourstr);
-% [mindiff,vhour] = min(abs(newhournum - handles.PreAssayHandling_SortingHour_datenums));
-% sortinghourstr = handles.PreAssayHandling_SortingHours{vhour};
-% % off by more than 1 min?
-% if mindiff > 1/1440,
-%   warndlg(sprintf('Rounding sorting hour %s scanned from barcode to %s',...
-%     datestr(rem(newhournum,1),'HH:MM'),sortinghourstr),'Rounding sorting hour');
-% end
-% 
-% set(handles.edit_PreAssayHandling_SortingHour,'Value',vhour);
+% set(handles.edit_PreAssayHandling_SortingHour,'String',newhourstr);
+[mindiff,vhour] = min(abs(newhournum - handles.PreAssayHandling_SortingHour_datenums));
+sortinghourstr = handles.PreAssayHandling_SortingHours{vhour};
+% off by more than 1 min?
+if mindiff > 1/1440,
+  warndlg(sprintf('Rounding sorting hour %s scanned from barcode to %s',...
+    datestr(rem(newhournum,1),'HH:MM'),sortinghourstr),'Rounding sorting hour');
+end
+
+set(handles.edit_PreAssayHandling_SortingHour,'Value',vhour);
 edit_PreAssayHandling_SortingHour_Callback(handles.edit_PreAssayHandling_SortingHour, [], handles);
 
 handles = guidata(handles.edit_PreAssayHandling_SortingHour);
@@ -1919,20 +1919,20 @@ function [handles,success] = setStarvationHour(handles,newhourstr)
 success = false; 
 
 newhourstr = strtrim(newhourstr);
-newhournum = datenum(newhourstr,'HH:MM');
+newhournum = rem(datenum(newhourstr,'HH:MM'),1);
 if isempty(newhournum),
   return;
 end
-set(handles.edit_PreAssayHandling_StarvationHour,'String',newhourstr);
-% [mindiff,vhour] = min(abs(newhournum - handles.PreAssayHandling_StarvationHour_datenums));
-% starvationhourstr = handles.PreAssayHandling_StarvationHours{vhour};
-% % off by more than 1 min?
-% if mindiff > 1/1440,
-%   warndlg(sprintf('Rounding starvation hour %s scanned from barcode to %s',...
-%     datestr(rem(newhournum,1),'HH:MM'),starvationhourstr),'Rounding starvation hour');
-% end
-% 
-% set(handles.edit_PreAssayHandling_StarvationHour,'Value',vhour);
+% set(handles.edit_PreAssayHandling_StarvationHour,'String',newhourstr);
+[mindiff,vhour] = min(abs(newhournum - handles.PreAssayHandling_StarvationHour_datenums));
+starvationhourstr = handles.PreAssayHandling_StarvationHours{vhour};
+% off by more than 1 min?
+if mindiff > 1/1440,
+  warndlg(sprintf('Rounding starvation hour %s scanned from barcode to %s',...
+    datestr(rem(newhournum,1),'HH:MM'),starvationhourstr),'Rounding starvation hour');
+end
+
+set(handles.edit_PreAssayHandling_StarvationHour,'Value',vhour);
 edit_PreAssayHandling_StarvationHour_Callback(handles.edit_PreAssayHandling_StarvationHour, [], handles);
 
 handles = guidata(handles.edit_PreAssayHandling_StarvationHour);
@@ -2654,14 +2654,21 @@ if isfield(handles.params,'DoSyncBarcode') && handles.params.DoSyncBarcode == 0,
   return;
 end
 % Query database for barcode
-try
-  %scanValue = FlyFQuery(scanNum);
-  scanValue = FlyBoyQuery( scanNum, handles.FlyBoyAssayCode, 1, handles.FlyBoy_stm);
-catch ME
-  errMsg = sprintf('Scan Error: %s', ME.message);
-  h = errordlg(errMsg);
-  uiwait(h);
-  return;
+
+if scanNum == -123,
+  scanValue = fakeBarcodeData(handles);
+else
+  
+  try
+    %scanValue = FlyFQuery(scanNum);
+    scanValue = FlyBoyQuery( scanNum, handles.FlyBoyAssayCode, 1, handles.FlyBoy_stm);
+  catch ME
+    errMsg = sprintf('Scan Error: %s', ME.message);
+    h = errordlg(errMsg);
+    uiwait(h);
+    return;
+  end
+  
 end
 
 % save metadata read from barcode
@@ -2747,7 +2754,8 @@ end
 
 % check set number
 if ismember('Set_Number',fields) && ...
-    handles.barcodeData.Set_Number ~= handles.WishList,
+    (handles.barcodeData.Set_Number ~= handles.WishList) && ...
+    ~(isnan(handles.barcodeData.Set_Number) && isnan(handles.WishList)),
   % set background color to indicate an error
   set(handles.edit_Barcode,'BackgroundColor',handles.shouldchange_bkgdcolor);
   %set(handles.popupmenu_WishList,'BackgroundColor',handles.shouldchange_bkgdcolor);
@@ -2827,13 +2835,13 @@ set(handles.jhedit_Barcode,'SelectionEnd', length(s));
 % 
 % % this menu is used just for the shortcut
 % pushbutton_ScanBarcode_Callback(handles.pushbutton_ScanBarcode, eventdata, handles);
-
-function HighlightEditText(hObject,eventdata)
-
-s = get(hObject,'Text');
-set(hObject,'SelectionStart', 0);
-set(hObject,'SelectionEnd', length(s)); 
 % 
+% function HighlightEditText(hObject,eventdata)
+% 
+% s = get(hObject,'Text');
+% set(hObject,'SelectionStart', 0);
+% set(hObject,'SelectionEnd', length(s)); 
+% % 
 % function [handles,success] = setWishList(handles,newwishlist)
 % 
 % success = false;

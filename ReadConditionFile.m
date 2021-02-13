@@ -21,7 +21,11 @@ metadata.SortingHandler = 'unknown';
 metadata.StarvationHandler = 'unknown';
 metadata.RearingProtocol = '?';
 metadata.LabName = 'unknown';
-metadata.ScreenReason = handles.ConditionName;
+if isfield(handles,'ConditionName'),
+  metadata.ScreenReason = handles.ConditionName;
+else
+  metadata.ScreenReason = 'unknown';
+end
 
 fns_required = fieldnames(metadata);
 fns_numeric = fns_required(structfun(@isnumeric,metadata));
