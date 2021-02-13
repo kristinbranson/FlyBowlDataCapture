@@ -31,55 +31,60 @@ end
 
 handles.metadata = ReadConditionFile(handles);
 
-if handles.IsBarcode,
-
-  % in hours
-  if isfield(handles,'StartRecording_Time_datenum') && isfield(handles,'PreAssayHandling_SortingTime_datenum') && ...
-      handles.StartRecording_Time_datenum > 0,
-    sorting_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_SortingTime_datenum)*24;
-    % unknown sorting time
-    if isnan(sorting_time),
-      sorting_time = -1;
-    elseif sorting_time < 0,
-      addToStatus(handles,'Hours sorted is negative. Storing as unknown.');
-      warndlg('Hours sorted is negative. Storing as unknown','Metadata Warning');
-      sorting_time = -1;
-    end
-  else
+% in hours
+if isfield(handles,'StartRecording_Time_datenum') && isfield(handles,'PreAssayHandling_SortingTime_datenum') && ...
+    handles.StartRecording_Time_datenum > 0,
+  sorting_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_SortingTime_datenum)*24;
+  % unknown sorting time
+  if isnan(sorting_time),
+    sorting_time = -1;
+  elseif sorting_time < 0,
+    addToStatus(handles,'Hours sorted is negative. Storing as unknown.');
+    warndlg('Hours sorted is negative. Storing as unknown','Metadata Warning');
     sorting_time = -1;
   end
-  handles.metadata.sorting_time = sorting_time;
-  
-  if isfield(handles,'StartRecording_Time_datenum') && isfield(handles,'PreAssayHandling_StarvationTime_datenum') && ...
-      handles.StartRecording_Time_datenum > 0,
-    starvation_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_StarvationTime_datenum)*24;
-    % unknown starvation time
-    if isnan(starvation_time),
-      starvation_time = -1;
-    elseif starvation_time < 0,
-      addToStatus(handles,'Hours starved is negative. Storing as 0.');
-      starvation_time = 0;
-    end
-  else
+else
+  sorting_time = -1;
+end
+handles.metadata.sorting_time = sorting_time;
+
+if isfield(handles,'StartRecording_Time_datenum') && isfield(handles,'PreAssayHandling_StarvationTime_datenum') && ...
+    handles.StartRecording_Time_datenum > 0,
+  starvation_time = (handles.StartRecording_Time_datenum - handles.PreAssayHandling_StarvationTime_datenum)*24;
+  % unknown starvation time
+  if isnan(starvation_time),
     starvation_time = -1;
+  elseif starvation_time < 0,
+    addToStatus(handles,'Hours starved is negative. Storing as 0.');
+    starvation_time = 0;
   end
-  handles.metadata.starvation_time = starvation_time;
-    
+else
+  starvation_time = -1;
+end
+handles.metadata.starvation_time = starvation_time;
+
+if isfield(handles,'PreAssayHandling_CrossDate_datenum') && handles.PreAssayHandling_CrossDate_datenum > 0,
+  handles.metadata.CrossDate = datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyymmddTHHMMSS');
+  %handles.metadata.CrossDate = handles.PreAssayHandling_CrossDate;
+end
+
+if isfield(handles,'PreAssayHandling_CrossDate_datenum') && ...
+    isfield(handles,'metadata') && isfield(handles.metadata,'FlipDays'),
+  flip_datenum = handles.PreAssayHandling_CrossDate_datenum + handles.metadata.FlipDays;
+  handles.metadata.FlipDate = datestr(flip_datenum,handles.datetimeformat);
+end
+
+if isfield(handles,'Gender'),
+  handles.metadata.Gender = handles.Gender;
+end
+
+if handles.IsBarcode,
+
   handles.metadata.LineName = handles.ConditionName;
   if isfield(handles,'MetaData_Effector') && ~strcmp(handles.MetaData_Effector,'Unknown'),
     handles.metadata.Effector = handles.MetaData_Effector;
   elseif isfield(handles.metadata,'Effector'),
     handles = setEffector(handles,handles.metadata.Effector);
-  end
-  if isfield(handles,'PreAssayHandling_CrossDate_datenum') && handles.PreAssayHandling_CrossDate_datenum > 0,
-    handles.metadata.CrossDate = datestr(handles.PreAssayHandling_CrossDate_datenum,'yyyymmddTHHMMSS');
-    %handles.metadata.CrossDate = handles.PreAssayHandling_CrossDate;
-  end
-
-  if isfield(handles,'PreAssayHandling_CrossDate_datenum') && ...
-      isfield(handles,'metadata') && isfield(handles.metadata,'FlipDays'),
-    flip_datenum = handles.PreAssayHandling_CrossDate_datenum + handles.metadata.FlipDays;
-    handles.metadata.FlipDate = datestr(flip_datenum,handles.datetimeformat);
   end
   handles.metadata.Barcode = handles.barcode;
   if isfield(handles,'WishList'),

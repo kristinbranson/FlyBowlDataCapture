@@ -22,7 +22,7 @@ function varargout = FlyBowlDataCapture(varargin)
 
 % Edit the above text to modify the response to help FlyBowlDataCapture
 
-% Last Modified by GUIDE v2.5 26-Feb-2015 14:49:09
+% Last Modified by GUIDE v2.5 12-Feb-2021 21:42:21
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -764,125 +764,124 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-% NO TIMES INPUT
-% function handles = CheckOrderingErrors(handles)
-% 
-% handles.isOrderingError = false(1,3);
-% 
-% % is CrossDate > SortingTime?
-% if handles.PreAssayHandling_CrossDate_datenum > handles.PreAssayHandling_SortingTime_datenum,
-%   handles.isOrderingError(1:2) = true;
-% end
-% % is SortingTime > StarvationTime?
-% if handles.PreAssayHandling_SortingTime_datenum > handles.PreAssayHandling_StarvationTime_datenum,
-%   handles.isOrderingError(2:3) = true;
-% end
-% 
-% % set background colors
-% if handles.isOrderingError(1),
-%   set(handles.popupmenu_PreAssayHandling_CrossDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
-% else  
-%   % no ordering error, set color to either isdefault or changed color
-%   if handles.isdefault.PreAssayHandling_CrossDate,
-%     set(handles.popupmenu_PreAssayHandling_CrossDate,'BackgroundColor',handles.isdefault_bkgdcolor);
-%   else
-%     set(handles.popupmenu_PreAssayHandling_CrossDate,'BackgroundColor',handles.changed_bkgdcolor);
-%   end
-% end
-% 
-% if handles.isOrderingError(2),
-%   set(handles.popupmenu_PreAssayHandling_SortingDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
-%   set(handles.edit_PreAssayHandling_SortingHour,'BackgroundColor',handles.shouldchange_bkgdcolor);
-% else
-%   if handles.isdefault.PreAssayHandling_SortingDate,
-%     set(handles.popupmenu_PreAssayHandling_SortingDate,'BackgroundColor',handles.isdefault_bkgdcolor);
-%   else
-%     set(handles.popupmenu_PreAssayHandling_SortingDate,'BackgroundColor',handles.changed_bkgdcolor);
-%   end
-%   if handles.isdefault.PreAssayHandling_SortingHour,
-%     set(handles.edit_PreAssayHandling_SortingHour,'BackgroundColor',handles.isdefault_bkgdcolor);
-%   else
-%     set(handles.edit_PreAssayHandling_SortingHour,'BackgroundColor',handles.changed_bkgdcolor);
-%   end
-% end
-% 
-% if handles.isOrderingError(3),
-%   set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
-%   set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.shouldchange_bkgdcolor);
-% else
-%   if handles.isdefault.PreAssayHandling_StarvationDate,
-%     set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.isdefault_bkgdcolor);
-%   else
-%     set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.changed_bkgdcolor);
-%   end
-%   if handles.isdefault.PreAssayHandling_StarvationHour,
-%     set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.isdefault_bkgdcolor);
-%   else
-%     set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.changed_bkgdcolor);
-%   end
-% end
+function handles = CheckOrderingErrors(handles)
 
-% % --- Executes on selection change in popupmenu_PreAssayHandling_SortingDate.
-% function popupmenu_PreAssayHandling_SortingDate_Callback(hObject, eventdata, handles, docheck)
-% % hObject    handle to popupmenu_PreAssayHandling_SortingDate (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
-% % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_SortingDate contents as cell array
-% %        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_SortingDate
-% 
-% % grab value
-% v = get(handles.popupmenu_PreAssayHandling_SortingDate,'Value');
-% handles.PreAssayHandling_SortingDate = handles.PreAssayHandling_SortingDates{v};
-% % store datenum
-% handles.PreAssayHandling_SortingDate_datenum = floor(datenum(handles.PreAssayHandling_SortingDate));
-% % and time datenum
-% handles.PreAssayHandling_SortingTime_datenum = ...
-%   handles.PreAssayHandling_SortingDate_datenum + ...
-%   handles.PreAssayHandling_SortingHour_datenum;
-% 
-% % no longer default
-% handles.isdefault.PreAssayHandling_SortingDate = false;
-% 
-% % highlight ordering errors
-% if nargin < 4 || docheck,
-%   handles = CheckOrderingErrors(handles);
-% end
-% 
-% handles = ChangedMetaData(handles);
-% 
-% guidata(hObject,handles);
-% 
-% CheckBarcodeConsistency(handles);
-% 
-% 
-% % --- Executes during object creation, after setting all properties.
-% function popupmenu_PreAssayHandling_SortingDate_CreateFcn(hObject, eventdata, handles)
-% % hObject    handle to popupmenu_PreAssayHandling_SortingDate (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    empty - handles not created until after all CreateFcns called
-% 
-% % Hint: popupmenu controls usually have a white background on Windows.
-% %       See ISPC and COMPUTER.
-% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-%     set(hObject,'BackgroundColor','white');
-% end
-% 
-% 
-% 
-% function edit_PreAssayHandling_SortingHour_Callback(hObject, eventdata, handles)
-% % hObject    handle to edit_PreAssayHandling_SortingHour (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
-% % Hints: get(hObject,'String') returns contents of edit_PreAssayHandling_SortingHour as text
-% %        str2double(get(hObject,'String')) returns contents of edit_PreAssayHandling_SortingHour as a double
-% 
-% % grab value
-% % v = get(handles.edit_PreAssayHandling_SortingHour,'Value');
-% % s = handles.PreAssayHandling_SortingHours{v};
-% 
-% % % make sure this is a valid time string
+handles.isOrderingError = false(1,3);
+
+% is CrossDate > SortingTime?
+if handles.PreAssayHandling_CrossDate_datenum > handles.PreAssayHandling_SortingTime_datenum,
+  handles.isOrderingError(1:2) = true;
+end
+% is SortingTime > StarvationTime?
+if handles.PreAssayHandling_SortingTime_datenum > handles.PreAssayHandling_StarvationTime_datenum,
+  handles.isOrderingError(2:3) = true;
+end
+
+% set background colors
+if handles.isOrderingError(1),
+  set(handles.popupmenu_PreAssayHandling_CrossDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
+else  
+  % no ordering error, set color to either isdefault or changed color
+  if handles.isdefault.PreAssayHandling_CrossDate,
+    set(handles.popupmenu_PreAssayHandling_CrossDate,'BackgroundColor',handles.isdefault_bkgdcolor);
+  else
+    set(handles.popupmenu_PreAssayHandling_CrossDate,'BackgroundColor',handles.changed_bkgdcolor);
+  end
+end
+
+if handles.isOrderingError(2),
+  set(handles.popupmenu_PreAssayHandling_SortingDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
+  set(handles.edit_PreAssayHandling_SortingHour,'BackgroundColor',handles.shouldchange_bkgdcolor);
+else
+  if handles.isdefault.PreAssayHandling_SortingDate,
+    set(handles.popupmenu_PreAssayHandling_SortingDate,'BackgroundColor',handles.isdefault_bkgdcolor);
+  else
+    set(handles.popupmenu_PreAssayHandling_SortingDate,'BackgroundColor',handles.changed_bkgdcolor);
+  end
+  if handles.isdefault.PreAssayHandling_SortingHour,
+    set(handles.edit_PreAssayHandling_SortingHour,'BackgroundColor',handles.isdefault_bkgdcolor);
+  else
+    set(handles.edit_PreAssayHandling_SortingHour,'BackgroundColor',handles.changed_bkgdcolor);
+  end
+end
+
+if handles.isOrderingError(3),
+  set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.shouldchange_bkgdcolor);
+  set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.shouldchange_bkgdcolor);
+else
+  if handles.isdefault.PreAssayHandling_StarvationDate,
+    set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.isdefault_bkgdcolor);
+  else
+    set(handles.popupmenu_PreAssayHandling_StarvationDate,'BackgroundColor',handles.changed_bkgdcolor);
+  end
+  if handles.isdefault.PreAssayHandling_StarvationHour,
+    set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.isdefault_bkgdcolor);
+  else
+    set(handles.edit_PreAssayHandling_StarvationHour,'BackgroundColor',handles.changed_bkgdcolor);
+  end
+end
+
+% --- Executes on selection change in popupmenu_PreAssayHandling_SortingDate.
+function popupmenu_PreAssayHandling_SortingDate_Callback(hObject, eventdata, handles, docheck)
+% hObject    handle to popupmenu_PreAssayHandling_SortingDate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_SortingDate contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_SortingDate
+
+% grab value
+v = get(handles.popupmenu_PreAssayHandling_SortingDate,'Value');
+handles.PreAssayHandling_SortingDate = handles.PreAssayHandling_SortingDates{v};
+% store datenum
+handles.PreAssayHandling_SortingDate_datenum = floor(datenum(handles.PreAssayHandling_SortingDate));
+% and time datenum
+handles.PreAssayHandling_SortingTime_datenum = ...
+  handles.PreAssayHandling_SortingDate_datenum + ...
+  handles.PreAssayHandling_SortingHour_datenum;
+
+% no longer default
+handles.isdefault.PreAssayHandling_SortingDate = false;
+
+% highlight ordering errors
+if nargin < 4 || docheck,
+  handles = CheckOrderingErrors(handles);
+end
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+CheckBarcodeConsistency(handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_PreAssayHandling_SortingDate_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_SortingDate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_PreAssayHandling_SortingHour_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_PreAssayHandling_SortingHour (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_PreAssayHandling_SortingHour as text
+%        str2double(get(hObject,'String')) returns contents of edit_PreAssayHandling_SortingHour as a double
+
+% grab value
+v = get(handles.edit_PreAssayHandling_SortingHour,'Value');
+s = handles.PreAssayHandling_SortingHours{v};
+
+% % make sure this is a valid time string
 % s = get(handles.edit_PreAssayHandling_SortingHour,'String');
 % s = strtrim(s);
 % m = regexp(s,'^[\d?][\d?]:[\d?][\d?]$','match');
@@ -891,50 +890,50 @@ end
 %     'BackgroundColor',handles.shouldchange_bkgdcolor);
 %   return;
 % end
-%   
-% handles.PreAssayHandling_SortingHour = s;
-% % unknown sorting hour
-% if strcmpi(s,'??:??'),
-%   handles.PreAssayHandling_SortingHour_datenum = nan;
-% else
-%   handles.PreAssayHandling_SortingHour_datenum = rem(datenum(s),1);
-% end
-% 
-% if handles.PreAssayHandling_SortingHour_datenum < handles.params.PreAssayHandling_SortingHour_Range(1)/24 || ...
-%   handles.PreAssayHandling_SortingHour_datenum > handles.params.PreAssayHandling_SortingHour_Range(2)/24,
-%   warndlg(sprintf('Sorting time %s outside of allowed range',handles.PreAssayHandling_SortingHour),'Bad Sorting Time');
-% end
-% 
-% 
-% handles.PreAssayHandling_SortingTime_datenum = ...
-%   handles.PreAssayHandling_SortingDate_datenum + ...
-%   handles.PreAssayHandling_SortingHour_datenum;
-% 
-% % no longer default
-% handles.isdefault.PreAssayHandling_SortingHour = false;
-% 
-% % make sure date order is legal
-% handles = CheckOrderingErrors(handles);
-% 
-% handles = ChangedMetaData(handles);
-% 
-% guidata(hObject,handles);
-% 
-% CheckBarcodeConsistency(handles);
-% 
-% % --- Executes during object creation, after setting all properties.
-% function edit_PreAssayHandling_SortingHour_CreateFcn(hObject, eventdata, handles)
-% % hObject    handle to edit_PreAssayHandling_SortingHour (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    empty - handles not created until after all CreateFcns called
-% 
-% % Hint: edit controls usually have a white background on Windows.
-% %       See ISPC and COMPUTER.
-% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-%     set(hObject,'BackgroundColor','white');
-% end
-% 
-% 
+  
+handles.PreAssayHandling_SortingHour = s;
+% unknown sorting hour
+if strcmpi(s,'??:??'),
+  handles.PreAssayHandling_SortingHour_datenum = nan;
+else
+  handles.PreAssayHandling_SortingHour_datenum = rem(datenum(s),1);
+end
+
+if handles.PreAssayHandling_SortingHour_datenum < handles.params.PreAssayHandling_SortingHour_Range(1)/24 || ...
+  handles.PreAssayHandling_SortingHour_datenum > handles.params.PreAssayHandling_SortingHour_Range(2)/24,
+  warndlg(sprintf('Sorting time %s outside of allowed range',handles.PreAssayHandling_SortingHour),'Bad Sorting Time');
+end
+
+
+handles.PreAssayHandling_SortingTime_datenum = ...
+  handles.PreAssayHandling_SortingDate_datenum + ...
+  handles.PreAssayHandling_SortingHour_datenum;
+
+% no longer default
+handles.isdefault.PreAssayHandling_SortingHour = false;
+
+% make sure date order is legal
+handles = CheckOrderingErrors(handles);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+CheckBarcodeConsistency(handles);
+
+% --- Executes during object creation, after setting all properties.
+function edit_PreAssayHandling_SortingHour_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_PreAssayHandling_SortingHour (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
 % % --- Executes on selection change in popupmenu_PreAssayHandling_SortingHandler.
 % function popupmenu_PreAssayHandling_SortingHandler_Callback(hObject, eventdata, handles)
 % % hObject    handle to popupmenu_PreAssayHandling_SortingHandler (see GCBO)
@@ -973,57 +972,60 @@ end
 % end
 % 
 % 
-% % --- Executes on selection change in popupmenu_PreAssayHandling_StarvationDate.
-% function popupmenu_PreAssayHandling_StarvationDate_Callback(hObject, eventdata, handles)
-% % hObject    handle to popupmenu_PreAssayHandling_StarvationDate (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
-% % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_StarvationDate contents as cell array
-% %        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_StarvationDate
-% 
-% % grab value
-% v = get(handles.popupmenu_PreAssayHandling_StarvationDate,'Value');
-% % store datenum
-% handles.PreAssayHandling_StarvationDate = handles.PreAssayHandling_StarvationDates{v};
-% handles.PreAssayHandling_StarvationDate_datenum = floor(datenum(handles.PreAssayHandling_StarvationDate));
-% % and time datenum
-% handles.PreAssayHandling_StarvationTime_datenum = ...
-%   handles.PreAssayHandling_StarvationDate_datenum + ...
-%   handles.PreAssayHandling_StarvationHour_datenum;
-% 
-% % no longer default
-% handles.isdefault.PreAssayHandling_StarvationDate = false;
-% 
-% % highlight ordering errors
-% handles = CheckOrderingErrors(handles);
-% 
-% handles = ChangedMetaData(handles);
-% 
-% guidata(hObject,handles);
-% 
-% % --- Executes during object creation, after setting all properties.
-% function popupmenu_PreAssayHandling_StarvationDate_CreateFcn(hObject, eventdata, handles)
-% % hObject    handle to popupmenu_PreAssayHandling_StarvationDate (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    empty - handles not created until after all CreateFcns called
-% 
-% % Hint: popupmenu controls usually have a white background on Windows.
-% %       See ISPC and COMPUTER.
-% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-%     set(hObject,'BackgroundColor','white');
-% end
-% 
-% 
-% 
-% function edit_PreAssayHandling_StarvationHour_Callback(hObject, eventdata, handles)
-% % hObject    handle to edit_PreAssayHandling_StarvationHour (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
-% % Hints: get(hObject,'String') returns contents of edit_PreAssayHandling_StarvationHour as text
-% %        str2double(get(hObject,'String')) returns contents of edit_PreAssayHandling_StarvationHour as a double
-% 
+% --- Executes on selection change in popupmenu_PreAssayHandling_StarvationDate.
+function popupmenu_PreAssayHandling_StarvationDate_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_StarvationDate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_StarvationDate contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_StarvationDate
+
+% grab value
+v = get(handles.popupmenu_PreAssayHandling_StarvationDate,'Value');
+% store datenum
+handles.PreAssayHandling_StarvationDate = handles.PreAssayHandling_StarvationDates{v};
+handles.PreAssayHandling_StarvationDate_datenum = floor(datenum(handles.PreAssayHandling_StarvationDate));
+% and time datenum
+handles.PreAssayHandling_StarvationTime_datenum = ...
+  handles.PreAssayHandling_StarvationDate_datenum + ...
+  handles.PreAssayHandling_StarvationHour_datenum;
+
+% no longer default
+handles.isdefault.PreAssayHandling_StarvationDate = false;
+
+% highlight ordering errors
+handles = CheckOrderingErrors(handles);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_PreAssayHandling_StarvationDate_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_StarvationDate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit_PreAssayHandling_StarvationHour_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_PreAssayHandling_StarvationHour (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit_PreAssayHandling_StarvationHour as text
+%        str2double(get(hObject,'String')) returns contents of edit_PreAssayHandling_StarvationHour as a double
+
+v = get(handles.edit_PreAssayHandling_StarvationHour,'Value');
+s = handles.PreAssayHandling_StarvationHours{v};
+
 % % % make sure this is a valid time string
 % s = get(handles.edit_PreAssayHandling_StarvationHour,'String');
 % s = strtrim(s);
@@ -1033,87 +1035,86 @@ end
 %     'BackgroundColor',handles.shouldchange_bkgdcolor);
 %   return;
 % end
-%   
-% handles.PreAssayHandling_StarvationHour = s;
-% % unknown starvation hour
-% if strcmpi(s,'??:??'),
-%   handles.PreAssayHandling_StarvationHour_datenum = nan;
-% else
-%   handles.PreAssayHandling_StarvationHour_datenum = rem(datenum(s),1);
-% end
-% 
-% if handles.PreAssayHandling_StarvationHour_datenum < handles.params.PreAssayHandling_StarvationHour_Range(1)/24 || ...
-%   handles.PreAssayHandling_StarvationHour_datenum > handles.params.PreAssayHandling_StarvationHour_Range(2)/24,
-%   warndlg(sprintf('Starvation time %s outside of allowed range',handles.PreAssayHandling_StarvationHour),'Bad Starvation Time');
-% end
-% 
-% 
-% handles.PreAssayHandling_StarvationTime_datenum = ...
-%   handles.PreAssayHandling_StarvationDate_datenum + ...
-%   handles.PreAssayHandling_StarvationHour_datenum;
-% 
-% % no longer default
-% handles.isdefault.PreAssayHandling_StarvationHour = false;
-% 
-% % make sure date order is legal
-% handles = CheckOrderingErrors(handles);
-% 
-% handles = ChangedMetaData(handles);
-% 
-% guidata(hObject,handles);
-% 
-% CheckBarcodeConsistency(handles);
+  
+handles.PreAssayHandling_StarvationHour = s;
+% unknown starvation hour
+if strcmpi(s,'??:??'),
+  handles.PreAssayHandling_StarvationHour_datenum = nan;
+else
+  handles.PreAssayHandling_StarvationHour_datenum = rem(datenum(s),1);
+end
 
-% 
-% % grab value
-% v = get(handles.edit_PreAssayHandling_StarvationHour,'Value');
-% s = handles.PreAssayHandling_StarvationHours{v};
-% 
-% % % make sure this is a valid time string
-% % s = strtrim(s);
-% % m = regexp(s,'^\d\d:\d\d$','match');
-% % if isempty(m),
-% %   set(handles.edit_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHour,...
-% %     'BackgroundColor',handles.shouldchange_bkgdcolor);
-% %   return;
-% % end
-% 
-% % store hour
-% handles.PreAssayHandling_StarvationHour = s;
-% % and hour datenum
-% if strcmpi(s,'??:??'),
-%   handles.PreAssayHandling_StarvationHour_datenum = nan;
-% else
-%   handles.PreAssayHandling_StarvationHour_datenum = rem(datenum(s),1);
+if handles.PreAssayHandling_StarvationHour_datenum < handles.params.PreAssayHandling_StarvationHour_Range(1)/24 || ...
+  handles.PreAssayHandling_StarvationHour_datenum > handles.params.PreAssayHandling_StarvationHour_Range(2)/24,
+  warndlg(sprintf('Starvation time %s outside of allowed range',handles.PreAssayHandling_StarvationHour),'Bad Starvation Time');
+end
+
+
+handles.PreAssayHandling_StarvationTime_datenum = ...
+  handles.PreAssayHandling_StarvationDate_datenum + ...
+  handles.PreAssayHandling_StarvationHour_datenum;
+
+% no longer default
+handles.isdefault.PreAssayHandling_StarvationHour = false;
+
+% make sure date order is legal
+handles = CheckOrderingErrors(handles);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+CheckBarcodeConsistency(handles);
+
+
+% grab value
+v = get(handles.edit_PreAssayHandling_StarvationHour,'Value');
+s = handles.PreAssayHandling_StarvationHours{v};
+
+% % make sure this is a valid time string
+% s = strtrim(s);
+% m = regexp(s,'^\d\d:\d\d$','match');
+% if isempty(m),
+%   set(handles.edit_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHour,...
+%     'BackgroundColor',handles.shouldchange_bkgdcolor);
+%   return;
 % end
-% 
-% % and time datenum
-% handles.PreAssayHandling_StarvationTime_datenum = ...
-%   handles.PreAssayHandling_StarvationDate_datenum + ...
-%   handles.PreAssayHandling_StarvationHour_datenum;
-% 
-% % no longer default
-% handles.isdefault.PreAssayHandling_StarvationHour = false;
-% 
-% % highlight ordering errors
-% handles = CheckOrderingErrors(handles);
-% 
-% handles = ChangedMetaData(handles);
-% 
-% guidata(hObject,handles);
+
+% store hour
+handles.PreAssayHandling_StarvationHour = s;
+% and hour datenum
+if strcmpi(s,'??:??'),
+  handles.PreAssayHandling_StarvationHour_datenum = nan;
+else
+  handles.PreAssayHandling_StarvationHour_datenum = rem(datenum(s),1);
+end
+
+% and time datenum
+handles.PreAssayHandling_StarvationTime_datenum = ...
+  handles.PreAssayHandling_StarvationDate_datenum + ...
+  handles.PreAssayHandling_StarvationHour_datenum;
+
+% no longer default
+handles.isdefault.PreAssayHandling_StarvationHour = false;
+
+% highlight ordering errors
+handles = CheckOrderingErrors(handles);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
-% function edit_PreAssayHandling_StarvationHour_CreateFcn(hObject, eventdata, handles)
-% % hObject    handle to edit_PreAssayHandling_StarvationHour (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    empty - handles not created until after all CreateFcns called
-% 
-% % Hint: edit controls usually have a white background on Windows.
-% %       See ISPC and COMPUTER.
-% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-%     set(hObject,'BackgroundColor','white');
-% end
+function edit_PreAssayHandling_StarvationHour_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit_PreAssayHandling_StarvationHour (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
 
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
 
 % --- Executes on selection change in popupmenu_Assay_Rig.
 function popupmenu_Assay_Rig_Callback(hObject, eventdata, handles)
@@ -1795,187 +1796,187 @@ handles = detectCamerasWrapper(handles);
 handles = ChangedMetaData(handles);
 
 guidata(hObject,handles);
-% 
-% function [handles,success] = setCrossDate(handles,newdatestr)
-% 
-% success = false;
-% hObject = handles.popupmenu_PreAssayHandling_CrossDate;
-% v = find(strcmp(newdatestr,handles.PreAssayHandling_CrossDates),1);
-% if isempty(v),
-%   warndlg(sprintf('Cross date %s not allowed',newdatestr),'Error setting cross date');
-%   CheckBarcodeConsistency(handles);
-%   return;
-% end
-% set(hObject,'Value',v);
-% popupmenu_PreAssayHandling_CrossDate_Callback(hObject, [], handles);
-% handles = guidata(hObject);
-% success = true;
-% 
-% function [handles,success] = setCrossHandler(handles,newcrosshandler)
-% 
-% success = false;
-% hObject = handles.popupmenu_PreAssayHandling_CrossHandler;
-% v = find(strcmp(newcrosshandler,handles.PreAssayHandling_CrossHandlers),1);
-% if isempty(v),
-%   warndlg(sprintf('Cross handler %s not allowed',newcrosshandler),'Error setting cross handler');
-%   CheckBarcodeConsistency(handles);
-%   return;
-% end
-% set(hObject,'Value',v);
-% popupmenu_PreAssayHandling_CrossHandler_Callback(hObject, [], handles);
-% handles = guidata(hObject);
-% success = true;
-% 
-% function [handles,success] = setSortingHandler(handles,newsortinghandler)
-% 
-% success = false;
-% hObject = handles.popupmenu_PreAssayHandling_SortingHandler;
-% v = find(strcmp(newsortinghandler,handles.PreAssayHandling_SortingHandlers),1);
-% if isempty(v),
-%   warndlg(sprintf('Sorting handler %s not allowed',newsortinghandler),'Error setting sorting handler');
-%   CheckBarcodeConsistency(handles);
-%   return;
-% end
-% set(hObject,'Value',v);
-% popupmenu_PreAssayHandling_SortingHandler_Callback(hObject, [], handles);
-% handles = guidata(hObject);
-% success = true;
-% 
-% function [handles,success] = setStarvationHandler(handles,newstarvationhandler)
-% 
-% success = false;
-% hObject = handles.popupmenu_PreAssayHandling_StarvationHandler;
-% v = find(strcmp(newstarvationhandler,handles.PreAssayHandling_StarvationHandlers),1);
-% if isempty(v),
-%   warndlg(sprintf('Starvation handler %s not allowed',newstarvationhandler),'Error setting starvation handler');
-%   CheckBarcodeConsistency(handles);
-%   return;
-% end
-% set(hObject,'Value',v);
-% popupmenu_PreAssayHandling_StarvationHandler_Callback(hObject, [], handles);
-% handles = guidata(hObject);
-% success = true;
-% 
-% 
-% function [handles,success] = setSortingDate(handles,newdatestr)
-% 
-% success = false;
-% 
-% vdate = find(strcmp(newdatestr,handles.PreAssayHandling_SortingDates),1);
-% if isempty(vdate),
-%   warndlg(sprintf('Sorting date %s not allowed',newdatestr),'Error setting sorting date');
-%   CheckBarcodeConsistency(handles);
-%   return;
-% end
-% 
-% set(handles.popupmenu_PreAssayHandling_SortingDate,'Value',vdate);
-% popupmenu_PreAssayHandling_SortingDate_Callback(handles.popupmenu_PreAssayHandling_SortingDate, [], handles);
-% handles = guidata(handles.popupmenu_PreAssayHandling_SortingDate);
-% success = true;
-% 
-% function [handles,success] = setStarvationDate(handles,newdatestr)
-% 
-% success = false;
-% 
-% vdate = find(strcmp(newdatestr,handles.PreAssayHandling_StarvationDates),1);
-% if isempty(vdate),
-%   warndlg(sprintf('Starvation date %s not allowed',newdatestr),'Error setting starvation date');
-%   CheckBarcodeConsistency(handles);
-%   return;
-% end
-% 
-% set(handles.popupmenu_PreAssayHandling_StarvationDate,'Value',vdate);
-% popupmenu_PreAssayHandling_StarvationDate_Callback(handles.popupmenu_PreAssayHandling_StarvationDate, [], handles);
-% handles = guidata(handles.popupmenu_PreAssayHandling_StarvationDate);
-% success = true;
-% 
-% function [handles,success] = setSortingHour(handles,newhourstr)
-% 
-% success = false; 
-% 
-% newhourstr = strtrim(newhourstr);
-% newhournum = datenum(newhourstr,'HH:MM');
-% if isempty(newhournum),
-%   return;
-% end
-% set(handles.edit_PreAssayHandling_SortingHour,'String',newhourstr);
-% % [mindiff,vhour] = min(abs(newhournum - handles.PreAssayHandling_SortingHour_datenums));
-% % sortinghourstr = handles.PreAssayHandling_SortingHours{vhour};
-% % % off by more than 1 min?
-% % if mindiff > 1/1440,
-% %   warndlg(sprintf('Rounding sorting hour %s scanned from barcode to %s',...
-% %     datestr(rem(newhournum,1),'HH:MM'),sortinghourstr),'Rounding sorting hour');
-% % end
-% % 
-% % set(handles.edit_PreAssayHandling_SortingHour,'Value',vhour);
-% edit_PreAssayHandling_SortingHour_Callback(handles.edit_PreAssayHandling_SortingHour, [], handles);
-% 
-% handles = guidata(handles.edit_PreAssayHandling_SortingHour);
-% success = true;
-% 
-% function [handles,success] = setStarvationHour(handles,newhourstr)
-% 
-% success = false; 
-% 
-% newhourstr = strtrim(newhourstr);
-% newhournum = datenum(newhourstr,'HH:MM');
-% if isempty(newhournum),
-%   return;
-% end
-% set(handles.edit_PreAssayHandling_StarvationHour,'String',newhourstr);
-% % [mindiff,vhour] = min(abs(newhournum - handles.PreAssayHandling_StarvationHour_datenums));
-% % starvationhourstr = handles.PreAssayHandling_StarvationHours{vhour};
-% % % off by more than 1 min?
-% % if mindiff > 1/1440,
-% %   warndlg(sprintf('Rounding starvation hour %s scanned from barcode to %s',...
-% %     datestr(rem(newhournum,1),'HH:MM'),starvationhourstr),'Rounding starvation hour');
-% % end
-% % 
-% % set(handles.edit_PreAssayHandling_StarvationHour,'Value',vhour);
-% edit_PreAssayHandling_StarvationHour_Callback(handles.edit_PreAssayHandling_StarvationHour, [], handles);
-% 
-% handles = guidata(handles.edit_PreAssayHandling_StarvationHour);
-% success = true;
 
-% % --- Executes on selection change in popupmenu_PreAssayHandling_CrossDate.
-% function popupmenu_PreAssayHandling_CrossDate_Callback(hObject, eventdata, handles)
-% % hObject    handle to popupmenu_PreAssayHandling_CrossDate (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    structure with handles and user data (see GUIDATA)
-% 
-% % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_CrossDate contents as cell array
-% %        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_CrossDate
-% 
-% % grab value
-% v = get(handles.popupmenu_PreAssayHandling_CrossDate,'Value');
-% handles.PreAssayHandling_CrossDate = handles.PreAssayHandling_CrossDates{v};
-% % store datenum
-% handles.PreAssayHandling_CrossDate_datenum = datenum(handles.PreAssayHandling_CrossDate);
-% 
-% % no longer default
-% handles.isdefault.PreAssayHandling_CrossDate = false;
-% 
-% % highlight ordering errors
-% handles = CheckOrderingErrors(handles);
-% 
-% handles = ChangedMetaData(handles);
-% 
-% guidata(hObject,handles);
-% 
-% CheckBarcodeConsistency(handles);
-% 
-% % --- Executes during object creation, after setting all properties.
-% function popupmenu_PreAssayHandling_CrossDate_CreateFcn(hObject, eventdata, handles)
-% % hObject    handle to popupmenu_PreAssayHandling_CrossDate (see GCBO)
-% % eventdata  reserved - to be defined in a future version of MATLAB
-% % handles    empty - handles not created until after all CreateFcns called
-% 
-% % Hint: popupmenu controls usually have a white background on Windows.
-% %       See ISPC and COMPUTER.
-% if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-%     set(hObject,'BackgroundColor','white');
+function [handles,success] = setCrossDate(handles,newdatestr)
+
+success = false;
+hObject = handles.popupmenu_PreAssayHandling_CrossDate;
+v = find(strcmp(newdatestr,handles.PreAssayHandling_CrossDates),1);
+if isempty(v),
+  warndlg(sprintf('Cross date %s not allowed',newdatestr),'Error setting cross date');
+  CheckBarcodeConsistency(handles);
+  return;
+end
+set(hObject,'Value',v);
+popupmenu_PreAssayHandling_CrossDate_Callback(hObject, [], handles);
+handles = guidata(hObject);
+success = true;
+
+function [handles,success] = setCrossHandler(handles,newcrosshandler)
+
+success = false;
+hObject = handles.popupmenu_PreAssayHandling_CrossHandler;
+v = find(strcmp(newcrosshandler,handles.PreAssayHandling_CrossHandlers),1);
+if isempty(v),
+  warndlg(sprintf('Cross handler %s not allowed',newcrosshandler),'Error setting cross handler');
+  CheckBarcodeConsistency(handles);
+  return;
+end
+set(hObject,'Value',v);
+popupmenu_PreAssayHandling_CrossHandler_Callback(hObject, [], handles);
+handles = guidata(hObject);
+success = true;
+
+function [handles,success] = setSortingHandler(handles,newsortinghandler)
+
+success = false;
+hObject = handles.popupmenu_PreAssayHandling_SortingHandler;
+v = find(strcmp(newsortinghandler,handles.PreAssayHandling_SortingHandlers),1);
+if isempty(v),
+  warndlg(sprintf('Sorting handler %s not allowed',newsortinghandler),'Error setting sorting handler');
+  CheckBarcodeConsistency(handles);
+  return;
+end
+set(hObject,'Value',v);
+popupmenu_PreAssayHandling_SortingHandler_Callback(hObject, [], handles);
+handles = guidata(hObject);
+success = true;
+
+function [handles,success] = setStarvationHandler(handles,newstarvationhandler)
+
+success = false;
+hObject = handles.popupmenu_PreAssayHandling_StarvationHandler;
+v = find(strcmp(newstarvationhandler,handles.PreAssayHandling_StarvationHandlers),1);
+if isempty(v),
+  warndlg(sprintf('Starvation handler %s not allowed',newstarvationhandler),'Error setting starvation handler');
+  CheckBarcodeConsistency(handles);
+  return;
+end
+set(hObject,'Value',v);
+popupmenu_PreAssayHandling_StarvationHandler_Callback(hObject, [], handles);
+handles = guidata(hObject);
+success = true;
+
+
+function [handles,success] = setSortingDate(handles,newdatestr)
+
+success = false;
+
+vdate = find(strcmp(newdatestr,handles.PreAssayHandling_SortingDates),1);
+if isempty(vdate),
+  warndlg(sprintf('Sorting date %s not allowed',newdatestr),'Error setting sorting date');
+  CheckBarcodeConsistency(handles);
+  return;
+end
+
+set(handles.popupmenu_PreAssayHandling_SortingDate,'Value',vdate);
+popupmenu_PreAssayHandling_SortingDate_Callback(handles.popupmenu_PreAssayHandling_SortingDate, [], handles);
+handles = guidata(handles.popupmenu_PreAssayHandling_SortingDate);
+success = true;
+
+function [handles,success] = setStarvationDate(handles,newdatestr)
+
+success = false;
+
+vdate = find(strcmp(newdatestr,handles.PreAssayHandling_StarvationDates),1);
+if isempty(vdate),
+  warndlg(sprintf('Starvation date %s not allowed',newdatestr),'Error setting starvation date');
+  CheckBarcodeConsistency(handles);
+  return;
+end
+
+set(handles.popupmenu_PreAssayHandling_StarvationDate,'Value',vdate);
+popupmenu_PreAssayHandling_StarvationDate_Callback(handles.popupmenu_PreAssayHandling_StarvationDate, [], handles);
+handles = guidata(handles.popupmenu_PreAssayHandling_StarvationDate);
+success = true;
+
+function [handles,success] = setSortingHour(handles,newhourstr)
+
+success = false; 
+
+newhourstr = strtrim(newhourstr);
+newhournum = datenum(newhourstr,'HH:MM');
+if isempty(newhournum),
+  return;
+end
+set(handles.edit_PreAssayHandling_SortingHour,'String',newhourstr);
+% [mindiff,vhour] = min(abs(newhournum - handles.PreAssayHandling_SortingHour_datenums));
+% sortinghourstr = handles.PreAssayHandling_SortingHours{vhour};
+% % off by more than 1 min?
+% if mindiff > 1/1440,
+%   warndlg(sprintf('Rounding sorting hour %s scanned from barcode to %s',...
+%     datestr(rem(newhournum,1),'HH:MM'),sortinghourstr),'Rounding sorting hour');
 % end
 % 
+% set(handles.edit_PreAssayHandling_SortingHour,'Value',vhour);
+edit_PreAssayHandling_SortingHour_Callback(handles.edit_PreAssayHandling_SortingHour, [], handles);
+
+handles = guidata(handles.edit_PreAssayHandling_SortingHour);
+success = true;
+
+function [handles,success] = setStarvationHour(handles,newhourstr)
+
+success = false; 
+
+newhourstr = strtrim(newhourstr);
+newhournum = datenum(newhourstr,'HH:MM');
+if isempty(newhournum),
+  return;
+end
+set(handles.edit_PreAssayHandling_StarvationHour,'String',newhourstr);
+% [mindiff,vhour] = min(abs(newhournum - handles.PreAssayHandling_StarvationHour_datenums));
+% starvationhourstr = handles.PreAssayHandling_StarvationHours{vhour};
+% % off by more than 1 min?
+% if mindiff > 1/1440,
+%   warndlg(sprintf('Rounding starvation hour %s scanned from barcode to %s',...
+%     datestr(rem(newhournum,1),'HH:MM'),starvationhourstr),'Rounding starvation hour');
+% end
+% 
+% set(handles.edit_PreAssayHandling_StarvationHour,'Value',vhour);
+edit_PreAssayHandling_StarvationHour_Callback(handles.edit_PreAssayHandling_StarvationHour, [], handles);
+
+handles = guidata(handles.edit_PreAssayHandling_StarvationHour);
+success = true;
+
+% --- Executes on selection change in popupmenu_PreAssayHandling_CrossDate.
+function popupmenu_PreAssayHandling_CrossDate_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_CrossDate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_PreAssayHandling_CrossDate contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_PreAssayHandling_CrossDate
+
+% grab value
+v = get(handles.popupmenu_PreAssayHandling_CrossDate,'Value');
+handles.PreAssayHandling_CrossDate = handles.PreAssayHandling_CrossDates{v};
+% store datenum
+handles.PreAssayHandling_CrossDate_datenum = datenum(handles.PreAssayHandling_CrossDate);
+
+% no longer default
+handles.isdefault.PreAssayHandling_CrossDate = false;
+
+% highlight ordering errors
+handles = CheckOrderingErrors(handles);
+
+handles = ChangedMetaData(handles);
+
+guidata(hObject,handles);
+
+CheckBarcodeConsistency(handles);
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_PreAssayHandling_CrossDate_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_PreAssayHandling_CrossDate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
 
 % --- Executes on selection change in popupmenu_Flag.
 function popupmenu_Flag_Callback(hObject, eventdata, handles)
@@ -3138,3 +3139,29 @@ if success,
   guidata(hObject,handles);
 end
 
+% --- Executes on selection change in popupmenu_Gender.
+function popupmenu_Gender_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Gender (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Gender contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu_Gender
+
+v = get(hObject,'Value');
+s = get(hObject,'String');
+handles.Gender = s{v};
+guidata(hObject,handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu_Gender_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu_Gender (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

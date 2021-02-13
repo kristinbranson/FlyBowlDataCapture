@@ -149,7 +149,22 @@ function popupmenu_Assay_VisualSurround_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns popupmenu_Assay_VisualSurround contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from popupmenu_Assay_VisualSurround
+% grab value
 
+main = guidata(handles.mainfig);
+
+v = get(handles.popupmenu_Assay_VisualSurround,'Value');
+main.Assay_VisualSurround = main.Assay_VisualSurrounds{v};
+
+% no longer default
+main.isdefault.Assay_VisualSurround = false;
+
+% set color
+set(handles.popupmenu_Assay_VisualSurround,'BackgroundColor',main.changed_bkgdcolor);
+
+main = FlyBowlDataCapture('ChangedMetaData',main);
+
+guidata(handles.mainfig,main);
 
 % --- Executes during object creation, after setting all properties.
 function popupmenu_Assay_VisualSurround_CreateFcn(hObject, eventdata, handles)

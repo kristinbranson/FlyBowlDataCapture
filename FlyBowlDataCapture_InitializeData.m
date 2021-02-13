@@ -173,7 +173,6 @@ handles.params = struct;
     'TempProbePeriod','TempProbeChannels',...
     'TempProbeReject60Hz','DoRecordTemp','NPreconSamples',...
     'Imaq_MaxFrameRate','ColormapPreview',...
-    'PreAssayHandling_SortingHour_Range',...
     'ScanLineYLim','MinFliesLoadedTime','MaxFliesLoadedTime',...
     'CoupleCameraTempProbeStart',...
     'BIASServerPortBegin','BIASServerPortStep','BIASCameraNumbers',...
@@ -181,7 +180,11 @@ handles.params = struct;
     'ChR_THUpdateP',...
     'ChR_isDaqCard',...
     'ChR_LEDpattern',...
-    'ExperimentStartDelay'};
+    'ExperimentStartDelay',...
+    'PreAssayHandling_CrossDate_Range',...
+    'PreAssayHandling_SortingDate_Range','PreAssayHandling_StarvationDate_Range',...
+    'PreAssayHandling_SortingHour_Range','PreAssayHandling_StarvationHour_Range',...
+    'PreAssayHandling_SortingHour_Interval','PreAssayHandling_StarvationHour_Interval'};
   for i = 1:length(numeric_params),
     if isfield(handles.params,numeric_params{i}),
       handles.params.(numeric_params{i}) = str2double(handles.params.(numeric_params{i}));
@@ -576,35 +579,33 @@ set(handles.popupmenu_Rearing_IncubatorID,'String',handles.Rearing_IncubatorIDs,
 
 %% Cross Date
 
-% handles.PreAssayHandling_CrossDate = datestr(0,handles.dateformat);
-% handles.PreAssayHandling_CrossDate_datenum = 0;
+handles.PreAssayHandling_CrossDate = datestr(0,handles.dateformat);
+handles.PreAssayHandling_CrossDate_datenum = 0;
 
-% NO CROSS DATE ENTRY
-% 
-% % whether this has been changed or not
-% handles.isdefault.PreAssayHandling_CrossDate = true;
-% 
-% % possible values for CrossDate
-% minv = floor(handles.now) - handles.params.PreAssayHandling_CrossDate_Range(2);
-% maxv = floor(handles.now) - handles.params.PreAssayHandling_CrossDate_Range(1);
-% handles.PreAssayHandling_CrossDate_datenums = minv:maxv;
-% handles.PreAssayHandling_CrossDates = cellstr(datestr(handles.PreAssayHandling_CrossDate_datenums,handles.dateformat));
-% 
-% % if CrossDate not stored in rc file, choose first date
-% if ~isfield(handles.previous_values,'PreAssayHandling_CrossDateOff') || ...
-%     handles.previous_values.PreAssayHandling_CrossDateOff > handles.params.PreAssayHandling_CrossDate_Range(2) || ...
-%     handles.previous_values.PreAssayHandling_CrossDateOff < handles.params.PreAssayHandling_CrossDate_Range(1),
-%   handles.previous_values.PreAssayHandling_CrossDateOff = handles.params.PreAssayHandling_CrossDate_Range(2);
-% end
-% 
-% % by default, previous offset
-% handles.PreAssayHandling_CrossDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_CrossDateOff;
-% handles.PreAssayHandling_CrossDate = datestr(handles.PreAssayHandling_CrossDate_datenum,handles.dateformat);
-% 
-% % set possible values, current value, color to default
-% set(handles.popupmenu_PreAssayHandling_CrossDate,'String',handles.PreAssayHandling_CrossDates,...
-%   'Value',find(strcmp(handles.PreAssayHandling_CrossDate,handles.PreAssayHandling_CrossDates),1),...
-%   'BackgroundColor',handles.isdefault_bkgdcolor);
+% whether this has been changed or not
+handles.isdefault.PreAssayHandling_CrossDate = true;
+
+% possible values for CrossDate
+minv = floor(handles.now) - handles.params.PreAssayHandling_CrossDate_Range(2);
+maxv = floor(handles.now) - handles.params.PreAssayHandling_CrossDate_Range(1);
+handles.PreAssayHandling_CrossDate_datenums = minv:maxv;
+handles.PreAssayHandling_CrossDates = cellstr(datestr(handles.PreAssayHandling_CrossDate_datenums,handles.dateformat));
+
+% if CrossDate not stored in rc file, choose first date
+if ~isfield(handles.previous_values,'PreAssayHandling_CrossDateOff') || ...
+    handles.previous_values.PreAssayHandling_CrossDateOff > handles.params.PreAssayHandling_CrossDate_Range(2) || ...
+    handles.previous_values.PreAssayHandling_CrossDateOff < handles.params.PreAssayHandling_CrossDate_Range(1),
+  handles.previous_values.PreAssayHandling_CrossDateOff = handles.params.PreAssayHandling_CrossDate_Range(2);
+end
+
+% by default, previous offset
+handles.PreAssayHandling_CrossDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_CrossDateOff;
+handles.PreAssayHandling_CrossDate = datestr(handles.PreAssayHandling_CrossDate_datenum,handles.dateformat);
+
+% set possible values, current value, color to default
+set(handles.popupmenu_PreAssayHandling_CrossDate,'String',handles.PreAssayHandling_CrossDates,...
+  'Value',find(strcmp(handles.PreAssayHandling_CrossDate,handles.PreAssayHandling_CrossDates),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Cross Handler
 
@@ -633,77 +634,72 @@ set(handles.popupmenu_Rearing_IncubatorID,'String',handles.Rearing_IncubatorIDs,
 
 %% Sorting Date
 
-% handles.PreAssayHandling_SortingDate_datenum = 0;
-% handles.PreAssayHandling_SortingDate = datestr(handles.PreAssayHandling_SortingDate_datenum,handles.dateformat);
+handles.PreAssayHandling_SortingDate_datenum = 0;
+handles.PreAssayHandling_SortingDate = datestr(handles.PreAssayHandling_SortingDate_datenum,handles.dateformat);
 
-% NO ENTRY
-% 
-% % whether this has been changed or not
-% handles.isdefault.PreAssayHandling_SortingDate = true;
-% 
-% % possible values for SortingDate
-% minv = floor(handles.now) - handles.params.PreAssayHandling_SortingDate_Range(2);
-% maxv = floor(handles.now) - handles.params.PreAssayHandling_SortingDate_Range(1);
-% handles.PreAssayHandling_SortingDate_datenums = minv:maxv;
-% handles.PreAssayHandling_SortingDates = cellstr(datestr(handles.PreAssayHandling_SortingDate_datenums,handles.dateformat));
-% 
-% % if SortingDate not stored in rc file, choose first date
-% if ~isfield(handles.previous_values,'PreAssayHandling_SortingDateOff') || ...
-%     handles.previous_values.PreAssayHandling_SortingDateOff > handles.params.PreAssayHandling_SortingDate_Range(2) || ...
-%     handles.previous_values.PreAssayHandling_SortingDateOff < handles.params.PreAssayHandling_SortingDate_Range(1),
-%   handles.previous_values.PreAssayHandling_SortingDateOff = handles.params.PreAssayHandling_SortingDate_Range(2);
-% end
-% 
-% % by default, previous offset
-% handles.PreAssayHandling_SortingDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_SortingDateOff;
-% handles.PreAssayHandling_SortingDate = datestr(handles.PreAssayHandling_SortingDate_datenum,handles.dateformat);
-% 
-% % set possible values, current value, color to default
-% set(handles.popupmenu_PreAssayHandling_SortingDate,'String',handles.PreAssayHandling_SortingDates,...
-%   'Value',find(strcmp(handles.PreAssayHandling_SortingDate,handles.PreAssayHandling_SortingDates),1),...
-%   'BackgroundColor',handles.isdefault_bkgdcolor);
+% whether this has been changed or not
+handles.isdefault.PreAssayHandling_SortingDate = true;
+
+% possible values for SortingDate
+minv = floor(handles.now) - handles.params.PreAssayHandling_SortingDate_Range(2);
+maxv = floor(handles.now) - handles.params.PreAssayHandling_SortingDate_Range(1);
+handles.PreAssayHandling_SortingDate_datenums = minv:maxv;
+handles.PreAssayHandling_SortingDates = cellstr(datestr(handles.PreAssayHandling_SortingDate_datenums,handles.dateformat));
+
+% if SortingDate not stored in rc file, choose first date
+if ~isfield(handles.previous_values,'PreAssayHandling_SortingDateOff') || ...
+    handles.previous_values.PreAssayHandling_SortingDateOff > handles.params.PreAssayHandling_SortingDate_Range(2) || ...
+    handles.previous_values.PreAssayHandling_SortingDateOff < handles.params.PreAssayHandling_SortingDate_Range(1),
+  handles.previous_values.PreAssayHandling_SortingDateOff = handles.params.PreAssayHandling_SortingDate_Range(2);
+end
+
+% by default, previous offset
+handles.PreAssayHandling_SortingDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_SortingDateOff;
+handles.PreAssayHandling_SortingDate = datestr(handles.PreAssayHandling_SortingDate_datenum,handles.dateformat);
+
+% set possible values, current value, color to default
+set(handles.popupmenu_PreAssayHandling_SortingDate,'String',handles.PreAssayHandling_SortingDates,...
+  'Value',find(strcmp(handles.PreAssayHandling_SortingDate,handles.PreAssayHandling_SortingDates),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Sorting Hour
+% allowed sorting hours
+handles.PreAssayHandling_SortingHour_datenums = ...
+  (handles.params.PreAssayHandling_SortingHour_Range(1):handles.params.PreAssayHandling_SortingHour_Interval:handles.params.PreAssayHandling_SortingHour_Range(2))/24;
+handles.PreAssayHandling_SortingHours = ...
+  cellstr(datestr(handles.PreAssayHandling_SortingHour_datenums,'HH:MM'));
 
-% handles.PreAssayHandling_SortingHour_datenum = nan;
-% handles.PreAssayHandling_SortingHour = '??:??';
+% whether this has been changed or not
+handles.isdefault.PreAssayHandling_SortingHour = true;
 
+% if SortingHour stored in rc file, use previous value
+if isfield(handles.previous_values,'PreAssayHandling_SortingHour') && ...
+    ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'??:??') && ...
+    ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'99:99'),
+  handles.PreAssayHandling_SortingHour = handles.previous_values.PreAssayHandling_SortingHour;
+  handles.PreAssayHandling_SortingHour_datenum = rem(datenum(handles.previous_values.PreAssayHandling_SortingHour,'HH:MM'),1);
+  [~,v] = min(abs(handles.PreAssayHandling_SortingHour_datenum-handles.PreAssayHandling_SortingHour_datenums));
+else
+  % otherwise, use unknown
+  handles.PreAssayHandling_SortingHour_datenum = nan;
+  handles.PreAssayHandling_SortingHour = '??:??';
+  v = numel(handles.PreAssayHandling_SortingHour_datenums)+1;
+end
 
-% NO ENTRY
-% % allowed sorting hours
-% handles.PreAssayHandling_SortingHour_datenums = ...
-%   (handles.params.PreAssayHandling_SortingHour_Range(1):handles.params.PreAssayHandling_SortingHour_Interval:handles.params.PreAssayHandling_SortingHour_Range(2))/24;
-% handles.PreAssayHandling_SortingHours = ...
-%   cellstr(datestr(handles.PreAssayHandling_SortingHour_datenums,'HH:MM'));
-% 
-% % whether this has been changed or not
-% handles.isdefault.PreAssayHandling_SortingHour = true;
-% 
-% % if SortingHour stored in rc file, use previous value
-% if isfield(handles.previous_values,'PreAssayHandling_SortingHour') && ...
-%     ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'??:??') && ...
-%     ~strcmp(handles.previous_values.PreAssayHandling_SortingHour,'99:99'),
-%   handles.PreAssayHandling_SortingHour = handles.previous_values.PreAssayHandling_SortingHour;
-%   handles.PreAssayHandling_SortingHour_datenum = rem(datenum(handles.previous_values.PreAssayHandling_SortingHour,'HH:MM'),1);
-% else
-%   % otherwise, use unknown
-%   handles.PreAssayHandling_SortingHour_datenum = nan;
-%   handles.PreAssayHandling_SortingHour = '??:??';
-% end
-% 
-% % add unknown to list of possible values
-% handles.PreAssayHandling_SortingHours{end+1} = '??:??';
-% handles.PreAssayHandling_SortingHour_datenums(end+1) = nan;
-% 
-% % set possible values, current value, color to default
-% % set(handles.popupmenu_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHours,...
-% %   'Value',v,...
-% %   'BackgroundColor',handles.isdefault_bkgdcolor);
-% set(handles.edit_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHour,...
+% add unknown to list of possible values
+handles.PreAssayHandling_SortingHours{end+1} = '??:??';
+handles.PreAssayHandling_SortingHour_datenums(end+1) = nan;
+
+% set possible values, current value, color to default
+% set(handles.popupmenu_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHours,...
+%   'Value',v,...
 %   'BackgroundColor',handles.isdefault_bkgdcolor);
-% 
-% handles.PreAssayHandling_SortingTime_datenum = handles.PreAssayHandling_SortingDate_datenum + ...
-%   handles.PreAssayHandling_SortingHour_datenum;
+set(handles.edit_PreAssayHandling_SortingHour,'String',handles.PreAssayHandling_SortingHours,...
+  'Value',v,...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
+
+handles.PreAssayHandling_SortingTime_datenum = handles.PreAssayHandling_SortingDate_datenum + ...
+  handles.PreAssayHandling_SortingHour_datenum;
 
 %% Sorting Handler
 
@@ -731,71 +727,70 @@ set(handles.popupmenu_Rearing_IncubatorID,'String',handles.Rearing_IncubatorIDs,
 %   'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Starvation Date
-% NO ENTRY
-% 
-% % whether this has been changed or not
-% handles.isdefault.PreAssayHandling_StarvationDate = true;
-% 
-% % possible values for StarvationDate
-% minv = floor(handles.now) - handles.params.PreAssayHandling_StarvationDate_Range(2);
-% maxv = floor(handles.now) - handles.params.PreAssayHandling_StarvationDate_Range(1);
-% handles.PreAssayHandling_StarvationDate_datenums = minv:maxv;
-% handles.PreAssayHandling_StarvationDates = cellstr(datestr(handles.PreAssayHandling_StarvationDate_datenums,handles.dateformat));
-% 
-% % if StarvationDate not stored in rc file, choose first date
-% if ~isfield(handles.previous_values,'PreAssayHandling_StarvationDateOff') || ...
-%     handles.previous_values.PreAssayHandling_StarvationDateOff > handles.params.PreAssayHandling_StarvationDate_Range(2) || ...
-%     handles.previous_values.PreAssayHandling_StarvationDateOff < handles.params.PreAssayHandling_StarvationDate_Range(1),
-%   handles.previous_values.PreAssayHandling_StarvationDateOff = handles.params.PreAssayHandling_StarvationDate_Range(2);
-% end
-% 
-% % by default, previous offset
-% handles.PreAssayHandling_StarvationDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_StarvationDateOff;
-% handles.PreAssayHandling_StarvationDate = datestr(handles.PreAssayHandling_StarvationDate_datenum,handles.dateformat);
-% 
-% % set possible values, current value, color to default
-% set(handles.popupmenu_PreAssayHandling_StarvationDate,'String',handles.PreAssayHandling_StarvationDates,...
-%   'Value',find(strcmp(handles.PreAssayHandling_StarvationDate,handles.PreAssayHandling_StarvationDates),1),...
-%   'BackgroundColor',handles.isdefault_bkgdcolor);
+
+% whether this has been changed or not
+handles.isdefault.PreAssayHandling_StarvationDate = true;
+
+% possible values for StarvationDate
+minv = floor(handles.now) - handles.params.PreAssayHandling_StarvationDate_Range(2);
+maxv = floor(handles.now) - handles.params.PreAssayHandling_StarvationDate_Range(1);
+handles.PreAssayHandling_StarvationDate_datenums = minv:maxv;
+handles.PreAssayHandling_StarvationDates = cellstr(datestr(handles.PreAssayHandling_StarvationDate_datenums,handles.dateformat));
+
+% if StarvationDate not stored in rc file, choose first date
+if ~isfield(handles.previous_values,'PreAssayHandling_StarvationDateOff') || ...
+    handles.previous_values.PreAssayHandling_StarvationDateOff > handles.params.PreAssayHandling_StarvationDate_Range(2) || ...
+    handles.previous_values.PreAssayHandling_StarvationDateOff < handles.params.PreAssayHandling_StarvationDate_Range(1),
+  handles.previous_values.PreAssayHandling_StarvationDateOff = handles.params.PreAssayHandling_StarvationDate_Range(2);
+end
+
+% by default, previous offset
+handles.PreAssayHandling_StarvationDate_datenum = floor(handles.now) - handles.previous_values.PreAssayHandling_StarvationDateOff;
+handles.PreAssayHandling_StarvationDate = datestr(handles.PreAssayHandling_StarvationDate_datenum,handles.dateformat);
+
+% set possible values, current value, color to default
+set(handles.popupmenu_PreAssayHandling_StarvationDate,'String',handles.PreAssayHandling_StarvationDates,...
+  'Value',find(strcmp(handles.PreAssayHandling_StarvationDate,handles.PreAssayHandling_StarvationDates),1),...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
 
 %% Starvation Hour
-% NO ENTRY
-% % allowed starvation hours
-% handles.PreAssayHandling_StarvationHour_datenums = ...
-%   (handles.params.PreAssayHandling_StarvationHour_Range(1):handles.params.PreAssayHandling_StarvationHour_Interval:handles.params.PreAssayHandling_StarvationHour_Range(2))/24;
-% handles.PreAssayHandling_StarvationHours = ...
-%   cellstr(datestr(handles.PreAssayHandling_StarvationHour_datenums,'HH:MM'));
-% 
-% % whether this has been changed or not
-% handles.isdefault.PreAssayHandling_StarvationHour = true;
-% 
-% % if StarvationHour stored in rc file, use previous value
-% if isfield(handles.previous_values,'PreAssayHandling_StarvationHour') && ...
-%     ~strcmp(handles.previous_values.PreAssayHandling_StarvationHour,'??:??') && ...
-%     ~strcmp(handles.previous_values.PreAssayHandling_StarvationHour,'99:99'),
-%   d = rem(datenum(handles.previous_values.PreAssayHandling_StarvationHour,'HH:MM'),1);
-%   v = argmin(abs(handles.PreAssayHandling_StarvationHour_datenums-d));
-%   handles.PreAssayHandling_StarvationHour = handles.PreAssayHandling_StarvationHours{v};
-%   handles.PreAssayHandling_StarvationHour_datenum = handles.PreAssayHandling_StarvationHour_datenums(v);
-% else
-%   % otherwise, use unknown
-%   handles.PreAssayHandling_StarvationHour_datenum = nan;
-%   v = numel(handles.PreAssayHandling_StarvationHours)+1;
-%   handles.PreAssayHandling_StarvationHour = '??:??';
-% end
-% 
-% % add unknown to list of possible values
-% handles.PreAssayHandling_StarvationHours{end+1} = '??:??';
-% handles.PreAssayHandling_StarvationHour_datenums(end+1) = nan;
-% 
-% % set(handles.popupmenu_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHours,...
-% %   'Value',v,...
-% %   'BackgroundColor',handles.isdefault_bkgdcolor);
+
+% allowed starvation hours
+handles.PreAssayHandling_StarvationHour_datenums = ...
+  (handles.params.PreAssayHandling_StarvationHour_Range(1):handles.params.PreAssayHandling_StarvationHour_Interval:handles.params.PreAssayHandling_StarvationHour_Range(2))/24;
+handles.PreAssayHandling_StarvationHours = ...
+  cellstr(datestr(handles.PreAssayHandling_StarvationHour_datenums,'HH:MM'));
+
+% whether this has been changed or not
+handles.isdefault.PreAssayHandling_StarvationHour = true;
+
+% if StarvationHour stored in rc file, use previous value
+if isfield(handles.previous_values,'PreAssayHandling_StarvationHour') && ...
+    ~strcmp(handles.previous_values.PreAssayHandling_StarvationHour,'??:??') && ...
+    ~strcmp(handles.previous_values.PreAssayHandling_StarvationHour,'99:99'),
+  d = rem(datenum(handles.previous_values.PreAssayHandling_StarvationHour,'HH:MM'),1);
+  v = argmin(abs(handles.PreAssayHandling_StarvationHour_datenums-d));
+  handles.PreAssayHandling_StarvationHour = handles.PreAssayHandling_StarvationHours{v};
+  handles.PreAssayHandling_StarvationHour_datenum = handles.PreAssayHandling_StarvationHour_datenums(v);
+else
+  % otherwise, use unknown
+  handles.PreAssayHandling_StarvationHour_datenum = nan;
+  v = numel(handles.PreAssayHandling_StarvationHours)+1;
+  handles.PreAssayHandling_StarvationHour = '??:??';
+end
+
+% add unknown to list of possible values
+handles.PreAssayHandling_StarvationHours{end+1} = '??:??';
+handles.PreAssayHandling_StarvationHour_datenums(end+1) = nan;
+
+set(handles.edit_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHours,...
+  'Value',v,...
+  'BackgroundColor',handles.isdefault_bkgdcolor);
 % set(handles.edit_PreAssayHandling_StarvationHour,'String',handles.PreAssayHandling_StarvationHour,...
 %   'BackgroundColor',handles.isdefault_bkgdcolor);
-% 
-% handles.PreAssayHandling_StarvationTime_datenum = handles.PreAssayHandling_StarvationDate_datenum + ...
-%   handles.PreAssayHandling_StarvationHour_datenum;
+
+handles.PreAssayHandling_StarvationTime_datenum = handles.PreAssayHandling_StarvationDate_datenum + ...
+  handles.PreAssayHandling_StarvationHour_datenum;
 
 %% Starvation Handler
 % 
@@ -969,6 +964,20 @@ handles.AdvancedMetadataFields = ...
   'Sorter','PreAssayHandling_SortingHandler',@(x) true,'<string>'
   'RobotID','RobotID',@(x) true,'<string>'
   'Effector','MetaData_Effector',@(x) true,'<string>'};
+
+%% gender
+handles.Genders_str = {'Both','Female','Male'};
+if ~isfield(handles.previous_values,'Gender') || ...
+    ~ismember(handles.previous_values.Gender,handles.Genders_str),
+  handles.previous_values.Gender = handles.Genders_str{1};
+end
+
+handles.Gender = handles.previous_values.Gender;
+v = find(strcmp(handles.Gender,handles.Genders_str));
+
+set(handles.popupmenu_Gender,'String',handles.Genders_str,...
+  'Value',v);
+
 
 %% Number of dead flies
 
