@@ -418,7 +418,7 @@ if isfield(barcodeData,'Date_Crossed'),
   % no longer default
   handles.isdefault.PreAssayHandling_CrossDate = false;
   
-  %handles = setCrossDate(handles,barcodeData.Date_Crossed);
+  handles = setCrossDate(handles,barcodeData.Date_Crossed);
 end
 
 % set number
@@ -462,7 +462,7 @@ if isfield(barcodeData,'Sorting_Date'),
   % no longer default
   handles.isdefault.PreAssayHandling_SortingDate = false;
   
-  %handles = setSortingDate(handles,barcodeData.Sorting_Date);
+  handles = setSortingDate(handles,barcodeData.Sorting_Date);
 end
 if isfield(barcodeData,'Sorting_Hour'),
   handles.PreAssayHandling_SortingHour = barcodeData.Sorting_Hour;
@@ -479,7 +479,7 @@ if isfield(barcodeData,'Sorting_Hour'),
   % no longer default
   handles.isdefault.PreAssayHandling_SortingHour = false;
   
-  %handles = setSortingHour(handles,barcodeData.Sorting_Hour);
+  handles = setSortingHour(handles,barcodeData.Sorting_Hour);
 end
 
 if isfield(handles,'PreAssayHandling_SortingDate_datenum') && isfield(handles,'PreAssayHandling_SortingHour_datenum'),
@@ -508,7 +508,7 @@ if isfield(barcodeData,'Starvation_Date'),
   % no longer default
   handles.isdefault.PreAssayHandling_StarvationDate = false;
   
-  %handles = setStarvationDate(handles,barcodeData.Starvation_Date);
+  handles = setStarvationDate(handles,barcodeData.Starvation_Date);
 end
 if isfield(barcodeData,'Starvation_Hour'),
   
@@ -528,7 +528,7 @@ if isfield(barcodeData,'Starvation_Hour'),
   % no longer default
   handles.isdefault.PreAssayHandling_StarvationHour = false;
   
-  %handles = setStarvationHour(handles,barcodeData.Starvation_Hour);
+  handles = setStarvationHour(handles,barcodeData.Starvation_Hour);
 end
 if all(isfield(handles,{'PreAssayHandling_StarvationDate_datenum','PreAssayHandling_StarvationHour_datenum'})),
   % and time datenum
