@@ -1261,40 +1261,38 @@ end
 
 %% figure title
 set(handles.figure_main,'Name',sprintf('FlyBowlDataCapture v.%s',handles.version));
-
+  
 %% ChR activation parameters
 
 if ~isfield(handles.params,'doChR'),
   handles.params.doChR = false;
 end
-
-if handles.params.doChR,
   
-  chrparamnames = {'ChR_serial_port_for_LED_Controller',...
-    'ChR_rigName',...
+ledparamnames = {'ChR_serial_port_for_LED_Controller',...
+  'ChR_rigName',...
+  'ChR_THUpdateP',...
+  'ChR_IrInt',...
+  'ChR_expProtocolFile',...
+  'ChR_LEDpattern'};
+if handles.params.doChR,
+  chrparamnames = {
     'ChR_THUpdateP',...
-    'ChR_IrInt',...
     'ChR_expProtocolFile',...
     'ChR_LEDpattern'};
+  ledparamnames = [ledparamnames,chrparamnames];
+end
   
-  % check that all params set
-  ismissing = ~isfield(handles.params,chrparamnames);
-  if any(ismissing),
-    s = ['Missing ChR parameters:',sprintf(' %s',chrparamnames{ismissing})];
-    errordlg(s);
-    error(s);
-  end
-  
-  if isfield(handles.params,'ChR_serial_port_for_LED_Controller'),
-    handles.params.ChR_serial_port_for_LED_Controller = ParseComputerSpecificParam(handles.params.ChR_serial_port_for_LED_Controller,handles);
-  end
-  % makes IrInt computer specific AR 3/14/2018
-  if isfield(handles.params,'ChR_IrInt')
-      handles.params.ChR_IrInt = str2double(ParseComputerSpecificParam(handles.params.ChR_IrInt,handles));
-  end
-  
+% check that all params set
+ismissing = ~isfield(handles.params,ledparamnames);
+if any(ismissing),
+  s = ['Missing LED parameters:',sprintf(' %s',ledparamnames{ismissing})];
+  errordlg(s);
+  error(s);
 end
 
+handles.params.ChR_serial_port_for_LED_Controller = ParseComputerSpecificParam(handles.params.ChR_serial_port_for_LED_Controller,handles);
+handles.params.ChR_IrInt = str2double(ParseComputerSpecificParam(handles.params.ChR_IrInt,handles));
+  
 %% Initialization complete
 
 handles.StartedRecordingVideo = false;

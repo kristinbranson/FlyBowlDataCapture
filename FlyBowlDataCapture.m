@@ -1674,8 +1674,14 @@ function pushbutton_InitializeCamera_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+[success,hComm,errmsg] = InitializeLEDPanel(handles.params);
+if ~success,
+  s = errmsg;
+  errordlg(s);
+  error(s);
+end
 if handles.params.doChR,
-  [success,handles.ChRStuff,errmsg] = InitializeChRStimulus(handles.params);
+  [success,handles.ChRStuff,errmsg] = InitializeChRStimulus(handles.params,hComm);
   handles.params.RecordTime = handles.ChRStuff.TotalDuration_Seconds;
   if ~success,
     s = errmsg;
