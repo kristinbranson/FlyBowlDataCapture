@@ -28,13 +28,13 @@ end
 handles = guidata(hObject);
 
 % close LED controller
-if handles.params.doChR,
+%if handles.params.doChR,
   
   handles = CloseLEDControllerConnection(handles);
   
   guidata(hObject,handles);
   
-end
+%end
   
 if strcmpi(AdaptorName,'bias'),
 

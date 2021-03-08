@@ -75,7 +75,18 @@ if isfield(handles,'PreAssayHandling_CrossDate_datenum') && ...
 end
 
 if isfield(handles,'Gender'),
-  handles.metadata.Gender = handles.Gender;
+  s = handles.Gender;
+  
+  switch lower(s),
+    case 'both',
+      s = 'b';
+    case 'male',
+      s = 'm';
+    case 'female',
+      s = 'f';
+  end
+  handles.metadata.Gender = s;
+  
 end
 
 if handles.IsBarcode,

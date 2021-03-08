@@ -121,7 +121,10 @@ if ~ischar(filestr) || isempty(filestr),
       exist(handles.GUIInstanceFileName,'file'),
     delete(handles.GUIInstanceFileName);
   end
-  uiresume(handles.figure_main);
+  if exist('hwait','var') && ishandle(hwait),
+    delete(hwait);
+  end
+  delete(handles.figure_main);
   return;
 end
 handles.params_file = fullfile(pathstr,filestr);
@@ -1674,14 +1677,14 @@ function pushbutton_InitializeCamera_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-[success,hComm,errmsg] = InitializeLEDPanel(handles.params);
+[success,handles.ChRStuff,errmsg] = InitializeLEDPanel(handles.params);
 if ~success,
   s = errmsg;
   errordlg(s);
   error(s);
 end
 if handles.params.doChR,
-  [success,handles.ChRStuff,errmsg] = InitializeChRStimulus(handles.params,hComm);
+  [success,handles.ChRStuff,errmsg] = InitializeChRStimulus(handles.params,handles.ChRStuff);
   handles.params.RecordTime = handles.ChRStuff.TotalDuration_Seconds;
   if ~success,
     s = errmsg;
@@ -2210,11 +2213,11 @@ end
 % end
 
 % stop LED controller
-if handles.params.doChR,
+%if handles.params.doChR,
   
   handles = CloseLEDControllerConnection(handles);
   
-end
+%end
 
 % save metadata
 if handles.MetaDataNeedsSave,
