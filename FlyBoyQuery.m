@@ -75,6 +75,11 @@ function output = FlyBoyQuery( barcode, exp, deferrck, stm, flyboymethod)
 %     Sorting_DateTime: '00000000T000000'
 % 
 
+% to use mysql directly to access flyboy:
+% mysql -u flyfRead -p'flyfRead' -h prd-db -D flyboy
+% useful information on flyboy:
+% https://wiki.int.janelia.org/wiki/display/ScientificComputing/Fly+Boy
+
 %%     
 
     bc = num2str(barcode);
