@@ -1,4 +1,4 @@
-function output = FlyBoyQuery( barcode, exp, deferrck, stm)
+function output = FlyBoyQuery( barcode, exp, deferrck, stm, flyboymethod)
 %function output = FlyBoyQuery2Params( barcode, exp, deferrck )
 %FLYBOYQUERY Query FlyBoy database for information associated with a barcode
 %
@@ -104,42 +104,49 @@ function output = FlyBoyQuery( barcode, exp, deferrck, stm)
        con = drv.connect(url,'');
        stm = con.createStatement;
      end
-
-     qry = strcat('select RobotID, Stock_Name, Date_Crossed, Reporter,',...
-         ' Wish_list, handler_cross',...
-         ', handler_sorting_',exp,...
-         ', handler_sorting_',exp,'_DateTime',...
-         ', handler_starvation_',exp,...
-         ', handler_starvation_',exp,'_DateTime',...
-         ' from project_crosses_expanded_vw where Barcode_CrossSerialNumber=',bc);
-     try
-       res = stm.executeQuery(qry);
-     catch ME
-       if didconnect,
-         error(ME);
-       else
-         drv = com.mysql.jdbc.Driver;
-         url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
-         con = drv.connect(url,'');
-         stm = con.createStatement;
-         res = stm.executeQuery(qry);
-       end
+     if nargin < 5 || ~ischar(flyboymethod),
+       flyboymethod = 'Project_Crosses';
      end
      
-     output = 0;
+     switch flyboymethod,
+       
+       case 'olympiad',
 
-     while res.next
-         date_crossed = datestr(datenum(char(res.getString('Date_Crossed'))),'yyyymmddTHHMMSS');
-         date_sorted = char(res.getString(strcat('handler_sorting_',exp,'_DateTime')));
-         if ~strcmp(date_sorted,'')
-            date_sorted = datestr(datenum(date_sorted),'yyyymmddTHHMMSS');
-         end
-         date_starved = char(res.getString(strcat('handler_starvation_',exp,'_DateTime')));
-         if ~strcmp(date_starved,'')
-            date_starved = datestr(datenum(date_starved),'yyyymmddTHHMMSS');
+         qry = strcat('select RobotID, Stock_Name, Date_Crossed, Reporter,',...
+           ' Wish_list, handler_cross',...
+           ', handler_sorting_',exp,...
+           ', handler_sorting_',exp,'_DateTime',...
+           ', handler_starvation_',exp,...
+           ', handler_starvation_',exp,'_DateTime',...
+           ' from project_crosses_expanded_vw where Barcode_CrossSerialNumber=',bc);
+         try
+           res = stm.executeQuery(qry);
+         catch ME
+           if didconnect,
+             error(ME);
+           else
+             drv = com.mysql.jdbc.Driver;
+             url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
+             con = drv.connect(url,'');
+             stm = con.createStatement;
+             res = stm.executeQuery(qry);
+           end
          end
          
-         output = struct('Line_Name',char(res.getString('Stock_Name')),...
+         output = 0;
+         
+         while res.next
+           date_crossed = datestr(datenum(char(res.getString('Date_Crossed'))),'yyyymmddTHHMMSS');
+           date_sorted = char(res.getString(strcat('handler_sorting_',exp,'_DateTime')));
+           if ~strcmp(date_sorted,'')
+             date_sorted = datestr(datenum(date_sorted),'yyyymmddTHHMMSS');
+           end
+           date_starved = char(res.getString(strcat('handler_starvation_',exp,'_DateTime')));
+           if ~strcmp(date_starved,'')
+             date_starved = datestr(datenum(date_starved),'yyyymmddTHHMMSS');
+           end
+           
+           output = struct('Line_Name',char(res.getString('Stock_Name')),...
              'Date_Crossed',date_crossed,...
              'Effector',char(res.getString('Reporter')),...
              'Set_Number',char(res.getString('Wish_List')),...
@@ -149,9 +156,53 @@ function output = FlyBoyQuery( barcode, exp, deferrck, stm)
              'Handler_Starvation',char(res.getString(strcat('handler_starvation_',exp))),...
              'Starvation_DateTime',date_starved,...
              'RobotID',char(res.getString('RobotID')));
-             
+           
+         end
+         
+       otherwise,
+         
+         qry = sprintf('select Stock_Name from StockFinder where __kp_UniqueID = (select _kf_Parent_UID from Project_Crosses where Barcode_CrossSerialNumber=%d)',barcode);
+         try
+           res = stm.executeQuery(qry);
+         catch ME
+           if didconnect,
+             error(ME);
+           else
+             drv = com.mysql.jdbc.Driver;
+             url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
+             con = drv.connect(url,'');
+             stm = con.createStatement;
+             res = stm.executeQuery(qry);
+           end
+         end
+         
+         output = 0;
+         
+         while res.next
+           output = struct('Line_Name',char(res.getString('Stock_Name')));
+         end
+         
+         if ~(isstruct(output))
+           error(strcat('Barcode >',bc,'< not found in FlyBoy'));
+         end
+         
+         qry = sprintf('select RobotID, Wish_List, Date_Crossed, Reporter from Project_Crosses where Barcode_CrossSerialNumber=%d',barcode);
+         res = stm.executeQuery(qry);
+         while res.next,
+           date_crossed = datestr(datenum(char(res.getString('Date_Crossed'))),'yyyymmddTHHMMSS');
+           
+           output.Date_Crossed = date_crossed;
+           output.Effector = char(res.getString('Reporter'));
+           output.Set_Number = char(res.getString('Wish_List'));
+           output.RobotID = char(res.getString('RobotID'));
+         end
+         output.Handler_Cross = '';
+         output.Handler_Sorting = '';
+         output.Sorting_DateTime = '';
+         output.Handler_Starvation = '';
+         output.Starvation_DateTime = '';
      end
-          
+     
      if ~(isstruct(output))
         error(strcat('Barcode >',bc,'< not found in FlyBoy'));
      end

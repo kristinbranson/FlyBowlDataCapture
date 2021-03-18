@@ -211,7 +211,8 @@ handles.params = struct;
     'ChR_expProtocolFile',...
     'StimulusTimingLogFileName',...
     'ExperimentNameComponents',...
-    'Lab'};
+    'Lab',...
+    'FlyBoyMethod'};
   for i = 1:length(notlist_params),
     fn = notlist_params{i};
     if ~isfield(handles.params,fn),
@@ -244,6 +245,10 @@ handles.params = struct;
 %   uiwait(errordlg({'Error parsing parameter file:',getReport(ME)},'Error reading parameters'));
 %   rethrow(ME);
 % end
+
+if ~isfield(handles.params,'FlyBoyMethod'),
+  handles.params.FlyBoyMethod = 'Project_Crosses';
+end
 
 %% dorotatepreview needs special parsing
 

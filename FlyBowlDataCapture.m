@@ -2670,7 +2670,7 @@ else
   
   try
     %scanValue = FlyFQuery(scanNum);
-    scanValue = FlyBoyQuery( scanNum, handles.FlyBoyAssayCode, 1, handles.FlyBoy_stm);
+    scanValue = FlyBoyQuery( scanNum, handles.FlyBoyAssayCode, 1, handles.FlyBoy_stm, handles.params.FlyBoyMethod);
   catch ME
     errMsg = sprintf('Scan Error: %s', ME.message);
     h = errordlg(errMsg);
