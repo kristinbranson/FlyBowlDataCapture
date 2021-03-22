@@ -154,6 +154,9 @@ classdef LEDController < handle
                 fprintf(obj.serialPort,s);
                 [~,status] = checkControllerStatus(obj);
                 totalSteps = str2double(status);
+                if ~isempty(totalSteps),
+                  totalSteps = totalSteps(end);
+                end
             end
         end
         

@@ -47,6 +47,7 @@ try
     if isempty(totalSteps) || (totalSteps ~= stepIndex),
       error('totalSteps returned from LED Controller -> addOneStep does not match');
     end
+    fprintf('stepIndex = %d, totalSteps = %d\n',stepIndex,totalSteps);
   end
   
   hComm.expData = hComm.hLEDController.getExperimentSteps();
