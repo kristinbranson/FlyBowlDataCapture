@@ -5,7 +5,7 @@ oneStep = struct();
 %calculate the four point value for each step
 for stepIndex = 1:length(protocol.stepNum)
   oneStep(stepIndex).NumStep = protocol.stepNum(stepIndex);
-  oneStep(stepIndex).Duration = protocol.duration(stepIndex);
+  oneStep(stepIndex).Duration = protocol.duration(stepIndex)/1000; % specify in ms but firmware expects seconds;
   oneStep(stepIndex).DelayTime = protocol.delayTime(stepIndex);
   %red light
   oneStep(stepIndex).RedIntensity = protocol.Rintensity(stepIndex);
