@@ -88,7 +88,7 @@ if strcmpi(params.AdaptorName,'udcam'),
   history = get(params.hLine_Status_FrameRate,'UserData');
   
   % did preview get stuck?
-  if history(1,end) == currenttime,
+  if history(1,end) >= currenttime,
 %     nochangeintimestamp = getappdata(himage,'NoChangeInTimestamp') + 1;
 %     fprintf('No change in timestamp for %d updates to preview\n',nochangeintimestamp);
 %     setappdata(himage,'NoChangeInTimestamp',nochangeintimestamp);

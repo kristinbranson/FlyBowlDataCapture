@@ -12,7 +12,7 @@ oneStep = ProtocolExperimentSteps(protocol);
 %% update the protocol in the axes
 cla(hax);
 
-totalDuration = sum(protocol.duration); %in seconds - change from old protocol files
+totalDuration = sum(protocol.duration)/1000; % was in ms
 
 X = (0:0.001:totalDuration)';
 %xticks('auto');

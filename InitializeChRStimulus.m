@@ -29,7 +29,7 @@ end
 hComm.ExperimentSteps = ProtocolExperimentSteps(hComm.protocol);
 
 % compute total stimulus time
-hComm.TotalDuration_Seconds = sum(hComm.protocol.duration); % units changed in new protocol
+hComm.TotalDuration_Seconds = sum(hComm.protocol.duration)/1000; % in ms
 %hComm.TotalDuration_Seconds = sum(hComm.protocol.duration)/1000;
 
 % set LED pattern
