@@ -279,11 +279,6 @@ if handles.IsAdvancedMode,
 end
 set(handles.menu_Edit_DetectCameras,'Enable','on');
 
-% enable file menus
-set(handles.menu_File_New,'Enable','on');
-set(handles.menu_File_Close,'Enable','on');
-set(handles.menu_Quit,'Enable','on');
-
 guidata(hObject,handles);
 
 hwait = mywaitbar(1,hwait,'Video file closed');

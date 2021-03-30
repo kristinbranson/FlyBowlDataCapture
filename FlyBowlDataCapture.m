@@ -1568,6 +1568,11 @@ end
 % record configuration
 handles = RecordConfiguration(handles);
 
+% enable file menus
+set(handles.menu_File_New,'Enable','on');
+set(handles.menu_File_Close,'Enable','on');
+set(handles.menu_Quit,'Enable','on');
+
 if ishandle(hObject),
   guidata(hObject,handles);
 end
