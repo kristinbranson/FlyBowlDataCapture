@@ -42,7 +42,7 @@ end
 
 % new code copied from Jin's flyBowl_RGB.m and modified
 res.stepNum = indata(:,1);
-res.duration_ms = indata(:,2); % specify in ms, only do the conversion to s when communicating with led panel
+res.duration = indata(:,2); % specify in ms, only do the conversion to s when communicating with led panel
 res.delayTime = indata(:,3);
 %red light
 res.Rintensity = indata(:,4);
