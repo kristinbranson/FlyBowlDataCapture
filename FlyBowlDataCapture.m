@@ -1420,6 +1420,7 @@ function pushbutton_Abort_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+fprintf('Abort button pushed.\n');
 [handles,didcancel] = CloseExperiment(handles);
 if didcancel,
   return;
@@ -2159,12 +2160,13 @@ if isfield(handles,'FinishedRecording') && ~handles.FinishedRecording && handles
     didcancel = true;
     return;
   end
-  addToStatus(handles,{'Experiment aborted.'});
+  addToStatus(handles,{'In CloseExperiment - Experiment aborted.'});
   didabort = true;
 end
 
 % store that we are trying to close
 global FBDC_DIDHALT; 
+fprintf('In CloseExperiment, setting FBDC_DIDHALT = true\n');
 FBDC_DIDHALT(handles.GUIi) = true; 
 
 hwaitbar = waitbar(.1,'Closing experiment');

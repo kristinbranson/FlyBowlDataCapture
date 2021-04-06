@@ -70,7 +70,7 @@ didhalt = false;
 while toc(curTime) < duration,
   pause(0.1);
   if FBDC_DIDHALT(GUIi),
-    fprintf('Experiment aborted.\n');
+    fprintf('In RunStimulusProtocol, detected FBDC_DIDHALT == true, signifying experiment aborted.\n');
     didhalt = true;
     break;
   end
