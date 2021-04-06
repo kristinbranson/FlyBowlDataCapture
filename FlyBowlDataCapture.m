@@ -2187,9 +2187,12 @@ end
 if isfield(handles,'StartedRecordingVideo') && handles.StartedRecordingVideo && handles.IsRecording && isfield(handles,'vid') && (strcmpi(handles.params.Imaq_Adaptor,'bias') || isvalid(handles.vid)),
   guidata(hObject,handles);
   % last parameter: we did abort
-  wrapUpVideo(handles.vid,'',hObject,handles.params.Imaq_Adaptor,true);
+  addToStatus(handles,'CloseExperiment -> wrapUpVideo');
+  stoptime = wrapUpVideo(handles.vid,'',hObject,handles.params.Imaq_Adaptor,true);
   %stop(handles.vid);
   handles = guidata(hObject);
+  handles.stoptime = stoptime;
+  guidata(hObject,handles);
 elseif isfield(handles,'IsCameraInitialized') && handles.IsCameraInitialized && ...
     strcmpi(handles.params.Imaq_Adaptor,'bias'),
   [success,msg] = BIASStop(handles.vid.BIASURL);
@@ -2226,15 +2229,6 @@ end
   handles = CloseLEDControllerConnection(handles);
   
 %end
-
-handles = resetTempProbe2(handles);
-handles = unsetCamera(handles);
-s = 'Reset camera and temperature probe.';
-if exist('hwaitbar','var') && ishandle(hwaitbar),
-  waitbar(.3,hwaitbar,s);
-else
-  hwaitbar = waitbar(.3,s);
-end
 
 % save metadata
 if handles.MetaDataNeedsSave,
@@ -2301,6 +2295,14 @@ if ~strcmpi(handles.params.Imaq_Adaptor,'bias'),
     hwaitbar = waitbar(.6,s);
   end
   
+end
+
+handles = unsetCamera(handles);
+s = 'Reset camera.';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.3,hwaitbar,s);
+else
+  hwaitbar = waitbar(.65,s);
 end
 
 % delete preview image

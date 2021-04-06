@@ -192,9 +192,14 @@ if handles.params.doChR,
   fprintf(expTimeFileID,'%.10f,start_camera,%d\n', handles.StartVideoTime_datenum, -1 );
   success = RunStimulusProtocol(handles,expTimeFileID);
   fclose(expTimeFileID);
-  
+  handles = guidata(hObject);
   % close experiment
-  stoptime = wrapUpVideo(handles.vid,[],handles.figure_main,handles.params.Imaq_Adaptor,~success);
+  addToStatus(handles,'startLogging -> wrapUpVideo');
+  if isempty(handles.stoptime) || isfield(handles,'StartedRecordingVideo') && handles.StartedRecordingVideo && handles.IsRecording && isfield(handles,'vid') && (strcmpi(handles.params.Imaq_Adaptor,'bias') || isvalid(handles.vid)),
+    stoptime = wrapUpVideo(handles.vid,[],handles.figure_main,handles.params.Imaq_Adaptor,~success);
+  else
+    stoptime = handles.stoptime;
+  end
   
   handles = guidata(hObject);
   

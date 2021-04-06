@@ -5,6 +5,7 @@ if numel(FBDC_DIDHALT) >= handles.GUIi && FBDC_DIDHALT(handles.GUIi),
   %warning('FBDC_DIDHALT set to true at start of InitializeData, resetting to false');
   FBDC_DIDHALT(handles.GUIi) = false;
 end
+handles.stoptime = []; % so that wrapUpVideo is not called twice
 
 % data capture code version
 handles.version = '??';

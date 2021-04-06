@@ -216,6 +216,7 @@ if strcmpi(handles.params.FileType,'ufmf'),
   
   try
 
+    addToStatus(handles,'Computing Quick Stats (wrapUpVideo)');
     [handles.QuickStats,success,errmsg,warnings] = computeQuickStats(handles.ExperimentDirectory,...
       handles.ComputeQuickStatsParams{:});
   

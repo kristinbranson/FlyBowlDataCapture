@@ -75,7 +75,6 @@ while toc(curTime) < duration,
   pause(0.1);
   if FBDC_DIDHALT(GUIi),
     fprintf('In RunStimulusProtocol, detected FBDC_DIDHALT == true, signifying experiment aborted.\n');
-    addToStatus(handles,'In RunStimulusProtocol, detected FBDC_DIDHALT == true, signifying experiment aborted.');
     didhalt = true;
     break;
   end
@@ -87,6 +86,7 @@ end
 fprintf(expTimeFileID, '%.10f,stop_experiment,%d\n', now);
 stopstatus = handles.ChRStuff.hLEDController.getExperimentStatus();
 handles.ChRStuff.hLEDController.stopExperiment();
+handles = guidata(handles.figure_main);
 addToStatus(handles,'Experiment status when stopped:');
 if isempty(stopstatus),
   addToStatus(handles,'NULL');
@@ -204,7 +204,11 @@ end
 % end
 
 %to guaranttee the leds are off at the end
-handles.ChRStuff.hLEDController.turnOffLED();
+if ~isempty(handles.ChRStuff.hLEDController),
+  handles.ChRStuff.hLEDController.turnOffLED();
+end
+handles = CloseLEDControllerConnection(handles);
+
 %flyBowl_LED_control(handles.ChRStuff.hLEDController, 'OFF',[],false);
 %setappdata(handles.figure_main,'ChRExpRunning',false);
 
