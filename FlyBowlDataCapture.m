@@ -2227,6 +2227,15 @@ end
   
 %end
 
+handles = resetTempProbe2(handles);
+handles = unsetCamera(handles);
+s = 'Reset camera and temperature probe.';
+if exist('hwaitbar','var') && ishandle(hwaitbar),
+  waitbar(.3,hwaitbar,s);
+else
+  hwaitbar = waitbar(.3,s);
+end
+
 % save metadata
 if handles.MetaDataNeedsSave,
   answer = questdlg('Save MetaData before closing?','Save MetaData?','Yes','No','Yes');
@@ -2327,16 +2336,10 @@ else
   hwaitbar = waitbar(.9,s);
 end
 
-if didabort,
-  % enable disabled menus
-  set(handles.menu_File_New,'Enable','on');
-  set(handles.menu_File_Close,'Enable','on');
-  set(handles.menu_Quit,'Enable','on');
-  
-else  
-  % enable Done button
-  set(handles.pushbutton_Done,'Enable','on','BackgroundColor',handles.Done_bkgdcolor,'String','Done');
-end
+% enable disabled menus
+set(handles.menu_File_New,'Enable','on');
+set(handles.menu_File_Close,'Enable','on');
+set(handles.menu_Quit,'Enable','on');
 s = 'Enabled menus';
 if exist('hwaitbar','var') && ishandle(hwaitbar),
   waitbar(.95,hwaitbar,s);
