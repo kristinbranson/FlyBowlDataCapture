@@ -251,8 +251,8 @@ handles = SaveMetaData(handles);
 
 hwait = mywaitbar(.99,hwait,'Closing video file: Updating GUI...');
 
-% enable Done button
-set(handles.pushbutton_Done,'Enable','on','BackgroundColor',handles.Done_bkgdcolor,'String','Done');
+% % enable Done button
+% set(handles.pushbutton_Done,'Enable','on','BackgroundColor',handles.Done_bkgdcolor,'String','Done');
 
 % set recording status
 set(handles.text_Status_Recording,'String','Finished','BackgroundColor',handles.grayed_bkgdcolor);

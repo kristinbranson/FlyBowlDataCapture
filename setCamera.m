@@ -66,7 +66,7 @@ if strcmpi(handles.params.Imaq_Adaptor,'bias'),
   totalrecordtime = handles.params.RecordTime;
   if isfield(handles.params,'ExperimentStartDelay'),
     totalrecordtime = totalrecordtime + handles.params.ExperimentStartDelay;
-    fprintf('Total record time = %f s\n',totalrecordtime);
+    addToStatus(handles,sprintf('Total record time = %f s',totalrecordtime));
   end
   PreviewParams.RecordTimeDays = totalrecordtime/86400;
   PreviewParams.StartRecording_Time_datenum = handles.StartRecording_Time_datenum;

@@ -7,3 +7,5 @@ if ~isempty(tmp),
 end
 
 CleanSemaphores;
+fprintf('Closing all open file handles...\n');
+fclose('all');

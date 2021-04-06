@@ -1420,7 +1420,7 @@ function pushbutton_Abort_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-fprintf('Abort button pushed.\n');
+addToStatus(handles,{'Abort button pushed.'});
 [handles,didcancel] = CloseExperiment(handles);
 if didcancel,
   return;
@@ -1569,7 +1569,7 @@ end
 % record configuration
 handles = RecordConfiguration(handles);
 
-% enable file menus
+% % enable file menus
 set(handles.menu_File_New,'Enable','on');
 set(handles.menu_File_Close,'Enable','on');
 set(handles.menu_Quit,'Enable','on');
@@ -2166,7 +2166,8 @@ end
 
 % store that we are trying to close
 global FBDC_DIDHALT; 
-fprintf('In CloseExperiment, setting FBDC_DIDHALT = true\n');
+
+addToStatus(handles,'In CloseExperiment, setting FBDC_DIDHALT = true');
 FBDC_DIDHALT(handles.GUIi) = true; 
 
 hwaitbar = waitbar(.1,'Closing experiment');
@@ -2326,12 +2327,16 @@ else
   hwaitbar = waitbar(.9,s);
 end
 
-% enable disabled menus
-set(handles.menu_File_New,'Enable','on');
-set(handles.menu_File_Close,'Enable','on');
-set(handles.menu_Quit,'Enable','on');
-
-
+if didabort,
+  % enable disabled menus
+  set(handles.menu_File_New,'Enable','on');
+  set(handles.menu_File_Close,'Enable','on');
+  set(handles.menu_Quit,'Enable','on');
+  
+else  
+  % enable Done button
+  set(handles.pushbutton_Done,'Enable','on','BackgroundColor',handles.Done_bkgdcolor,'String','Done');
+end
 s = 'Enabled menus';
 if exist('hwaitbar','var') && ishandle(hwaitbar),
   waitbar(.95,hwaitbar,s);
@@ -2349,10 +2354,14 @@ function handles = EnableGUI(handles)
 
 chil = findobj(handles.figure_main,'type','uicontrol');
 handles.menus_disable = [handles.menu_Edit,handles.menu_File_SaveMetaData,handles.menu_File_Close];
+pbs_leavealone = {'pushbutton_Done','pushbutton_Abort','pushbutton_StartRecording'};
 chil = [chil;handles.menus_disable'];
 for i = 1:length(chil),
   if ishandle(chil(i)) && ~strcmpi(get(chil(i),'Enable'),'on') && ...
       (handles.IsAdvancedMode || ~ismember(chil(i),handles.advanced_controls)),
+    if ismember(get(chil(i),'tag'),pbs_leavealone),
+      continue;
+    end
     try
       set(chil(i),'Enable','on');
     catch %#ok<CTCH>
