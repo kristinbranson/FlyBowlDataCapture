@@ -5,6 +5,10 @@ GUIi = handles.GUIi;
 if numel(FBDC_DIDHALT) < GUIi,
   FBDC_DIDHALT(GUIi) = false;
 end
+if FBDC_DIDHALT(GUIi),
+  addToStatus('PROBLEM!!! FBDC_DIDHALT == true at start of RunStimulusProtocol, setting to false...');
+  FBDC_DIDHALT(GUIi) = false;
+end
 
 success = false;
 
@@ -71,6 +75,7 @@ while toc(curTime) < duration,
   pause(0.1);
   if FBDC_DIDHALT(GUIi),
     fprintf('In RunStimulusProtocol, detected FBDC_DIDHALT == true, signifying experiment aborted.\n');
+    addToStatus(handles,'In RunStimulusProtocol, detected FBDC_DIDHALT == true, signifying experiment aborted.');
     didhalt = true;
     break;
   end

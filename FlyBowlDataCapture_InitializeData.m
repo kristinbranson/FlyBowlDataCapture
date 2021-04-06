@@ -1,5 +1,11 @@
 function handles = FlyBowlDataCapture_InitializeData(handles)
 
+global FBDC_DIDHALT;
+if numel(FBDC_DIDHALT) >= handles.GUIi && FBDC_DIDHALT(handles.GUIi),
+  warning('FBDC_DIDHALT set to true at start of InitializeData, resetting to false');
+  FBDC_DIDHALT(handles.GUIi) = false;
+end
+
 % data capture code version
 handles.version = '??';
 if exist('version.txt','file'),
