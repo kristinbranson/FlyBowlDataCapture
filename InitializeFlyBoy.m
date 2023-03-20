@@ -8,7 +8,8 @@ if ~ismember(jarpath,javaclasspath)
 end
 % also connect to the database
 drv = com.mysql.jdbc.Driver;
-url = 'jdbc:mysql://prd-db.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
+url = 'jdbc:mysql://flyboy-mysql-db.int.janelia.org:3306/flyboy?user=flyFRead&password=zfs88BeYwbYW9Vza';
+% url = 'jdbc:mysql://prd-db.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
 %url = 'jdbc:mysql://10.40.11.14:3306/flyboy?user=flyfRead&password=flyfRead';
 %url = 'jdbc:mysql://mysql2.int.janelia.org:3306/flyboy?user=flyfRead&password=flyfRead';
 con = drv.connect(url,'');
