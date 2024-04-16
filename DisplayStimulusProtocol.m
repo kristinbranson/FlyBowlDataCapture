@@ -1,6 +1,6 @@
 function hax = DisplayStimulusProtocol(protocol,varargin)
 
-hax = myparse(varargin,'hax',[]);
+[hax,isRGG] = myparse(varargin,'hax',[],'isRGG',false);
 
 if isempty(hax) || ~ishandle(hax),
   hfig = figure;
@@ -52,7 +52,7 @@ for stepIndex = 1:length(protocol.stepNum)
         end
     end
     
-    if oneStep(stepIndex).BluIntensity > 0
+    if oneStep(stepIndex).BluIntensity > 0 && ~isRGG
         for index = 1:oneStep(stepIndex).BluIteration
             numPntOn = oneStep(stepIndex).BluPulsePeriod*oneStep(stepIndex).BluPulseNum;
             Yb(BluOnStartPnt:BluOnStartPnt+numPntOn-1) = ones(numPntOn,1).*powerB;

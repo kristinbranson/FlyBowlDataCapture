@@ -26,7 +26,12 @@ end
 if ~success,
   return;
 end
-hComm.ExperimentSteps = ProtocolExperimentSteps(hComm.protocol);
+% set blue channel data from green protocol fields if red-green-green board
+if isfield(params,'isRGG') && params.isRGG
+    hComm.ExperimentSteps = ProtocolExperimentStepsRGG(hComm.protocol);
+else
+    hComm.ExperimentSteps = ProtocolExperimentSteps(hComm.protocol);
+end
 
 % compute total stimulus time
 hComm.TotalDuration_Seconds = sum(hComm.protocol.duration)/1000; % in ms

@@ -58,13 +58,17 @@ res.GpulsePeriod = indata(:,12);
 res.GpulseNum = indata(:,13);
 res.GoffTime = indata(:,14);
 res.Giteration = indata(:,15);
+
 %blue light
-res.Bintensity = indata(:,16);
-res.BpulseWidth = indata(:,17);
-res.BpulsePeriod = indata(:,18);
-res.BpulseNum = indata(:,19);
-res.BoffTime = indata(:,20);
-res.Biteration = indata(:,21);
+%only load blue light data if RGB protocol file
+if size(indata,2) > 15
+    res.Bintensity = indata(:,16);
+    res.BpulseWidth = indata(:,17);
+    res.BpulsePeriod = indata(:,18);
+    res.BpulseNum = indata(:,19);
+    res.BoffTime = indata(:,20);
+    res.Biteration = indata(:,21);
+end
 
 res.ProtocolData = indata;
 res.ProtocolHeader = intext(1,:);
