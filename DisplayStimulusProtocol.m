@@ -6,9 +6,11 @@ if isempty(hax) || ~ishandle(hax),
   hfig = figure;
   hax = gca;
 end
-
+if isRGG
+  oneStep = ProtocolExperimentStepsRGG(protocol);
+else
 oneStep = ProtocolExperimentSteps(protocol);
-
+end
 %% update the protocol in the axes
 cla(hax);
 
@@ -52,12 +54,14 @@ for stepIndex = 1:length(protocol.stepNum)
         end
     end
     
-    if oneStep(stepIndex).BluIntensity > 0 && ~isRGG
+    if ~isRGG
+    if oneStep(stepIndex).BluIntensity > 0 
         for index = 1:oneStep(stepIndex).BluIteration
             numPntOn = oneStep(stepIndex).BluPulsePeriod*oneStep(stepIndex).BluPulseNum;
             Yb(BluOnStartPnt:BluOnStartPnt+numPntOn-1) = ones(numPntOn,1).*powerB;
             BluOnStartPnt = BluOnStartPnt + numPntOn + oneStep(stepIndex).BluOffTime-1;
         end
+    end
     end
 
     stepStartPnt = stepStartPnt + oneStep(stepIndex).Duration*1000;
@@ -75,9 +79,9 @@ protocolRL = line(X,Yr+2,'color','r','LineStyle','-','Parent',hax);
 hold(hax,'on');
 protocolGL = line(X,Yg+1,'color','g','LineStyle','-','Parent',hax);
 grid(hax,'off');
-
+if ~isRGG
 protocolBL = line(X,Yb,'color','b','LineStyle','-','Parent',hax);
-
+end
 stepStartSec = 0;
 
 %plot steps start and stop line
