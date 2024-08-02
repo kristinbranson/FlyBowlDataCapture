@@ -7,8 +7,8 @@
 
 % MovieFile = '/groups/branson/home/robiea/Downloads/movie_cam_0_date_2020_08_07_time_14_02_16_v001.ufmf';
 reflineval = 215;
-%MovieFile = 'C:\Users\bransonk\Videos\bias_video_v002.ufmf'
-MovieFile = 'C:\Users\bransonk\Videos\BLUeveness_v002.ufmf'
+MovieFile = 'C:\Users\bransonk\Videos\bias_video_v013.ufmf'
+% MovieFile = 'C:\Users\bransonk\Videos\BLUeveness_v002.ufmf'
 % MovieFile = 'E:\debug_data\locomotionGtACR1_emptySplit24m_Unknown_RigB_20210310T174924\movie.ufmf'
 [moviepath,moviename] = fileparts(MovieFile);
 
